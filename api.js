@@ -50,11 +50,23 @@ export async function streamProposal({ vision, selections, model, provider, onCh
         const json = JSON.parse(data);
         let delta = '';
 
-        // Anthropic format
+        // CLAUDE format
         if (json.type === 'content_block_delta') {
           delta = json.delta?.text || '';
         }
         // OpenAI / DeepSeek format
+        else if (json.choices?.[0]?.delta?.content) {
+          delta = json.choices[0].delta.content;
+        }
+// LEONARDO / DeepSeek format
+        else if (json.choices?.[0]?.delta?.content) {
+          delta = json.choices[0].delta.content;
+        }
+// DeepSeek format
+        else if (json.choices?.[0]?.delta?.content) {
+          delta = json.choices[0].delta.content;
+        }
+//  MESHI format
         else if (json.choices?.[0]?.delta?.content) {
           delta = json.choices[0].delta.content;
         }
