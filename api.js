@@ -13,8 +13,8 @@
  * @param {Object} opts.selections  - { obj, vis, bud }
  * @param {string} opts.model       - Modelo elegido
  * @param {string} opts.provider    - 'anthropic' | 'openai' | 'deepseek'
- * @param {(chunk: string) => void} opts.onChunk  - Callback por cada delta
- * @param {() => void}              opts.onDone   - Callback al terminar
+ * @paramparam {(chunk: string) => void} opts.onChunk  - Callback por cada delta
+ * @ {() => void}              opts.onDone   - Callback al terminar
  * @returns {Promise<string>}       - Texto completo
  */
 export async function streamProposal({ vision, selections, model, provider, onChunk, onDone }) {
