@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   }
 
   const { prompt, style = 'realistic', taskId } = req.body;
-  const key = process.env.MESHY_API_KEY;
+  const key = process.env.MESHI;
 
   if (!key) {
     return res.status(500).json({ error: 'MESHY_API_KEY not configured' });
