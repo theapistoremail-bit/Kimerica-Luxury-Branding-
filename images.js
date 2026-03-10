@@ -11,7 +11,7 @@ export default async function handler(req, res) {
 
   const { prompt, count = 4, width = 512, height = 512 } = req.body;
 
-  const key = process.env.LEONARDO_API_KEY;
+  const key = process.env.LEONARDO;
   if (!key) {
     return res.status(500).json({ error: 'LEONARDO_API_KEY not configured' });
   }
