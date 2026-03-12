@@ -895,32 +895,586 @@ document.querySelectorAll('button,a,.c-card,.tag,.port-card,.ai-card,.f-row,.msg
 (function loop(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;$r.style.transform=`translate(${rx-16}px,${ry-16}px)`;requestAnimationFrame(loop)})();
 
 // ══════════════════════════════════════════
-// BG CANVAS (Three.js grid)
+//<!-- ══════════════════════════════════════════ -->
+<!-- MULTIMODAL PREVIEW CANVAS                  -->
+<!-- Reemplaza bg-canvas — pega donde estaba    -->
+<!-- ══════════════════════════════════════════ -->
+
+<canvas id="bg-canvas"></canvas>
+
+<div id="preview-panel" style="
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:1;
+  background:#060608;
+  flex-direction:column;
+">
+  <!-- Tab bar -->
+  <div id="preview-tabs" style="
+    display:flex;
+    align-items:center;
+    gap:2px;
+    padding:0 16px;
+    height:42px;
+    background:#060608;
+    border-bottom:1px solid #111;
+    flex-shrink:0;
+  ">
+    <div id="tab-btns" style="display:flex;gap:2px;flex:1"></div>
+    <button onclick="closePreview()" style="
+      background:none;border:none;color:#333;font-size:18px;
+      cursor:pointer;padding:4px 10px;line-height:1;
+      transition:color .2s;
+    " onmouseenter="this.style.color='#FF1A1A'" onmouseleave="this.style.color='#333'">✕</button>
+  </div>
+
+  <!-- Content area -->
+  <div id="preview-content" style="flex:1;position:relative;overflow:hidden;"></div>
+
+  <!-- Bottom bar -->
+  <div style="
+    height:32px;flex-shrink:0;
+    background:#050505;border-top:1px solid #0d0d0d;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 16px;
+  ">
+    <span id="preview-status" style="font-family:monospace;font-size:9px;letter-spacing:3px;color:#222;">KIMERICA PREVIEW</span>
+    <button onclick="downloadPreviewPDF()" id="dl-btn" style="
+      font-family:monospace;font-size:8px;letter-spacing:3px;
+      background:none;border:1px solid #1a1a1a;color:#333;
+      padding:4px 14px;cursor:pointer;border-radius:2px;transition:all .2s;
+    " onmouseenter="this.style.borderColor='#FF1A1A';this.style.color='#FF1A1A'"
+       onmouseleave="this.style.borderColor='#1a1a1a';this.style.color='#333'">
+      ⬇ PREVIEW PDF
+    </button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// BG CANVAS — Three.js grid (estado inicial)
 // ══════════════════════════════════════════
 (function initBG(){
-  const cv=document.getElementById('bg-canvas');
-  const W=()=>window.innerWidth,H=()=>window.innerHeight;
-  const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:false});
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
-  renderer.setClearColor(0x060608,1); renderer.setSize(W(),H());
-  const scene=new THREE.Scene();
-  const cam=new THREE.PerspectiveCamera(55,W()/H(),.1,200);
-  cam.position.set(0,2,12); cam.lookAt(0,0,0);
-  const gridMat=new THREE.LineBasicMaterial({color:0xFF1A1A,opacity:.13,transparent:true});
-  const gridGroup=new THREE.Group(); scene.add(gridGroup);
-  const COLS=28,ROWS=18,GW=30,GH=16;
-  for(let r=0;r<=ROWS;r++){const pts=[];const y=-GH/2+(r/ROWS)*GH;for(let i=0;i<=80;i++){const t=i/80;const x=-GW/2+t*GW;const lift=Math.pow((t*2-1),2)*2.5;pts.push(new THREE.Vector3(x,y+lift,0))}gridGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),gridMat))}
-  for(let c=0;c<=COLS;c++){const pts=[];const xBase=-GW/2+(c/COLS)*GW;for(let i=0;i<=60;i++){const t=i/60;const y=-GH/2+t*GH;const xConv=xBase*(1-t*0.35);const lift=Math.pow(((c/COLS)*2-1),2)*2.5*(1-t);pts.push(new THREE.Vector3(xConv,y+lift,0))}gridGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),gridMat))}
-  gridGroup.position.set(0,-2,-4); gridGroup.rotation.x=-.25;
-  const accentMat=new THREE.LineBasicMaterial({color:0xFF1A1A,opacity:.55,transparent:true});
-  [-1,1].forEach(sign=>{const pts2=[];for(let i=0;i<=80;i++){const t=i/80;const x=-GW/2+t*GW;const lift=Math.pow((t*2-1),2)*2.5;pts2.push(new THREE.Vector3(x,sign*1.5+lift,0))}const ln=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts2),accentMat);ln.position.copy(gridGroup.position);ln.rotation.copy(gridGroup.rotation);scene.add(ln)});
-  const pGeo=new THREE.BufferGeometry();const pN=200,pPos=new Float32Array(pN*3);for(let i=0;i<pN*3;i+=3){pPos[i]=(Math.random()-.5)*40;pPos[i+1]=(Math.random()-.5)*20;pPos[i+2]=(Math.random()-.5)*20}pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));scene.add(new THREE.Points(pGeo,new THREE.PointsMaterial({color:0xFF1A1A,size:.04,opacity:.4,transparent:true})));
-  let f=0;let camMx=0,camMy=0;
-  document.addEventListener('mousemove',e=>{camMx=(e.clientX/window.innerWidth-.5)*.4;camMy=-(e.clientY/window.innerHeight-.5)*.3});
-  window.addEventListener('resize',()=>{renderer.setSize(W(),H());cam.aspect=W()/H();cam.updateProjectionMatrix()});
-  (function loop(){requestAnimationFrame(loop);f+=.003;gridGroup.position.z=Math.sin(f)*.3-4;gridGroup.position.x=Math.sin(f*.5)*.2;cam.position.x+=(camMx-cam.position.x)*.02;cam.position.y+=(camMy+2-cam.position.y)*.02;cam.lookAt(0,0,0);renderer.render(scene,cam)})();
+  const cv = document.getElementById('bg-canvas');
+  if (!cv || !window.THREE) return;
+  cv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:0;display:block;';
+
+  const W = () => window.innerWidth, H = () => window.innerHeight;
+  const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: false });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  renderer.setClearColor(0x060608, 1);
+  renderer.setSize(W(), H());
+
+  const scene = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(55, W() / H(), 0.1, 200);
+  cam.position.set(0, 2, 12); cam.lookAt(0, 0, 0);
+
+  const gridMat = new THREE.LineBasicMaterial({ color: 0xFF1A1A, opacity: .13, transparent: true });
+  const gridGroup = new THREE.Group(); scene.add(gridGroup);
+  const COLS = 28, ROWS = 18, GW = 30, GH = 16;
+
+  for (let r = 0; r <= ROWS; r++) {
+    const pts = [], y = -GH/2 + (r/ROWS)*GH;
+    for (let i = 0; i <= 80; i++) {
+      const t = i/80, x = -GW/2 + t*GW, lift = Math.pow((t*2-1),2)*2.5;
+      pts.push(new THREE.Vector3(x, y+lift, 0));
+    }
+    gridGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gridMat));
+  }
+  for (let c = 0; c <= COLS; c++) {
+    const pts = [], xBase = -GW/2 + (c/COLS)*GW;
+    for (let i = 0; i <= 60; i++) {
+      const t = i/60, y = -GH/2 + t*GH;
+      const xConv = xBase*(1 - t*0.35), lift = Math.pow(((c/COLS)*2-1),2)*2.5*(1-t);
+      pts.push(new THREE.Vector3(xConv, y+lift, 0));
+    }
+    gridGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gridMat));
+  }
+  gridGroup.position.set(0,-2,-4); gridGroup.rotation.x = -.25;
+
+  const accentMat = new THREE.LineBasicMaterial({ color: 0xFF1A1A, opacity: .55, transparent: true });
+  [-1,1].forEach(sign => {
+    const pts2 = [];
+    for (let i = 0; i <= 80; i++) {
+      const t = i/80, x = -GW/2 + t*GW, lift = Math.pow((t*2-1),2)*2.5;
+      pts2.push(new THREE.Vector3(x, sign*1.5+lift, 0));
+    }
+    const ln = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts2), accentMat);
+    ln.position.copy(gridGroup.position); ln.rotation.copy(gridGroup.rotation);
+    scene.add(ln);
+  });
+
+  const pGeo = new THREE.BufferGeometry();
+  const pN = 200, pPos = new Float32Array(pN*3);
+  for (let i = 0; i < pN*3; i+=3) {
+    pPos[i] = (Math.random()-.5)*40; pPos[i+1] = (Math.random()-.5)*20; pPos[i+2] = (Math.random()-.5)*20;
+  }
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos,3));
+  scene.add(new THREE.Points(pGeo, new THREE.PointsMaterial({ color:0xFF1A1A, size:.04, opacity:.4, transparent:true })));
+
+  let f = 0, camMx = 0, camMy = 0;
+  document.addEventListener('mousemove', e => {
+    camMx = (e.clientX/window.innerWidth-.5)*.4;
+    camMy = -(e.clientY/window.innerHeight-.5)*.3;
+  });
+  window.addEventListener('resize', () => {
+    renderer.setSize(W(),H()); cam.aspect = W()/H(); cam.updateProjectionMatrix();
+  });
+
+  // Expose renderer so we can pause it
+  window._bgRenderer = renderer;
+  window._bgLoop = true;
+
+  (function loop(){
+    if (!window._bgLoop) return;
+    requestAnimationFrame(loop); f+=.003;
+    gridGroup.position.z = Math.sin(f)*.3-4;
+    gridGroup.position.x = Math.sin(f*.5)*.2;
+    cam.position.x += (camMx-cam.position.x)*.02;
+    cam.position.y += (camMy+2-cam.position.y)*.02;
+    cam.lookAt(0,0,0);
+    renderer.render(scene,cam);
+  })();
 })();
 
+// ══════════════════════════════════════════
+// PREVIEW PANEL — state machine
+// ══════════════════════════════════════════
+window.PREVIEW = {
+  tabs: [],      // { id, label, icon, type, content }
+  active: null,
+};
+
+const ICONS = { web:'🌐', model3d:'⬡', image:'◆', brand:'▣', pdf:'📄' };
+
+function openPreview() {
+  // Hide bg-canvas, show panel
+  const bg = document.getElementById('bg-canvas');
+  const panel = document.getElementById('preview-panel');
+  bg.style.display = 'none';
+  panel.style.display = 'flex';
+  window._bgLoop = false;
+  setStatus('READY');
+}
+
+function closePreview() {
+  const bg = document.getElementById('bg-canvas');
+  const panel = document.getElementById('preview-panel');
+  panel.style.display = 'none';
+  bg.style.display = 'block';
+  window._bgLoop = true;
+  // Restart loop
+  if (window._bgRenderer) {
+    (function loop(){
+      if (!window._bgLoop) return;
+      requestAnimationFrame(loop);
+      window._bgRenderer.render;
+    })();
+  }
+  // Actually just reload the bg — simplest restart
+  window._bgLoop = true;
+  initBGLoop();
+}
+
+function initBGLoop() {
+  // Re-trigger animation by reloading the stored animate fn
+  if (window._bgAnimate) window._bgAnimate();
+}
+
+function setStatus(txt) {
+  const el = document.getElementById('preview-status');
+  if (el) el.textContent = txt;
+}
+
+function renderTabs() {
+  const bar = document.getElementById('tab-btns');
+  bar.innerHTML = '';
+  PREVIEW.tabs.forEach(tab => {
+    const btn = document.createElement('button');
+    btn.style.cssText = `
+      display:flex;align-items:center;gap:6px;
+      padding:0 14px;height:42px;
+      background:${tab.id===PREVIEW.active?'#0d0d10':'transparent'};
+      border:none;border-bottom:2px solid ${tab.id===PREVIEW.active?'#FF1A1A':'transparent'};
+      color:${tab.id===PREVIEW.active?'#f8f6f2':'#444'};
+      font-family:monospace;font-size:9px;letter-spacing:3px;
+      cursor:pointer;transition:all .15s;white-space:nowrap;
+    `;
+    btn.innerHTML = `<span>${ICONS[tab.type]||'◉'}</span>${tab.label.toUpperCase()}`;
+    btn.onclick = () => activateTab(tab.id);
+    // Close x per tab
+    const x = document.createElement('span');
+    x.textContent = '×';
+    x.style.cssText = 'color:#333;margin-left:6px;font-size:14px;line-height:1;';
+    x.onclick = e => { e.stopPropagation(); removeTab(tab.id); };
+    btn.appendChild(x);
+    bar.appendChild(btn);
+  });
+}
+
+function activateTab(id) {
+  PREVIEW.active = id;
+  renderTabs();
+  renderContent();
+}
+
+function removeTab(id) {
+  PREVIEW.tabs = PREVIEW.tabs.filter(t => t.id !== id);
+  if (PREVIEW.active === id) {
+    PREVIEW.active = PREVIEW.tabs.length ? PREVIEW.tabs[PREVIEW.tabs.length-1].id : null;
+  }
+  if (!PREVIEW.tabs.length) { closePreview(); return; }
+  renderTabs();
+  renderContent();
+}
+
+function renderContent() {
+  const area = document.getElementById('preview-content');
+  area.innerHTML = '';
+  const tab = PREVIEW.tabs.find(t => t.id === PREVIEW.active);
+  if (!tab) return;
+
+  if (tab.type === 'web') {
+    // Interactive iframe — no code visible, just the rendered page
+    const frame = document.createElement('iframe');
+    frame.sandbox = 'allow-scripts allow-forms allow-same-origin';
+    frame.style.cssText = 'width:100%;height:100%;border:none;display:block;';
+    if (tab.content.startsWith('http')) {
+      frame.src = tab.content;
+    } else {
+      frame.srcdoc = tab.content; // full HTML string
+    }
+    area.appendChild(frame);
+    setStatus('WEB · INTERACTIVE');
+  }
+
+  else if (tab.type === 'model3d') {
+    // Three.js scene in a dedicated canvas
+    const cv = document.createElement('canvas');
+    cv.style.cssText = 'width:100%;height:100%;display:block;';
+    area.appendChild(cv);
+    launch3DScene(cv, tab.content); // tab.content = scene config or GLB url
+    setStatus('3D · REAL-TIME');
+  }
+
+  else if (tab.type === 'image') {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#060608;';
+    const img = document.createElement('img');
+    img.src = tab.content;
+    img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
+    wrap.appendChild(img);
+    area.appendChild(wrap);
+    setStatus('IMAGE');
+  }
+
+  else if (tab.type === 'brand') {
+    // Inline brand board
+    area.innerHTML = buildBrandBoard(tab.content);
+    setStatus('BRAND SYSTEM');
+  }
+
+  else if (tab.type === 'pdf') {
+    const frame = document.createElement('iframe');
+    frame.src = tab.content;
+    frame.style.cssText = 'width:100%;height:100%;border:none;';
+    area.appendChild(frame);
+    setStatus('DOCUMENT');
+  }
+}
+
+// ── Add tab from anywhere in the app ──────────────────
+// Usage examples:
+//   PREVIEW.add('web', 'Website', htmlString)
+//   PREVIEW.add('model3d', 'Logo 3D', { type:'cube' })
+//   PREVIEW.add('image', 'Logotype', 'data:image/png;base64,...')
+//   PREVIEW.add('brand', 'Branding', { colors, fonts, name })
+window.PREVIEW.add = function(type, label, content) {
+  const id = type + '_' + Date.now();
+  PREVIEW.tabs.push({ id, label, icon: ICONS[type], type, content });
+  PREVIEW.active = id;
+  openPreview();
+  renderTabs();
+  renderContent();
+};
+
+// ── 3D scene launcher (Three.js) ──────────────────────
+function launch3DScene(canvas, config) {
+  if (!window.THREE) return;
+  const THREE = window.THREE;
+  const W = () => canvas.clientWidth, H = () => canvas.clientHeight;
+  canvas.width = W(); canvas.height = H();
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setClearColor(0x060608, 1);
+  renderer.setSize(W(), H());
+
+  const scene = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(50, W()/H(), 0.1, 100);
+  cam.position.set(0, 0, 5);
+
+  // Default: branded rotating cube
+  const geo = new THREE.BoxGeometry(2, 2, 2);
+  const mat = new THREE.MeshStandardMaterial({ color: 0xFF1A1A, metalness: 0.8, roughness: 0.2 });
+  const mesh = new THREE.Mesh(geo, mat);
+  scene.add(mesh);
+
+  // Wireframe overlay
+  const wmat = new THREE.LineBasicMaterial({ color: 0xFF1A1A, opacity: 0.3, transparent: true });
+  scene.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo), wmat));
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+  const dlight = new THREE.DirectionalLight(0xFF1A1A, 1.2);
+  dlight.position.set(5, 5, 5); scene.add(dlight);
+
+  // If config provides a GLB url, load it
+  if (typeof config === 'string' && config.endsWith('.glb') && window.THREE.GLTFLoader) {
+    const loader = new THREE.GLTFLoader();
+    loader.load(config, gltf => { scene.remove(mesh); scene.add(gltf.scene); });
+  }
+
+  let t = 0;
+  (function loop() {
+    requestAnimationFrame(loop); t += 0.008;
+    mesh.rotation.y = t; mesh.rotation.x = t * 0.4;
+    renderer.render(scene, cam);
+  })();
+}
+
+// ── Brand board HTML builder ──────────────────────────
+function buildBrandBoard(data) {
+  const colors = data.colors || [['#060608','Obsidian'],['#FF1A1A','Brand Red'],['#f8f6f2','Ivory']];
+  const fonts = data.fonts || ['Cormorant Garamond','Syne'];
+  const name = data.name || 'KIMERICA';
+  const swatches = colors.map(([h,n]) =>
+    `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+      <div style="width:36px;height:36px;background:${h};border-radius:4px;border:1px solid #222;flex-shrink:0"></div>
+      <div><p style="color:#ccc;font-size:12px;margin:0">${n}</p><p style="color:#333;font-size:10px;font-family:monospace;margin:0">${h}</p></div>
+    </div>`
+  ).join('');
+
+  return `
+  <div style="padding:32px;height:100%;overflow:auto;background:#060608;color:#f8f6f2;font-family:Georgia,serif">
+    <p style="color:#FF1A1A;font-size:9px;letter-spacing:5px;font-family:monospace;margin-bottom:20px">BRAND SYSTEM</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px">
+      <div>
+        <p style="color:#333;font-size:9px;letter-spacing:4px;font-family:monospace;margin-bottom:14px">IDENTITY</p>
+        <p style="font-size:36px;font-weight:700;letter-spacing:8px;background:linear-gradient(90deg,#FF1A1A,#ff6b1a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">${name}</p>
+        <p style="color:#333;font-size:10px;font-family:monospace;letter-spacing:4px">CREATIVE STUDIO</p>
+      </div>
+      <div>
+        <p style="color:#333;font-size:9px;letter-spacing:4px;font-family:monospace;margin-bottom:14px">COLORS</p>
+        ${swatches}
+      </div>
+      <div>
+        <p style="color:#333;font-size:9px;letter-spacing:4px;font-family:monospace;margin-bottom:14px">TYPOGRAPHY</p>
+        <p style="color:#1e1e1e;font-size:8px;letter-spacing:3px;font-family:monospace;margin-bottom:6px">DISPLAY</p>
+        <p style="font-size:38px;line-height:1;margin-bottom:16px">Aa Bb</p>
+        <p style="color:#1e1e1e;font-size:8px;letter-spacing:3px;font-family:monospace;margin-bottom:6px">SECONDARY</p>
+        <p style="font-family:monospace;font-size:14px;letter-spacing:6px;color:#666">ABCDEFG</p>
+        <div style="margin-top:20px;padding:12px;background:#080808;border:1px solid #111;border-radius:4px">
+          <p style="color:#333;font-size:8px;letter-spacing:3px;font-family:monospace;margin-bottom:6px">DIRECTION</p>
+          <p style="color:#FF1A1A;font-size:12px">${data.direction || 'Luxury Black · Minimal'}</p>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════
+// DOWNLOAD — one-page watermarked PDF
+// ══════════════════════════════════════════
+async function downloadPreviewPDF() {
+  const btn = document.getElementById('dl-btn');
+  btn.textContent = 'GENERATING...';
+  btn.style.pointerEvents = 'none';
+
+  try {
+    // Capture current preview area as image
+    const area = document.getElementById('preview-content');
+    const tab = PREVIEW.tabs.find(t => t.id === PREVIEW.active);
+    if (!tab) { btn.textContent = '⬇ PREVIEW PDF'; btn.style.pointerEvents = ''; return; }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 1240; canvas.height = 1754;
+    const ctx = canvas.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#060608'; ctx.fillRect(0,0,1240,1754);
+
+    // Header
+    ctx.fillStyle = '#0a0a0c'; ctx.fillRect(0,0,1240,110);
+    ctx.strokeStyle = '#FF1A1A'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(0,110); ctx.lineTo(1240,110); ctx.stroke();
+    ctx.fillStyle = '#FF1A1A'; ctx.font = 'bold 46px serif';
+    ctx.fillText('KIMERICA', 60, 72);
+    ctx.fillStyle = '#333'; ctx.font = '13px monospace';
+    ctx.fillText('PROJECT PREVIEW  ·  ' + new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}), 60, 96);
+
+    // Watermark
+    ctx.save();
+    ctx.translate(620,877); ctx.rotate(-Math.PI/6);
+    ctx.globalAlpha = 0.04; ctx.fillStyle = '#FF1A1A';
+    ctx.font = 'bold 120px serif'; ctx.textAlign = 'center';
+    ['PREVIEW','PREVIEW','PREVIEW'].forEach((t,i) => ctx.fillText(t, 0, (i-1)*160));
+    ctx.globalAlpha = 1; ctx.restore(); ctx.textAlign = 'left';
+
+    // Content snapshot — brand board or text summary
+    const S = window.S || {};
+    const sc = S.proposal || {};
+    let y = 150;
+
+    if (tab.type === 'brand' || tab.type === 'web') {
+      // Scope
+      ctx.fillStyle = '#FF1A1A'; ctx.font = '10px monospace';
+      ctx.fillText('SCOPE OF WORK', 60, y); y += 32;
+      const items = [
+        ['Creative Direction', sc.sc1||'$2,800'], ['Visual Identity', sc.sc2||'$4,200'],
+        ['Digital Experience', sc.sc3||'$5,500'], ['3D / AI Elements', sc.sc4||'$3,800'],
+      ];
+      for (const [k,v] of items) {
+        ctx.fillStyle = '#111'; ctx.fillRect(60, y-18, 560, 1);
+        ctx.fillStyle = '#777'; ctx.font = '15px Georgia'; ctx.fillText(k, 60, y);
+        ctx.fillStyle = '#f8f6f2'; ctx.font = '15px monospace'; ctx.textAlign = 'right';
+        ctx.fillText(v, 620, y); ctx.textAlign = 'left'; y += 40;
+      }
+      ctx.fillStyle = '#FF1A1A'; ctx.fillRect(60, y-8, 560, 1.5); y += 16;
+      ctx.fillStyle = '#FF1A1A'; ctx.font = 'bold 18px monospace';
+      ctx.textAlign = 'right'; ctx.fillText('$'+(sc.total||'16,300'), 620, y);
+      ctx.textAlign = 'left'; y += 40;
+
+      // Proposal text
+      ctx.fillStyle = '#FF1A1A'; ctx.font = '9px monospace';
+      ctx.fillText('CREATIVE DIRECTION', 60, y); y += 26;
+      ctx.fillStyle = '#666'; ctx.font = '14px Georgia';
+      const words = (S.proposalText||'KIMERICA brand system.').split(' ');
+      let line = '', lines = 0;
+      for (const w of words) {
+        const test = line+w+' ';
+        if (ctx.measureText(test).width > 1120 && line) {
+          ctx.fillText(line,60,y+lines*22); line=w+' '; lines++;
+          if(lines>8){ctx.fillText(line+'...',60,y+lines*22);lines++;break;}
+        } else line=test;
+      }
+      if(line)ctx.fillText(line,60,y+lines*22);
+      y += lines*22+60;
+    }
+
+    // Colors row
+    const colors = [['#060608','Obsidian'],['#FF1A1A','Brand Red'],['#f8f6f2','Ivory'],['#1a1a1a','Charcoal']];
+    ctx.fillStyle = '#FF1A1A'; ctx.font = '9px monospace';
+    ctx.fillText('COLOR PALETTE', 60, y); y += 24;
+    colors.forEach(([h,n],i) => {
+      const cx = 60 + i*280;
+      ctx.fillStyle = h; ctx.strokeStyle = '#222'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.roundRect(cx,y,60,60,4); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#aaa'; ctx.font = '13px Georgia'; ctx.fillText(n, cx+72, y+24);
+      ctx.fillStyle = '#333'; ctx.font = '11px monospace'; ctx.fillText(h, cx+72, y+44);
+    });
+    y += 90;
+
+    // Logo
+    const grad = ctx.createLinearGradient(60,0,460,0);
+    grad.addColorStop(0,'#FF1A1A'); grad.addColorStop(1,'#ff6b1a');
+    ctx.fillStyle = '#0a0a0c'; ctx.beginPath(); ctx.roundRect(60,y,560,90,6); ctx.fill();
+    ctx.strokeStyle = '#1a1a1a'; ctx.stroke();
+    ctx.fillStyle = grad; ctx.font = 'bold 40px serif'; ctx.letterSpacing = '8px';
+    ctx.fillText('KIMERICA', 90, y+58); ctx.letterSpacing = '0px';
+    ctx.fillStyle = '#333'; ctx.font = '9px monospace'; ctx.letterSpacing = '5px';
+    ctx.fillText('CREATIVE STUDIO', 96, y+78); ctx.letterSpacing = '0px';
+    y += 120;
+
+    // Footer
+    ctx.fillStyle = '#0a0a0c'; ctx.fillRect(0,1684,1240,70);
+    ctx.strokeStyle = '#111'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0,1684); ctx.lineTo(1240,1684); ctx.stroke();
+    ctx.fillStyle = '#1a1a1a'; ctx.font = '10px monospace'; ctx.letterSpacing = '2px';
+    ctx.fillText('KIMERICA · WATERMARKED PREVIEW · NOT FOR DISTRIBUTION · FULL FILES AVAILABLE AFTER PAYMENT', 60, 1724);
+    ctx.textAlign = 'right'; ctx.fillStyle = '#FF1A1A';
+    ctx.fillText('kimerica.studio', 1180, 1724);
+    ctx.textAlign = 'left'; ctx.letterSpacing = '0px';
+
+    // Convert canvas → JPEG → PDF
+    canvas.toBlob(async (imgBlob) => {
+      const ab = await imgBlob.arrayBuffer();
+      const imgBytes = new Uint8Array(ab);
+      const pdfBytes = buildImagePDF(imgBytes, 595, 842);
+
+      // ZIP it
+      const enc = new TextEncoder();
+      function crc32b(buf){const t=[];for(let i=0;i<256;i++){let c=i;for(let j=0;j<8;j++)c=c&1?0xedb88320^(c>>>1):c>>>1;t[i]=c}let crc=0xffffffff;for(let i=0;i<buf.length;i++)crc=t[(crc^buf[i])&0xff]^(crc>>>8);return(crc^0xffffffff)>>>0}
+      function u16b(v){const b=new Uint8Array(2);new DataView(b.buffer).setUint16(0,v,true);return b}
+      function u32b(v){const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,v,true);return b}
+      function cat(...a){const tot=a.reduce((s,x)=>s+x.length,0);const out=new Uint8Array(tot);let p=0;a.forEach(x=>{out.set(x,p);p+=x.length});return out}
+      const nm = enc.encode('KIMERICA_Preview.pdf');
+      const crc = crc32b(pdfBytes);
+      const lh = cat(new Uint8Array([0x50,0x4b,0x03,0x04]),u16b(20),u16b(0),u16b(0),u16b(0),u16b(0),u32b(crc),u32b(pdfBytes.length),u32b(pdfBytes.length),u16b(nm.length),u16b(0),nm);
+      const cd = cat(new Uint8Array([0x50,0x4b,0x01,0x02]),u16b(20),u16b(20),u16b(0),u16b(0),u16b(0),u16b(0),u32b(crc),u32b(pdfBytes.length),u32b(pdfBytes.length),u16b(nm.length),u16b(0),u16b(0),u16b(0),u16b(0),u32b(0),u32b(0),nm);
+      const eocd = cat(new Uint8Array([0x50,0x4b,0x05,0x06]),u16b(0),u16b(0),u16b(1),u16b(1),u32b(cd.length),u32b(lh.length+pdfBytes.length),u16b(0));
+      const zip = cat(lh,pdfBytes,cd,eocd);
+
+      const blob = new Blob([zip],{type:'application/zip'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='KIMERICA_Preview.zip'; a.click();
+      URL.revokeObjectURL(url);
+
+      btn.textContent = '✓ DOWNLOADED';
+      setTimeout(() => { btn.textContent = '⬇ PREVIEW PDF'; btn.style.pointerEvents = ''; }, 2500);
+    }, 'image/jpeg', 0.90);
+
+  } catch(e) {
+    console.error(e);
+    btn.textContent = '⬇ PREVIEW PDF'; btn.style.pointerEvents = '';
+  }
+}
+
+function buildImagePDF(jpegBytes, pw, ph) {
+  const enc = new TextEncoder();
+  const il = jpegBytes.length;
+  const o1="1 0 obj\n<</Type/Catalog/Pages 2 0 R>>\nendobj\n";
+  const o2="2 0 obj\n<</Type/Pages/Kids[3 0 R]/Count 1>>\nendobj\n";
+  const o3=`3 0 obj\n<</Type/Page/Parent 2 0 R/MediaBox[0 0 ${pw} ${ph}]/Contents 4 0 R/Resources<</XObject<</Im0 5 0 R>>>>>>\nendobj\n`;
+  const s4=`q ${pw} 0 0 ${ph} 0 0 cm /Im0 Do Q`;
+  const o4=`4 0 obj\n<</Length ${s4.length}>>\nstream\n${s4}\nendstream\nendobj\n`;
+  const o5h=`5 0 obj\n<</Type/XObject/Subtype/Image/Width 1240/Height 1754/ColorSpace/DeviceRGB/BitsPerComponent 8/Filter/DCTDecode/Length ${il}>>\nstream\n`;
+  const o5f="\nendstream\nendobj\n";
+  const h=enc.encode("%PDF-1.4\n");
+  const b1=enc.encode(o1),b2=enc.encode(o2),b3=enc.encode(o3),b4=enc.encode(o4),b5h=enc.encode(o5h),b5f=enc.encode(o5f);
+  const off1=h.length,off2=off1+b1.length,off3=off2+b2.length,off4=off3+b3.length,off5=off4+b4.length;
+  const xo=off5+b5h.length+il+b5f.length;
+  const xr=enc.encode(`xref\n0 6\n0000000000 65535 f \n${String(off1).padStart(10,'0')} 00000 n \n${String(off2).padStart(10,'0')} 00000 n \n${String(off3).padStart(10,'0')} 00000 n \n${String(off4).padStart(10,'0')} 00000 n \n${String(off5).padStart(10,'0')} 00000 n \ntrailer\n<</Size 6/Root 1 0 R>>\nstartxref\n${xo}\n%%EOF`);
+  const cat=(...a)=>{const tot=a.reduce((s,x)=>s+x.length,0);const out=new Uint8Array(tot);let p=0;a.forEach(x=>{out.set(x,p);p+=x.length});return out};
+  return cat(h,b1,b2,b3,b4,b5h,jpegBytes,b5f,xr);
+}
+
+// ══════════════════════════════════════════
+// PUBLIC API — call from anywhere in tu app
+// ══════════════════════════════════════════
+//
+// Mostrar una página web generada:
+//   PREVIEW.add('web', 'Website', htmlString)
+//
+// Mostrar un objeto 3D:
+//   PREVIEW.add('model3d', 'Logo 3D', { type:'cube' })
+//   PREVIEW.add('model3d', 'Model', 'https://...model.glb')
+//
+// Mostrar una imagen:
+//   PREVIEW.add('image', 'Logo', dataURLorSrc)
+//
+// Mostrar branding completo:
+//   PREVIEW.add('brand', 'Branding', {
+//     name:'KIMERICA',
+//     colors:[['#060608','Obsidian'],['#FF1A1A','Brand Red']],
+//     fonts:['Cormorant Garamond','Syne'],
+//     direction:'Luxury Black · Minimal'
+//   })
+//
+// Ejemplo — conectarlo con el output de Claude:
+//   const html = document.getElementById('claude-out').textContent;
+//   PREVIEW.add('web', 'Generated Site', html);
+//
+</script>
 // ══════════════════════════════════════════
 // HERO / ABOUT CANVASES
 // ══════════════════════════════════════════
