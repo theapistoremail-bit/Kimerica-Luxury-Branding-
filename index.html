@@ -332,7 +332,7 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
 #toast.err{border-left:2px solid var(--scarlet);box-shadow:0 0 16px var(--scarlet-dim)}
 
 /* ── PREVIEW PANEL ── */
-#preview-panel{display:none;position:fixed;inset:0;z-index:500;background:#060608;flex-direction:column}
+#preview-panel{display:none;position:fixed;inset:0;z-index:1100;background:#060608;flex-direction:column}
 #preview-tabs{display:flex;align-items:center;gap:2px;padding:0 16px;height:42px;background:#060608;border-bottom:1px solid #111;flex-shrink:0}
 #tab-btns{display:flex;gap:2px;flex:1}
 #preview-content{flex:1;position:relative;overflow:hidden}
@@ -373,7 +373,10 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
   <div id="preview-content"></div>
   <div id="preview-bottombar">
     <span id="preview-status">KIMERICA PREVIEW</span>
-    <button id="dl-btn" onclick="downloadPreviewPDF()">⬇ PREVIEW PDF</button>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button id="tts-btn" onclick="speakProposal()" style="font-family:monospace;font-size:8px;letter-spacing:3px;background:none;border:1px solid #1a1a1a;color:#333;padding:4px 14px;cursor:pointer;border-radius:2px;transition:all .2s" onmouseenter="this.style.borderColor='#FF1A1A';this.style.color='#FF1A1A'" onmouseleave="this.style.borderColor='#1a1a1a';this.style.color='#333'">🔊 VOICE</button>
+      <button id="dl-btn" onclick="downloadPreviewPDF()" style="font-family:monospace;font-size:8px;letter-spacing:3px;background:none;border:1px solid #1a1a1a;color:#333;padding:4px 14px;cursor:pointer;border-radius:2px;transition:all .2s" onmouseenter="this.style.borderColor='#FF1A1A';this.style.color='#FF1A1A'" onmouseleave="this.style.borderColor='#1a1a1a';this.style.color='#333'">⬇ PREVIEW PDF</button>
+    </div>
   </div>
 </div>
 
@@ -555,6 +558,7 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
   <div style="display:flex;gap:14px;flex-wrap:wrap;margin:20px 0">
     <button class="btn btn-blk" id="gen-btn" onclick="runProposal()">Generate AI Proposal</button>
     <button class="btn btn-out" onclick="demoProposal()">Demo (Offline)</button>
+    <button class="btn btn-red" id="open-preview-btn" style="display:none" onclick="openPreview();renderContent()">🌐 Ver Preview →</button>
   </div>
   <div class="loader" id="loader">
     <div class="dots"><div class="dot-anim"></div><div class="dot-anim"></div><div class="dot-anim"></div></div>
@@ -1309,9 +1313,14 @@ async function runProposal(){
     if(dirMatch)document.getElementById('claude-out').textContent=dirMatch[1].trim();
     fetchImages(vision).then(imgs=>{if(imgs)renderImages(imgs);});
     toast('Proposal generated via backend ✓','ok');
-    // ── CHANGE 1: launch preview panel with generated content ──
-    PREVIEW.add('web','Website',buildPreviewSite());
-    PREVIEW.add('brand','Branding',{name:'KIMERICA',colors:[['#060608','Obsidian'],['#FF1A1A','Brand Red'],['#f8f6f2','Ivory'],['#1a1a1a','Charcoal']],direction:S.sel.vis||'Luxury Black · Minimal'});
+    // ── Preparar preview sin abrir panel, mostrar botón
+    PREVIEW.tabs=[];
+    const _rid1='web_'+Date.now();
+    PREVIEW.tabs.push({id:_rid1,label:'Website',icon:'\u{1F310}',type:'web',content:buildPreviewSite()});
+    const _rid2='brand_'+(Date.now()+1);
+    PREVIEW.tabs.push({id:_rid2,label:'Branding',icon:'\u25A3',type:'brand',content:{name:'KIMERICA',colors:[['#060608','Obsidian'],['#FF1A1A','Brand Red'],['#f8f6f2','Ivory'],['#1a1a1a','Charcoal']],direction:S.sel.vis||'Luxury Black \u00B7 Minimal'}});
+    PREVIEW.active=_rid1; renderTabs();
+    const _rpb=document.getElementById('open-preview-btn');if(_rpb)_rpb.style.display='inline-flex';
   }catch(e){
     toast(`${e.message.slice(0,55)}. Using demo.`,'err');
     demoProposal();return;
@@ -1400,9 +1409,14 @@ function demoProposal(){
     document.getElementById('claude-out').textContent=dirs[Math.floor(Math.random()*dirs.length)];
     populateScope({});document.getElementById('proposal-out').classList.add('on');
     setLoader(false);toast('Demo proposal generated ✓','ok');
-    // ── CHANGE 2: launch preview panel with demo content ──
-    PREVIEW.add('web','Website',buildPreviewSite());
-    PREVIEW.add('brand','Branding',{name:'KIMERICA',colors:[['#060608','Obsidian'],['#FF1A1A','Brand Red'],['#f8f6f2','Ivory']],direction:S.sel.vis||'Luxury Black · Minimal'});
+    // ── Preparar preview sin abrir panel, mostrar botón
+    PREVIEW.tabs=[];
+    const _did1='web_'+Date.now();
+    PREVIEW.tabs.push({id:_did1,label:'Website',icon:'\u{1F310}',type:'web',content:buildPreviewSite()});
+    const _did2='brand_'+(Date.now()+1);
+    PREVIEW.tabs.push({id:_did2,label:'Branding',icon:'\u25A3',type:'brand',content:{name:'KIMERICA',colors:[['#060608','Obsidian'],['#FF1A1A','Brand Red'],['#f8f6f2','Ivory']],direction:S.sel.vis||'Luxury Black \u00B7 Minimal'}});
+    PREVIEW.active=_did1; renderTabs();
+    const _dpb=document.getElementById('open-preview-btn');if(_dpb)_dpb.style.display='inline-flex';
   },1600);
 }
 
@@ -1530,6 +1544,42 @@ function _mbCell6_Wave(){const cv=document.getElementById('mb-cv-6');if(!cv)retu
 // ══════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════
+// ══════════════════════════════════════════
+// ELEVENLABS TEXT-TO-VOICE
+// ══════════════════════════════════════════
+let _ttsAudio=null,_ttsSpeaking=false;
+async function speakProposal(){
+  const btn=document.getElementById('tts-btn');
+  if(_ttsSpeaking){
+    if(_ttsAudio){_ttsAudio.pause();URL.revokeObjectURL(_ttsAudio.src);_ttsAudio=null;}
+    _ttsSpeaking=false;btn.textContent='🔊 VOICE';return;
+  }
+  const text=document.getElementById('claude-out')?.textContent?.trim();
+  if(!text){toast('Generate a proposal first.','err');return;}
+  btn.textContent='⏳ LOADING...';btn.style.color='#FF1A1A';btn.style.borderColor='#FF1A1A';
+  try{
+    const res=await fetch('/api/voice',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:text.substring(0,2500)})
+    });
+    if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error||'Voice error '+res.status);}
+    const blob=await res.blob();
+    const url=URL.createObjectURL(blob);
+    _ttsAudio=new Audio(url);_ttsSpeaking=true;
+    btn.textContent='⏹ STOP';
+    _ttsAudio.onended=()=>{
+      _ttsSpeaking=false;_ttsAudio=null;
+      btn.textContent='🔊 VOICE';btn.style.color='#333';btn.style.borderColor='#1a1a1a';
+      URL.revokeObjectURL(url);
+    };
+    await _ttsAudio.play();
+  }catch(e){
+    toast(e.message.slice(0,60),'err');
+    btn.textContent='🔊 VOICE';btn.style.color='#333';btn.style.borderColor='#1a1a1a';
+    _ttsSpeaking=false;
+  }
+}
+
 window.addEventListener('load',()=>{go('home')});
 window.addEventListener('resize',()=>{if(S.step==='home')initHero();if(S.step==='about')initAbout();if(S.step==='project-preview')initProjectPreviewCanvas()});
 </script>
