@@ -212,92 +212,7 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
 .psg-label{font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 .psg-val{font-size:.88rem;font-weight:600;color:var(--white);margin-bottom:4px}
 .psg-price{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;color:var(--scarlet)}
-.preview-moodboard{margin-bottom:32px;animation:fup .7s .6s both}
-
-/* ── BRAND PANEL (replaces moodboard grid) ── */
-.brand-panel{
-  display:grid;
-  grid-template-columns:1fr 380px;
-  grid-template-rows:auto auto auto;
-  gap:6px;
-  background:var(--black);
-  border:1px solid var(--border);
-}
-.brand-panel-main{
-  grid-row:span 3;
-  background:var(--surface);
-  border-right:1px solid var(--border);
-  overflow:hidden;
-  position:relative;
-  cursor:pointer;
-  transition:border-color .3s;
-}
-.brand-panel-main:hover{ border-color:var(--border-red); }
-.brand-panel-subs{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  grid-template-rows:1fr 1fr;
-  gap:6px;
-  padding:6px;
-  background:var(--black);
-}
-.bp-sub{
-  background:var(--surface);
-  border:1px solid var(--border);
-  overflow:hidden;
-  position:relative;
-  cursor:pointer;
-  transition:all .3s;
-  display:flex;
-  flex-direction:column;
-  min-height:160px;
-}
-.bp-sub:hover{ border-color:var(--border-red);transform:translateY(-1px);box-shadow:0 4px 20px rgba(255,26,26,.12); }
-.bp-sub.expanded{
-  position:fixed;inset:60px;z-index:2000;
-  border-color:var(--border-red)!important;
-  transform:none!important;
-  box-shadow:0 0 60px rgba(0,0,0,.9)!important;
-  overflow:auto;
-  min-height:unset;
-}
-.bp-sub-header{
-  padding:10px 12px 8px;
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  flex-shrink:0;
-}
-.bp-sub-title{
-  font-size:.52rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--scarlet);
-}
-.bp-expand-btn{
-  font-size:.48rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;
-  background:none;border:none;padding:0;cursor:pointer;transition:color .2s;
-}
-.bp-expand-btn:hover{color:var(--scarlet)}
-.bp-sub-body{flex:1;padding:12px;overflow:hidden;position:relative;}
-.bp-sub.expanded .bp-sub-body{overflow:auto;}
-
-/* Main panel labels */
-.bp-main-label{
-  position:absolute;bottom:14px;left:16px;right:16px;z-index:3;
-  display:flex;justify-content:space-between;align-items:center;
-  pointer-events:none;
-}
-.bp-main-label-left{font-size:.56rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(248,246,242,.25)}
-.bp-main-label-right{font-size:.56rem;color:var(--scarlet);font-style:normal}
-.bp-nav-overlay{
-  position:absolute;bottom:40px;left:16px;z-index:4;
-  display:flex;gap:6px;
-}
-.bp-nav-btn{
-  padding:6px 14px;font-size:.52rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
-  background:rgba(6,6,8,.8);border:1px solid var(--border);color:var(--muted);
-  cursor:pointer;transition:all .2s;backdrop-filter:blur(8px);
-}
-.bp-nav-btn:hover,.bp-nav-btn.on{border-color:var(--border-red);color:var(--scarlet);background:rgba(255,26,26,.08)}
-
-/* mb-cell kept for compat with other sections */
+.preview-moodboard{display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:200px 200px;gap:4px;margin-bottom:32px;animation:fup .7s .6s both}
 .mb-cell{overflow:hidden;position:relative;cursor:pointer;background:var(--surface)}
 .mb-cell:first-child{grid-column:span 3;grid-row:span 2}
 .mb-cell:nth-child(2){grid-column:span 2}
@@ -474,8 +389,8 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
   .out-grid,.checkout-wrap,.stat-row,.port-grid,.about-grid,.services-cards,.preview-deck,.preview-scope-grid,.zip-contents,.model-grid{grid-template-columns:1fr}
   #s-dash{flex-direction:column}.db-side{width:100%;height:auto;position:static;padding:80px 20px 20px}
   .ai-lab-grid{grid-template-columns:1fr 1fr}
-  .brand-panel{grid-template-columns:1fr}
-  .brand-panel-subs{grid-template-columns:1fr 1fr;grid-template-rows:auto}
+  .preview-moodboard{grid-template-columns:repeat(3,1fr);grid-template-rows:auto}
+  .mb-cell:first-child{grid-column:span 2}
 }
 </style>
 </head>
@@ -745,7 +660,24 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
     <div class="preview-badge">Project Package Ready · AI Generated</div>
     <h1 class="preview-main-title">Your brand<br><em>universe.</em><br><span class="ghost">Complete.</span></h1>
     <div class="preview-deck">
-      <div class="preview-3d-stage"><canvas id="preview-main-cv"></canvas><div class="preview-3d-label"><span>3D Brand Environment · Three.js</span><em>Live</em></div></div>
+      <div class="preview-3d-stage" id="preview-3d-stage" style="padding:0;border:1px solid var(--border-red);overflow:hidden;position:relative;background:#060608">
+        <div style="position:absolute;top:0;left:0;right:0;height:28px;background:#0a0a14;display:flex;align-items:center;padding:0 12px;gap:8px;border-bottom:1px solid rgba(255,26,26,.18);z-index:10">
+          <div style="display:flex;gap:5px">
+            <div style="width:9px;height:9px;border-radius:50%;background:#ff5f57"></div>
+            <div style="width:9px;height:9px;border-radius:50%;background:#febc2e"></div>
+            <div style="width:9px;height:9px;border-radius:50%;background:#28c840"></div>
+          </div>
+          <div style="flex:1;background:rgba(255,255,255,.05);border-radius:4px;height:16px;display:flex;align-items:center;padding:0 10px;margin:0 8px">
+            <span id="site-url-bar" style="font-size:9px;font-family:monospace;color:rgba(255,255,255,.3);letter-spacing:.03em">www.brand.studio</span>
+          </div>
+          <div style="display:flex;gap:5px;align-items:center">
+            <div style="width:6px;height:6px;border-radius:50%;background:#22d464;box-shadow:0 0 6px #22d464;animation:pulse-green 2s infinite"></div>
+            <span style="font-size:8px;color:rgba(34,212,100,.6);letter-spacing:.1em;font-weight:700">LIVE</span>
+          </div>
+        </div>
+        <iframe id="brand-site-iframe" style="position:absolute;top:28px;left:0;width:100%;height:calc(100% - 28px);border:none" sandbox="allow-scripts" title="Brand Website"></iframe>
+        <canvas id="preview-main-cv" style="display:none;position:absolute"></canvas>
+      </div>
       <div class="preview-sidebar">
         <div class="prev-info-card"><div class="pic-label">Creative Objective</div><div class="pic-value" id="pv-objective">Brand Authority System</div></div>
         <div class="prev-info-card"><div class="pic-label">Visual Direction</div><div class="pic-value" id="pv-visual">Luxury Black · Minimal</div></div>
@@ -761,395 +693,103 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
       <div class="psg-item"><div class="psg-label">Digital Experience</div><div class="psg-val">Web + Interactions</div><div class="psg-price" id="pv-sc3">$5,500</div></div>
       <div class="psg-item"><div class="psg-label">3D / AI Elements</div><div class="psg-val">Assets + Environments</div><div class="psg-price" id="pv-sc4">$3,800</div></div>
     </div>
-    <div class="out-label" style="margin-bottom:16px">Brand Universe — Creative Environments</div>
-
-    <!-- BRAND PANEL: Main + 6 sub-screens -->
+    <div class="out-label" style="margin-bottom:16px">Creative Environments — Generated Live</div>
     <div class="preview-moodboard" id="live-moodboard">
-    <div class="brand-panel">
 
-      <!-- ── MAIN SCREEN (website mockup, switchable) ── -->
-      <div class="brand-panel-main" id="bp-main">
-        <!-- NAV SWITCHER -->
-        <div class="bp-nav-overlay">
-          <button class="bp-nav-btn on" onclick="bpSwitch('website',this)">WEBSITE</button>
-          <button class="bp-nav-btn" onclick="bpSwitch('3d',this)">3D VIEW</button>
-          <button class="bp-nav-btn" onclick="bpSwitch('social',this)">SOCIAL</button>
-          <button class="bp-nav-btn" onclick="bpSwitch('logo',this)">LOGO</button>
-        </div>
-
-        <!-- WEBSITE MOCKUP VIEW -->
-        <div id="bpv-website" style="width:100%;height:100%;display:flex;flex-direction:column;background:var(--surface2);">
-          <!-- Browser chrome -->
-          <div style="background:#111118;padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);flex-shrink:0">
-            <div style="width:10px;height:10px;border-radius:50%;background:#ff5f57"></div>
-            <div style="width:10px;height:10px;border-radius:50%;background:#febc2e"></div>
-            <div style="width:10px;height:10px;border-radius:50%;background:#28c840"></div>
-            <div style="flex:1;background:rgba(255,255,255,.05);border-radius:4px;padding:4px 12px;margin-left:10px;font-size:.52rem;color:var(--muted);font-family:monospace">kimerica.studio</div>
+      <!-- CELDA 1 (grande): Three.js — objeto 3D del producto del cliente -->
+      <div class="mb-cell" id="mb1" style="cursor:default">
+        <canvas id="mb-cv-1"></canvas>
+        <div class="mb-cell-overlay" style="opacity:1;background:none;align-items:flex-start;padding:10px;flex-direction:column;gap:4px;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="width:5px;height:5px;border-radius:50%;background:#FF1A1A;box-shadow:0 0 6px rgba(255,26,26,.8);animation:pulse-red 2s infinite"></div>
+            <span class="mb-tag">3D Brand Object · Live</span>
           </div>
-          <!-- Mock website hero -->
-          <div style="flex:1;overflow:hidden;position:relative;background:var(--black)">
-            <!-- Animated background -->
-            <canvas id="mb-cv-1" style="position:absolute;inset:0;width:100%!important;height:100%!important"></canvas>
-            <!-- Nav -->
-            <div style="position:relative;z-index:2;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(6,6,8,.7);backdrop-filter:blur(12px)">
-              <div style="font-size:.7rem;font-weight:800;letter-spacing:.2em;color:var(--white)">KIMERICA<span style="color:var(--scarlet)">.</span></div>
-              <div style="display:flex;gap:20px">
-                <span style="font-size:.52rem;color:var(--muted);font-weight:600;letter-spacing:.1em;text-transform:uppercase">Inicio</span>
-                <span style="font-size:.52rem;color:var(--muted);font-weight:600;letter-spacing:.1em;text-transform:uppercase">Proyectos</span>
-                <span style="font-size:.52rem;color:var(--muted);font-weight:600;letter-spacing:.1em;text-transform:uppercase">Servicios</span>
-                <span style="font-size:.52rem;color:var(--muted);font-weight:600;letter-spacing:.1em;text-transform:uppercase">Contacto</span>
-              </div>
-              <div style="padding:5px 14px;background:var(--scarlet);color:#000;font-size:.52rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase">Consulta Exclusiva</div>
-            </div>
-            <!-- Hero content -->
-            <div style="position:relative;z-index:2;padding:40px 32px 24px;display:flex;flex-direction:column;align-items:flex-start;gap:10px">
-              <div style="font-size:.52rem;color:var(--scarlet);font-weight:700;letter-spacing:.3em;text-transform:uppercase;display:flex;align-items:center;gap:8px">
-                <div style="width:24px;height:1px;background:var(--scarlet)"></div>ESTUDIO CREATIVO
-              </div>
-              <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,3.5vw,3rem);font-weight:300;line-height:1;color:var(--white)">
-                Identidad que<br><em style="color:var(--scarlet);font-style:italic">domina.</em>
-              </div>
-              <div style="font-size:.7rem;color:var(--muted);line-height:1.7;max-width:380px">Sistemas de marca de clase mundial para negocios que no aceptan lo ordinario.</div>
-              <div style="display:flex;gap:10px;margin-top:8px">
-                <div style="padding:8px 20px;background:var(--scarlet);color:#000;font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase">Ver Proyectos →</div>
-                <div style="padding:8px 20px;border:1px solid var(--border);color:var(--white);font-size:.58rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase">Servicios</div>
-              </div>
-            </div>
-            <!-- Exclusive Collections strip -->
-            <div style="position:relative;z-index:2;margin:0 24px;padding:14px 18px;background:rgba(255,26,26,.08);border:1px solid var(--border-red);display:flex;align-items:center;justify-content:space-between">
-              <div>
-                <div style="font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--white);margin-bottom:4px">Exclusive Collections</div>
-                <div style="font-size:.56rem;color:var(--muted)">Brand · Identity · Motion · 3D</div>
-              </div>
-              <div style="padding:6px 16px;background:var(--scarlet);color:#000;font-size:.52rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer">DISCOVER MORE</div>
-            </div>
+          <div style="display:flex;gap:6px">
+            <button onclick="mb3dShape('torus')" style="background:rgba(255,26,26,.15);border:1px solid rgba(255,26,26,.35);color:#FF1A1A;font-size:8px;font-weight:700;letter-spacing:.08em;padding:4px 8px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,26,26,.3)'" onmouseout="this.style.background='rgba(255,26,26,.15)'">TORUS</button>
+            <button onclick="mb3dShape('gem')" style="background:rgba(255,26,26,.15);border:1px solid rgba(255,26,26,.35);color:#FF1A1A;font-size:8px;font-weight:700;letter-spacing:.08em;padding:4px 8px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,26,26,.3)'" onmouseout="this.style.background='rgba(255,26,26,.15)'">GEM</button>
+            <button onclick="mb3dShape('bottle')" style="background:rgba(255,26,26,.15);border:1px solid rgba(255,26,26,.35);color:#FF1A1A;font-size:8px;font-weight:700;letter-spacing:.08em;padding:4px 8px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,26,26,.3)'" onmouseout="this.style.background='rgba(255,26,26,.15)'">BOTTLE</button>
+            <button onclick="mb3dShape('box')" style="background:rgba(255,26,26,.15);border:1px solid rgba(255,26,26,.35);color:#FF1A1A;font-size:8px;font-weight:700;letter-spacing:.08em;padding:4px 8px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,26,26,.3)'" onmouseout="this.style.background='rgba(255,26,26,.15)'">BOX</button>
           </div>
-        </div>
-
-        <!-- 3D VIEW -->
-        <div id="bpv-3d" style="display:none;width:100%;height:100%;position:relative;background:#060608">
-          <canvas id="mb-cv-6" style="position:absolute;inset:0;width:100%!important;height:100%!important"></canvas>
-          <div style="position:absolute;top:16px;left:20px;z-index:2">
-            <div style="font-size:.56rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,26,26,.7)">3D BRAND OBJECT</div>
-            <div style="font-size:.5rem;color:var(--muted);margin-top:2px">Three.js · WebGL · Real-time</div>
-          </div>
-          <div style="position:absolute;bottom:16px;left:20px;z-index:2">
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <div style="padding:4px 10px;border:1px solid rgba(255,26,26,.3);font-size:.48rem;color:var(--scarlet);font-family:monospace">METALNESS: 0.95</div>
-              <div style="padding:4px 10px;border:1px solid var(--border);font-size:.48rem;color:var(--muted);font-family:monospace">ROUGHNESS: 0.04</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SOCIAL VIEW -->
-        <div id="bpv-social" style="display:none;width:100%;height:100%;background:var(--black);overflow:hidden;position:relative">
-          <canvas id="mb-cv-4" style="position:absolute;inset:0;width:100%!important;height:100%!important;opacity:.4"></canvas>
-          <div style="position:relative;z-index:2;padding:24px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;height:100%;align-content:center">
-            <!-- Post 1 -->
-            <div style="aspect-ratio:1/1;background:linear-gradient(135deg,#060608,#1a0000);border:1px solid var(--border-red);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;position:relative;overflow:hidden">
-              <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(255,26,26,.12);top:-20px;right:-20px;filter:blur(16px)"></div>
-              <div style="font-size:.6rem;font-weight:800;letter-spacing:.3em;color:var(--scarlet)">KIMERICA</div>
-              <div style="font-family:'Cormorant Garamond',serif;font-size:.9rem;font-weight:300;color:var(--white);text-align:center;line-height:1.2">Elegance<br><em>Redefined.</em></div>
-              <div style="font-size:.45rem;color:var(--muted);letter-spacing:.12em">#KIMERICA #BRAND</div>
-            </div>
-            <!-- Story -->
-            <div style="aspect-ratio:9/16;background:var(--surface2);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:12px;gap:4px;position:relative;overflow:hidden;max-height:180px">
-              <div style="position:absolute;inset:0;background:linear-gradient(to bottom,#060608,rgba(255,26,26,.2))"></div>
-              <div style="position:relative;z-index:2;text-align:center">
-                <div style="font-size:.55rem;font-weight:700;letter-spacing:.2em;color:var(--white)">KIMERICA<span style="color:var(--scarlet)">.</span></div>
-                <div style="font-size:.42rem;color:var(--muted)">Studio · Story</div>
-              </div>
-            </div>
-            <!-- Post 2 -->
-            <div style="aspect-ratio:1/1;background:var(--surface2);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;position:relative;overflow:hidden">
-              <canvas id="mb-cv-2" style="position:absolute;inset:0;width:100%!important;height:100%!important;opacity:.6"></canvas>
-              <div style="position:relative;z-index:2;text-align:center">
-                <div style="font-size:.52rem;color:var(--scarlet);font-weight:700;letter-spacing:.14em">NEW PROJECT</div>
-                <div style="font-size:.42rem;color:var(--muted)">Identity System</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- LOGO VIEW -->
-        <div id="bpv-logo" style="display:none;width:100%;height:100%;background:#060608;display:none;align-items:center;justify-content:center">
-          <canvas id="mb-cv-3" style="position:absolute;inset:0;width:100%!important;height:100%!important"></canvas>
-          <div style="position:relative;z-index:2;display:flex;flex-direction:column;gap:20px;padding:24px;align-items:center;justify-content:center;height:100%">
-            <!-- Logo dark bg -->
-            <div style="background:var(--black);border:1px solid var(--border);padding:24px 40px;display:flex;flex-direction:column;align-items:center;gap:8px">
-              <div style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:.3em;color:var(--white)">KIMERICA<span style="color:var(--scarlet)">.</span></div>
-              <div style="width:80%;height:1px;background:var(--border-red);box-shadow:0 0 8px var(--scarlet-glow)"></div>
-              <div style="font-size:.42rem;letter-spacing:.3em;color:var(--muted);text-transform:uppercase">Creative Systems</div>
-            </div>
-            <!-- Logo on white -->
-            <div style="background:#ffffff;border:1px solid #ddd;padding:20px 40px;display:flex;flex-direction:column;align-items:center;gap:6px">
-              <div style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;letter-spacing:.3em;color:#060608">KIMERICA<span style="color:#FF1A1A">.</span></div>
-              <div style="width:80%;height:1px;background:#FF1A1A"></div>
-              <div style="font-size:.4rem;letter-spacing:.3em;color:#888;text-transform:uppercase">Creative Systems</div>
-            </div>
-            <!-- Symbol -->
-            <div style="display:flex;gap:12px;align-items:center">
-              <div style="width:36px;height:36px;background:var(--scarlet);display:flex;align-items:center;justify-content:center">
-                <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;color:#000">K</span>
-              </div>
-              <div style="width:36px;height:36px;border:1px solid var(--border-red);display:flex;align-items:center;justify-content:center">
-                <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;color:var(--scarlet)">K</span>
-              </div>
-              <div style="width:36px;height:36px;background:var(--white);display:flex;align-items:center;justify-content:center">
-                <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;color:#060608">K</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bp-main-label">
-          <span class="bp-main-label-left" id="bp-main-label-txt">Website · kimerica.studio</span>
-          <em class="bp-main-label-right">Live Preview</em>
         </div>
       </div>
 
-      <!-- ── 6 SUB-PANELS RIGHT ── -->
-      <div class="brand-panel-subs">
-
-        <!-- 1. 3D PRODUCT RENDERINGS -->
-        <div class="bp-sub" id="bps-3d" onclick="bpExpand(event,'bps-3d')">
-          <div class="bp-sub-header">
-            <span class="bp-sub-title">3D RENDERINGS</span>
-            <button class="bp-expand-btn" onclick="bpExpand(event,'bps-3d')">EXPAND ↗</button>
-          </div>
-          <div class="bp-sub-body" style="display:flex;flex-direction:column;gap:6px">
-            <!-- Mini 3D canvas -->
-            <div style="flex:1;background:#060608;border:1px solid var(--border);position:relative;overflow:hidden;min-height:60px">
-              <canvas id="bp-cv-3d" style="position:absolute;inset:0;width:100%!important;height:100%!important"></canvas>
-            </div>
-            <!-- Product chips -->
-            <div style="display:flex;gap:4px;flex-wrap:wrap">
-              <div style="padding:3px 8px;border:1px solid var(--border-red);font-size:.44rem;color:var(--scarlet);font-weight:700;letter-spacing:.1em">FRASCO</div>
-              <div style="padding:3px 8px;border:1px solid var(--border);font-size:.44rem;color:var(--muted);letter-spacing:.1em">PACKAGING</div>
-              <div style="padding:3px 8px;border:1px solid var(--border);font-size:.44rem;color:var(--muted);letter-spacing:.1em">MERCH</div>
-            </div>
-            <div style="display:flex;gap:6px">
-              <div style="flex:1;height:32px;background:linear-gradient(135deg,#1a0000,#060608);border:1px solid var(--border-red);display:flex;align-items:center;justify-content:center">
-                <span style="font-size:.42rem;color:var(--scarlet);font-family:'Cormorant Garamond',serif;font-style:italic">Luxury Scent</span>
-              </div>
-              <div style="flex:1;height:32px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center">
-                <span style="font-size:.42rem;color:var(--muted)">K · BAG</span>
-              </div>
-            </div>
+      <!-- CELDA 2: Logo & Identidad tipográfica -->
+      <div class="mb-cell" id="mb2" style="grid-column:span 2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px;background:#060608;cursor:pointer" onclick="mbExpand('logo')">
+        <div class="mb-tag" style="opacity:1;position:relative;margin-bottom:4px">LOGO & IDENTITY</div>
+        <div id="mb-logo-display" style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;letter-spacing:.06em;color:#f8f6f2;line-height:1;text-align:center">BRAND</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <div id="mb-mono-display" style="width:36px;height:36px;border:1px solid rgba(255,26,26,.35);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:#f8f6f2">B</div>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <div style="width:60px;height:1px;background:#FF1A1A;box-shadow:0 0 4px rgba(255,26,26,.5)"></div>
+            <div id="mb-tagline-display" style="font-size:7px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35)">TAGLINE</div>
           </div>
         </div>
+        <div class="mb-cell-overlay"></div>
+      </div>
 
-        <!-- 2. LOGO & IDENTITY -->
-        <div class="bp-sub" id="bps-logo" onclick="bpExpand(event,'bps-logo')">
-          <div class="bp-sub-header">
-            <span class="bp-sub-title">LOGO & IDENTITY</span>
-            <button class="bp-expand-btn" onclick="bpExpand(event,'bps-logo')">EXPAND ↗</button>
+      <!-- CELDA 3: Paleta de color del branding -->
+      <div class="mb-cell" id="mb3" style="display:flex;flex-direction:column;cursor:pointer;padding:0;overflow:hidden" onclick="mbExpand('palette')">
+        <div style="padding:8px 10px;background:rgba(6,6,8,.7);border-bottom:1px solid rgba(255,26,26,.12)">
+          <div class="mb-tag" style="opacity:1;position:relative">COLOR SYSTEM</div>
+        </div>
+        <div id="mb-palette-swatches" style="flex:1;display:flex;flex-direction:column">
+          <div class="mb-swatch" style="flex:1;background:#FF1A1A;display:flex;align-items:flex-end;padding:4px 8px"><span style="font-size:7px;color:rgba(0,0,0,.6);font-weight:700;letter-spacing:.1em">SCARLET</span></div>
+          <div class="mb-swatch" style="flex:1;background:#060608;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:flex-end;padding:4px 8px"><span style="font-size:7px;color:rgba(255,255,255,.35);font-weight:700;letter-spacing:.1em">NOIR</span></div>
+          <div class="mb-swatch" style="flex:1;background:#f8f6f2;border-top:1px solid rgba(0,0,0,.1);display:flex;align-items:flex-end;padding:4px 8px"><span style="font-size:7px;color:rgba(0,0,0,.4);font-weight:700;letter-spacing:.1em">IVORY</span></div>
+          <div id="mb-accent-swatch" class="mb-swatch" style="flex:1;background:#8b0000;border-top:1px solid rgba(255,26,26,.2);display:flex;align-items:flex-end;padding:4px 8px"><span style="font-size:7px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.1em">DEEP RED</span></div>
+        </div>
+        <div class="mb-cell-overlay"></div>
+      </div>
+
+      <!-- CELDA 4: Tipografía viva -->
+      <div class="mb-cell" id="mb4" style="cursor:pointer" onclick="mbExpand('type')">
+        <canvas id="mb-cv-4"></canvas>
+        <div class="mb-cell-overlay"><div class="mb-tag">TYPOGRAPHY</div></div>
+      </div>
+
+      <!-- CELDA 5: Packaging / Social mock -->
+      <div class="mb-cell" id="mb5" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#060608;cursor:pointer;padding:12px" onclick="mbExpand('social')">
+        <div class="mb-tag" style="opacity:1;position:relative;align-self:flex-start">SOCIAL · PACKAGING</div>
+        <!-- Mini social card mockup -->
+        <div style="width:100%;background:linear-gradient(135deg,#0d0408,#1a0808);border:1px solid rgba(255,26,26,.2);padding:8px;position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;right:0;width:40px;height:40px;background:rgba(255,26,26,.1);border-radius:50%;transform:translate(50%,-50%)"></div>
+          <div id="mb-social-brand" style="font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:300;color:#f8f6f2;letter-spacing:.1em">BRAND</div>
+          <div id="mb-social-tag" style="font-size:6px;letter-spacing:.2em;color:rgba(255,26,26,.7);margin-top:2px">#CAMPAIGN</div>
+          <div style="margin-top:6px;width:80%;height:1px;background:rgba(255,26,26,.3)"></div>
+          <div style="margin-top:4px;font-size:6px;color:rgba(255,255,255,.25);line-height:1.4">Visual identity · Digital presence</div>
+        </div>
+        <!-- Mini packaging box -->
+        <div style="display:flex;gap:4px;width:100%;align-items:center">
+          <div style="flex:1;height:30px;background:linear-gradient(135deg,#0d0408,#200a0a);border:1px solid rgba(255,26,26,.25);display:flex;align-items:center;justify-content:center">
+            <span style="font-size:11px">📦</span>
           </div>
-          <div class="bp-sub-body" style="display:flex;flex-direction:column;gap:6px">
-            <!-- Logo dark -->
-            <div style="background:var(--black);border:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;justify-content:space-between">
-              <div>
-                <div style="font-family:'Syne',sans-serif;font-size:.72rem;font-weight:800;letter-spacing:.2em;color:var(--white)">KIMERICA<span style="color:var(--scarlet)">.</span></div>
-                <div style="font-size:.38rem;letter-spacing:.16em;color:var(--muted)">CREATIVE SYSTEMS</div>
-              </div>
-              <div style="width:22px;height:22px;background:var(--scarlet);display:flex;align-items:center;justify-content:center">
-                <span style="font-family:'Syne',sans-serif;font-size:.5rem;font-weight:800;color:#000">K</span>
-              </div>
-            </div>
-            <!-- Logo light -->
-            <div style="background:#ffffff;border:1px solid #ddd;padding:6px 12px;display:flex;align-items:center;justify-content:space-between">
-              <div>
-                <div style="font-family:'Syne',sans-serif;font-size:.62rem;font-weight:800;letter-spacing:.2em;color:#060608">KIMERICA<span style="color:#FF1A1A">.</span></div>
-                <div style="font-size:.36rem;letter-spacing:.12em;color:#999">CREATIVE SYSTEMS</div>
-              </div>
-              <div style="font-size:.4rem;color:#FF1A1A;border:1px solid #FF1A1A;padding:2px 6px;font-weight:700">LUXE</div>
-            </div>
-            <!-- Colors -->
-            <div style="display:flex;gap:3px">
-              <div style="flex:1;height:12px;background:#FF1A1A" title="#FF1A1A"></div>
-              <div style="flex:1;height:12px;background:#060608;border:1px solid var(--border)"></div>
-              <div style="flex:1;height:12px;background:#f8f6f2"></div>
-              <div style="flex:1;height:12px;background:#8B0000"></div>
-              <div style="flex:1;height:12px;background:#1a1a1a;border:1px solid var(--border)"></div>
-            </div>
-            <div style="font-size:.42rem;color:var(--muted)">Scarlet · Obsidian · Ivory · Crimson · Graphite</div>
+          <div style="flex:1;height:30px;background:linear-gradient(135deg,#0d0408,#200a0a);border:1px solid rgba(255,26,26,.15);display:flex;align-items:center;justify-content:center">
+            <span style="font-size:11px">🛍️</span>
+          </div>
+          <div style="flex:1;height:30px;background:linear-gradient(135deg,#0d0408,#200a0a);border:1px solid rgba(255,26,26,.1);display:flex;align-items:center;justify-content:center">
+            <span style="font-size:11px">🕯️</span>
           </div>
         </div>
+        <div class="mb-cell-overlay"></div>
+      </div>
 
-        <!-- 3. LUXURY PACKAGING -->
-        <div class="bp-sub" id="bps-pkg" onclick="bpExpand(event,'bps-pkg')">
-          <div class="bp-sub-header">
-            <span class="bp-sub-title">LUXURY PACKAGING</span>
-            <button class="bp-expand-btn" onclick="bpExpand(event,'bps-pkg')">EXPAND ↗</button>
-          </div>
-          <div class="bp-sub-body" style="display:flex;flex-direction:column;gap:5px">
-            <!-- Box main -->
-            <div style="background:linear-gradient(135deg,#0d0d10,#1a0000);border:1px solid var(--border-red);padding:10px;display:flex;gap:8px;align-items:center;flex:1;min-height:60px">
-              <div style="display:flex;gap:4px;flex-wrap:wrap">
-                <!-- box 1 -->
-                <div style="width:32px;height:32px;background:#0a0a0a;border:1px solid rgba(255,26,26,.4);position:relative">
-                  <div style="position:absolute;bottom:0;left:0;right:0;height:4px;background:rgba(255,26,26,.6)"></div>
-                  <div style="position:absolute;top:4px;left:50%;transform:translateX(-50%);font-size:.32rem;font-weight:800;color:rgba(255,26,26,.8);letter-spacing:.05em">K</div>
-                </div>
-                <!-- box 2 -->
-                <div style="width:44px;height:44px;background:linear-gradient(135deg,#0f0f0f,#1a0000);border:1px solid rgba(255,26,26,.5);position:relative;display:flex;align-items:center;justify-content:center">
-                  <div style="font-size:.45rem;font-weight:800;color:rgba(255,26,26,.9);letter-spacing:.1em">K</div>
-                </div>
-                <!-- cylinder -->
-                <div style="width:28px;height:44px;background:linear-gradient(to right,#0a0a0a,#1a0000,#0a0a0a);border:1px solid rgba(255,26,26,.3);display:flex;align-items:center;justify-content:center">
-                  <div style="transform:rotate(90deg);font-size:.3rem;color:rgba(255,26,26,.7);letter-spacing:.08em;white-space:nowrap">KIMERICA</div>
-                </div>
-              </div>
-              <div>
-                <div style="font-size:.44rem;color:var(--white);font-weight:700;letter-spacing:.1em;margin-bottom:3px">BOX SYSTEM</div>
-                <div style="font-size:.4rem;color:var(--muted)">Rigid · Matte · Foil stamp</div>
-              </div>
-            </div>
-            <!-- Candle / secondary -->
-            <div style="display:flex;gap:4px">
-              <div style="flex:1;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;gap:6px">
-                <div style="width:16px;height:22px;background:linear-gradient(to top,#1a0000,#060608);border:1px solid rgba(255,26,26,.3)"></div>
-                <div style="font-size:.4rem;color:var(--muted)">Candle · Noir</div>
-              </div>
-              <div style="flex:1;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;gap:6px">
-                <div style="width:22px;height:16px;background:var(--scarlet)"></div>
-                <div style="font-size:.4rem;color:var(--muted)">Ribbon · Bag</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <!-- CELDA 6: Motion / Wave / Partículas -->
+      <div class="mb-cell" id="mb6" style="cursor:pointer" onclick="mbExpand('motion')">
+        <canvas id="mb-cv-6"></canvas>
+        <div class="mb-cell-overlay"><div class="mb-tag">MOTION LANGUAGE</div></div>
+      </div>
 
-        <!-- 4. SOCIAL MEDIA CAMPAIGNS -->
-        <div class="bp-sub" id="bps-social" onclick="bpExpand(event,'bps-social')">
-          <div class="bp-sub-header">
-            <span class="bp-sub-title">SOCIAL MEDIA</span>
-            <button class="bp-expand-btn" onclick="bpExpand(event,'bps-social')">EXPAND ↗</button>
-          </div>
-          <div class="bp-sub-body" style="display:flex;flex-direction:column;gap:5px">
-            <!-- Phone mockup small -->
-            <div style="display:flex;gap:6px;flex:1">
-              <div style="width:52px;background:#060608;border:1px solid var(--border);border-radius:6px;overflow:hidden;flex-shrink:0;display:flex;flex-direction:column">
-                <div style="background:#0d0d10;padding:3px 4px;display:flex;align-items:center;gap:3px;border-bottom:1px solid var(--border)">
-                  <div style="width:5px;height:5px;border-radius:50%;background:rgba(255,26,26,.4)"></div>
-                </div>
-                <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px">
-                  <div style="width:100%;height:20px;background:linear-gradient(135deg,var(--black),rgba(255,26,26,.2));display:flex;align-items:center;justify-content:center">
-                    <span style="font-size:.34rem;color:var(--scarlet);font-weight:800">K</span>
-                  </div>
-                  <div style="width:80%;height:1px;background:rgba(255,26,26,.3)"></div>
-                  <div style="width:100%;height:8px;background:var(--surface2)"></div>
-                  <div style="width:100%;height:8px;background:var(--surface2)"></div>
-                </div>
-              </div>
-              <div style="flex:1;display:flex;flex-direction:column;gap:4px">
-                <div style="display:flex;gap:4px">
-                  <div style="flex:1;height:28px;background:linear-gradient(135deg,#1a0000,#060608);border:1px solid rgba(255,26,26,.3);display:flex;align-items:center;justify-content:center">
-                    <span style="font-size:.4rem;color:var(--scarlet);font-weight:700">POST</span>
-                  </div>
-                  <div style="flex:1;height:28px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center">
-                    <span style="font-size:.4rem;color:var(--muted)">STORY</span>
-                  </div>
-                </div>
-                <div style="flex:1;background:var(--surface2);border:1px solid var(--border);padding:5px 6px">
-                  <div style="font-size:.4rem;color:var(--muted);margin-bottom:3px">Caption:</div>
-                  <div style="font-size:.4rem;color:var(--white);line-height:1.5">"Elegance is<br>not acquired."</div>
-                  <div style="font-size:.38rem;color:var(--scarlet);margin-top:2px">#KIMERICA</div>
-                </div>
-              </div>
-            </div>
-            <!-- Metrics row -->
-            <div style="display:flex;gap:4px">
-              <div style="flex:1;padding:4px;border:1px solid var(--border);text-align:center">
-                <div style="font-family:'Cormorant Garamond',serif;font-size:.7rem;color:var(--scarlet)">12K</div>
-                <div style="font-size:.38rem;color:var(--muted)">Reach</div>
-              </div>
-              <div style="flex:1;padding:4px;border:1px solid var(--border);text-align:center">
-                <div style="font-family:'Cormorant Garamond',serif;font-size:.7rem;color:var(--white)">8.4%</div>
-                <div style="font-size:.38rem;color:var(--muted)">Engage</div>
-              </div>
-              <div style="flex:1;padding:4px;border:1px solid var(--border);text-align:center">
-                <div style="font-family:'Cormorant Garamond',serif;font-size:.7rem;color:var(--white)">340</div>
-                <div style="font-size:.38rem;color:var(--muted)">Saves</div>
-              </div>
-            </div>
-          </div>
-        </div>
+    </div>
 
-        <!-- 5. PRINT MATERIALS -->
-        <div class="bp-sub" id="bps-print" onclick="bpExpand(event,'bps-print')">
-          <div class="bp-sub-header">
-            <span class="bp-sub-title">PRINT MATERIALS</span>
-            <button class="bp-expand-btn" onclick="bpExpand(event,'bps-print')">EXPAND ↗</button>
-          </div>
-          <div class="bp-sub-body" style="display:flex;flex-direction:column;gap:5px">
-            <!-- Magazine / brochure mockup -->
-            <div style="flex:1;background:linear-gradient(135deg,#0d0d10,#060608);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:8px;padding:8px;min-height:60px">
-              <!-- Book 1 -->
-              <div style="width:36px;height:50px;background:var(--black);border:1px solid var(--border-red);position:relative;overflow:hidden">
-                <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--scarlet)"></div>
-                <div style="padding:4px 6px;padding-left:8px">
-                  <div style="font-size:.28rem;font-weight:800;color:var(--white);letter-spacing:.05em;line-height:1.3">KIME<br>RICA</div>
-                  <div style="width:70%;height:1px;background:rgba(255,26,26,.4);margin:3px 0"></div>
-                  <div style="font-size:.24rem;color:var(--muted)">Brand<br>Book</div>
-                </div>
-              </div>
-              <!-- Open book -->
-              <div style="display:flex;height:44px">
-                <div style="width:28px;background:#ffffff;border:1px solid #ddd;display:flex;flex-direction:column;padding:4px 4px 4px 6px">
-                  <div style="width:80%;height:1px;background:#FF1A1A;margin-bottom:3px"></div>
-                  <div style="width:60%;height:1.5px;background:#eee;margin-bottom:2px"></div>
-                  <div style="width:80%;height:1.5px;background:#eee;margin-bottom:2px"></div>
-                  <div style="width:50%;height:1.5px;background:#eee"></div>
-                </div>
-                <div style="width:28px;background:#f5f5f5;border:1px solid #ddd;border-left:none;display:flex;align-items:center;justify-content:center">
-                  <div style="font-size:.24rem;color:#FF1A1A;font-weight:700;transform:rotate(-90deg);white-space:nowrap">LUXE</div>
-                </div>
-              </div>
-              <!-- Business card -->
-              <div style="width:56px;height:34px;background:var(--black);border:1px solid rgba(255,26,26,.5);display:flex;flex-direction:column;justify-content:space-between;padding:4px 6px">
-                <div style="font-size:.28rem;font-weight:800;letter-spacing:.1em;color:var(--white)">KIMERICA<span style="color:var(--scarlet)">.</span></div>
-                <div>
-                  <div style="font-size:.22rem;color:var(--muted)">studio@kimerica.com</div>
-                  <div style="font-size:.22rem;color:var(--scarlet)">kimerica.studio</div>
-                </div>
-              </div>
-            </div>
-            <!-- Formats -->
-            <div style="display:flex;gap:4px">
-              <div style="flex:1;padding:4px 6px;border:1px solid var(--border);font-size:.4rem;color:var(--muted);text-align:center">A4 · Letter</div>
-              <div style="flex:1;padding:4px 6px;border:1px solid var(--border);font-size:.4rem;color:var(--muted);text-align:center">88×55mm</div>
-              <div style="flex:1;padding:4px 6px;border:1px solid rgba(255,26,26,.3);font-size:.4rem;color:var(--scarlet);text-align:center">CMYK</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 6. MOODBOARD CONCEPTS -->
-        <div class="bp-sub" id="bps-mood" onclick="bpExpand(event,'bps-mood')">
-          <div class="bp-sub-header">
-            <span class="bp-sub-title">MOODBOARD</span>
-            <button class="bp-expand-btn" onclick="bpExpand(event,'bps-mood')">EXPAND ↗</button>
-          </div>
-          <div class="bp-sub-body" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:3px;padding:8px">
-            <div style="background:#060608;border:1px solid rgba(255,26,26,.2);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden">
-              <div style="position:absolute;inset:0;background:radial-gradient(circle at 30% 70%,rgba(255,26,26,.2),transparent)"></div>
-              <span style="font-size:.56rem;color:rgba(255,26,26,.5);font-weight:700;letter-spacing:.1em;z-index:1">DARK</span>
-            </div>
-            <div style="background:linear-gradient(135deg,#f8f6f2,#e8e4dc);display:flex;align-items:center;justify-content:center">
-              <span style="font-size:.5rem;color:#060608;font-weight:700;letter-spacing:.08em">IVORY</span>
-            </div>
-            <div style="background:linear-gradient(135deg,#8B0000,#FF1A1A);display:flex;align-items:center;justify-content:center">
-              <span style="font-size:.5rem;color:#000;font-weight:700;letter-spacing:.08em">SCARLET</span>
-            </div>
-            <div style="background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden">
-              <canvas id="mb-cv-5" style="position:absolute;inset:0;width:100%!important;height:100%!important;opacity:.7"></canvas>
-              <span style="font-size:.44rem;color:var(--muted);z-index:1;letter-spacing:.08em">TEXTURE</span>
-            </div>
-          </div>
-        </div>
-
-      </div><!-- /brand-panel-subs -->
-    </div><!-- /brand-panel -->
-    </div><!-- /preview-moodboard -->
+    <!-- MODAL EXPAND para sub-celdas -->
+    <div id="mb-modal" style="display:none;position:fixed;inset:0;background:rgba(6,6,8,.95);z-index:5000;flex-direction:column;backdrop-filter:blur(8px);animation:fup .25s forwards">
+      <div style="height:50px;background:#0d0d10;border-bottom:1px solid rgba(255,26,26,.2);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0">
+        <div style="width:8px;height:8px;border-radius:50%;background:#FF1A1A;box-shadow:0 0 8px rgba(255,26,26,.7)"></div>
+        <div id="mb-modal-title" style="font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#f8f6f2;flex:1">ASSET</div>
+        <button onclick="mbClose()" style="padding:6px 16px;border:1px solid rgba(255,26,26,.35);background:transparent;color:#FF1A1A;font-size:10px;font-weight:700;letter-spacing:.12em;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,26,26,.1)'" onmouseout="this.style.background='transparent'">✕ CERRAR</button>
+      </div>
+      <div id="mb-modal-body" style="flex:1;overflow:auto;padding:32px;display:flex;gap:16px;flex-wrap:wrap;align-content:flex-start"></div>
+    </div>
     <div class="preview-proposal-text">
       <div class="out-label">Creative Direction — <span id="pv-model-label">AI</span></div>
       <div class="proposal-body" id="pv-proposal-text">KIMERICA proposes a creative direction built around "structured authority" — the deliberate communication of power through restraint. The visual system anchors in monochromatic architecture where typography becomes the primary voice: severe, confident, architectural.</div>
@@ -1421,8 +1061,289 @@ function initAbout(){
   let f=0;(function loop(){requestAnimationFrame(loop);f+=.006;mesh.rotation.y=f;mesh.rotation.x=Math.sin(f*.5)*.3;wire.rotation.y=f*1.02;renderer.render(scene,cam)})();
 }
 function initProjectPreviewCanvas(){
-  const cv=document.getElementById('preview-main-cv');if(!cv||!window.THREE)return;
-  const W=cv.offsetWidth||700,H=cv.offsetHeight||480;
+  // Canvas hidden — website rendered via iframe instead
+  buildBrandWebsite();
+}
+
+// ══════════════════════════════════════════
+// BUILD LIVE BRAND WEBSITE IN IFRAME
+// ══════════════════════════════════════════
+function buildBrandWebsite(){
+  const iframe = document.getElementById('brand-site-iframe');
+  if(!iframe) return;
+
+  // Pull data from the proposal
+  const proposalText = document.getElementById('claude-out')?.textContent || '';
+  const vision = document.getElementById('vision')?.value || '';
+
+  // Extract brand name: first capitalized word > 3 chars from vision or proposal
+  const allText = (vision + ' ' + proposalText);
+  const brandWords = allText.split(/\s+/).filter(w => w.length > 3 && /^[A-Z]/.test(w));
+  const rawBrand = brandWords[0] || 'LUXE';
+  const BRAND = rawBrand.replace(/[^A-Za-z0-9]/g,'').toUpperCase().substring(0,10) || 'LUXE';
+  const INITIAL = BRAND[0];
+
+  // Visual direction
+  const visDir = (document.getElementById('pv-visual')?.textContent || 'Luxury Black').toLowerCase();
+  const objective = document.getElementById('pv-objective')?.textContent || 'Brand Authority System';
+
+  // Tagline — extract from proposal or use default
+  const taglineMatch = proposalText.match(/[""]([^""]{10,60})[""]/);
+  const TAGLINE = taglineMatch ? taglineMatch[1] : 'Elegance Redefined';
+
+  // Colors based on visual direction
+  let PRIMARY = '#FF1A1A', ACCENT = '#8b0000', BG = '#060608', TEXT = '#f8f6f2';
+  if(visDir.includes('gold') || visDir.includes('luxury')) { PRIMARY='#c9a96e'; ACCENT='#8b6914'; }
+  if(visDir.includes('blue') || visDir.includes('corporate')) { PRIMARY='#1a6eff'; ACCENT='#003cb3'; }
+  if(visDir.includes('green') || visDir.includes('sustain')) { PRIMARY='#22d464'; ACCENT='#0d7a36'; }
+
+  // Update url bar
+  const urlBar = document.getElementById('site-url-bar');
+  if(urlBar) urlBar.textContent = `www.${BRAND.toLowerCase()}.studio`;
+
+  // Sync moodboard brand labels
+  ['mb-logo-display','mb-social-brand'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.textContent=BRAND;
+  });
+  const monoEl=document.getElementById('mb-mono-display'); if(monoEl) monoEl.textContent=INITIAL;
+  const tagEl=document.getElementById('mb-tagline-display'); if(tagEl) tagEl.textContent=TAGLINE.substring(0,22);
+  const socialTag=document.getElementById('mb-social-tag'); if(socialTag) socialTag.textContent='#'+BRAND;
+
+  // Build the full website HTML
+  const siteHTML = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${BRAND}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--p:${PRIMARY};--a:${ACCENT};--bg:${BG};--tx:${TEXT}}
+html{scroll-behavior:smooth;font-size:14px}
+body{background:var(--bg);color:var(--tx);font-family:'Syne',sans-serif;overflow-x:hidden}
+/* NAV */
+nav{position:sticky;top:0;background:rgba(6,6,8,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.07);padding:14px 32px;display:flex;align-items:center;gap:28px;z-index:100}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;letter-spacing:.1em;color:var(--tx)}
+.nav-logo em{color:var(--p);font-style:italic}
+.nav-links{display:flex;gap:24px;margin-left:auto}
+.nav-links a{font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(248,246,242,.4);text-decoration:none;transition:color .3s}
+.nav-links a:hover{color:var(--tx)}
+.nav-cta{padding:8px 20px;border:1px solid var(--p);color:var(--p);font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;background:transparent;transition:all .3s;margin-left:8px}
+.nav-cta:hover{background:var(--p);color:#000}
+/* HERO */
+.hero{min-height:85vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 40px 60px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,${PRIMARY}18 0%,transparent 65%);pointer-events:none}
+.hero-eyebrow{font-size:.65rem;font-weight:700;letter-spacing:.35em;text-transform:uppercase;color:var(--p);margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';flex:1;max-width:40px;height:1px;background:var(--p);opacity:.6}
+.hero-h1{font-family:'Cormorant Garamond',serif;font-size:clamp(3.5rem,8vw,7rem);font-weight:300;line-height:.95;letter-spacing:-.02em;margin-bottom:24px}
+.hero-h1 em{font-style:italic;color:var(--p)}
+.hero-h1 .ghost{-webkit-text-stroke:1px rgba(248,246,242,.2);color:transparent}
+.hero-p{font-size:.9rem;color:rgba(248,246,242,.5);max-width:480px;line-height:1.8;margin-bottom:40px}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.btn-primary{padding:14px 36px;background:var(--p);color:#000;font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border:none;transition:all .3s;box-shadow:0 0 20px ${PRIMARY}44}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px ${PRIMARY}66}
+.btn-out{padding:14px 36px;border:1px solid rgba(255,255,255,.2);color:var(--tx);font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;background:transparent;transition:all .3s}
+.btn-out:hover{border-color:var(--p);color:var(--p)}
+/* METRICS */
+.metrics{display:flex;justify-content:center;gap:0;border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07);margin:0}
+.metric{flex:1;max-width:200px;padding:28px 24px;text-align:center;border-right:1px solid rgba(255,255,255,.07)}
+.metric:last-child{border-right:none}
+.metric-num{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:300;color:var(--p);line-height:1}
+.metric-lbl{font-size:.6rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:rgba(248,246,242,.3);margin-top:6px}
+/* SECTION */
+.section{padding:80px 5%;max-width:1200px;margin:0 auto}
+.section-label{font-size:.62rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--p);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.section-label::before{content:'';width:24px;height:1px;background:var(--p)}
+.section-h{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3.5rem);font-weight:300;line-height:1.05;margin-bottom:48px}
+.section-h em{font-style:italic;color:var(--p)}
+/* SERVICES GRID */
+.services{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);margin-bottom:80px}
+.svc-card{background:var(--bg);padding:32px 28px;transition:background .3s;cursor:pointer;position:relative;overflow:hidden}
+.svc-card::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--p);transition:width .4s;box-shadow:0 0 8px ${PRIMARY}88}
+.svc-card:hover::after{width:100%}
+.svc-card:hover{background:${PRIMARY}08}
+.svc-icon{font-size:1.6rem;margin-bottom:16px;display:block}
+.svc-title{font-size:.82rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tx);margin-bottom:10px}
+.svc-desc{font-size:.8rem;color:rgba(248,246,242,.4);line-height:1.7}
+.svc-price{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;color:var(--p);margin-top:16px}
+/* ABOUT */
+.about{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-bottom:80px;padding:0 5%}
+.about-text .section-label{margin-bottom:12px}
+.about-body{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:300;line-height:1.85;color:rgba(248,246,242,.75);border-left:1px solid var(--p);padding-left:20px;margin-bottom:24px}
+.about-visual{background:linear-gradient(135deg,${BG},${PRIMARY}22);border:1px solid ${PRIMARY}33;min-height:280px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.about-visual::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,${PRIMARY}15,transparent 70%)}
+.about-brand-big{font-family:'Cormorant Garamond',serif;font-size:6rem;font-weight:300;color:${PRIMARY}18;letter-spacing:-.04em;line-height:1;position:relative}
+.about-brand-big em{font-style:italic;color:${PRIMARY}35}
+/* PORTFOLIO */
+.portfolio{padding:0 5% 80px;max-width:1200px;margin:0 auto}
+.port-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.port-item{aspect-ratio:4/3;background:linear-gradient(135deg,${BG},${PRIMARY}18);border:1px solid ${PRIMARY}22;display:flex;align-items:flex-end;padding:16px;cursor:pointer;transition:all .35s;position:relative;overflow:hidden}
+.port-item::before{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(6,6,8,.8) 0%,transparent 60%)}
+.port-item:hover{border-color:${PRIMARY}66;transform:scale(1.02)}
+.port-item .port-num{position:absolute;top:12px;right:12px;font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:300;color:${PRIMARY}15;line-height:1}
+.port-label{position:relative;z-index:1;font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(248,246,242,.5)}
+/* CTA SECTION */
+.cta-section{background:linear-gradient(135deg,${PRIMARY}12,${BG});border-top:1px solid ${PRIMARY}22;border-bottom:1px solid ${PRIMARY}22;padding:80px 5%;text-align:center;margin-bottom:60px}
+.cta-h{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,5vw,4.5rem);font-weight:300;line-height:1;margin-bottom:20px}
+.cta-h em{font-style:italic;color:var(--p)}
+.cta-sub{font-size:.9rem;color:rgba(248,246,242,.4);margin-bottom:36px;max-width:400px;margin-left:auto;margin-right:auto}
+/* FOOTER */
+footer{padding:36px 5%;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:rgba(248,246,242,.3)}
+.footer-links{display:flex;gap:20px}
+.footer-links a{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(248,246,242,.25);text-decoration:none}
+.footer-links a:hover{color:var(--p)}
+/* SCROLL ANIMATIONS */
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.reveal{animation:slideUp .7s ease both}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">${BRAND.split('').map((c,i)=>i===0?`<em>${c}</em>`:c).join('')}</div>
+  <div class="nav-links">
+    <a href="#servicios" onclick="return scrollTo_(this)">Servicios</a>
+    <a href="#nosotros" onclick="return scrollTo_(this)">Nosotros</a>
+    <a href="#portafolio" onclick="return scrollTo_(this)">Portafolio</a>
+    <a href="#contacto" onclick="return scrollTo_(this)">Contacto</a>
+  </div>
+  <button class="nav-cta" onclick="showContact()">Consulta Exclusiva</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">${TAGLINE.substring(0,30)}</div>
+  <h1 class="hero-h1">
+    <em>${BRAND}</em><br>
+    <span class="ghost">Studio</span>
+  </h1>
+  <p class="hero-p">${objective}. Sistemas visuales de autoridad construidos para marcas que no piden permiso.</p>
+  <div class="hero-btns">
+    <button class="btn-primary" onclick="showContact()">Iniciar Proyecto</button>
+    <button class="btn-out" onclick="document.getElementById('portafolio').scrollIntoView({behavior:'smooth'})">Ver Portafolio</button>
+  </div>
+</section>
+
+<!-- METRICS -->
+<div class="metrics">
+  <div class="metric"><div class="metric-num">48<sup style="font-size:1.2rem;color:var(--p)">+</sup></div><div class="metric-lbl">Proyectos Entregados</div></div>
+  <div class="metric"><div class="metric-num">12</div><div class="metric-lbl">Países</div></div>
+  <div class="metric"><div class="metric-num">∞</div><div class="metric-lbl">Posibilidades</div></div>
+  <div class="metric"><div class="metric-num">1</div><div class="metric-lbl">Estándar: Excelencia</div></div>
+</div>
+
+<!-- SERVICIOS -->
+<div class="section" id="servicios">
+  <div class="section-label">Lo que construimos</div>
+  <h2 class="section-h">Sistemas creativos<br><em>de autoridad.</em></h2>
+  <div class="services">
+    <div class="svc-card">
+      <span class="svc-icon">◈</span>
+      <div class="svc-title">Identidad Visual</div>
+      <div class="svc-desc">Sistema completo de marca. Logo, tipografía, paleta, guías de uso, papelería.</div>
+      <div class="svc-price">desde $4,200</div>
+    </div>
+    <div class="svc-card">
+      <span class="svc-icon">⬡</span>
+      <div class="svc-title">Experiencia Digital</div>
+      <div class="svc-desc">Sitios web que comunican poder. WebGL, animaciones, interacciones calculadas.</div>
+      <div class="svc-price">desde $5,500</div>
+    </div>
+    <div class="svc-card">
+      <span class="svc-icon">◭</span>
+      <div class="svc-title">3D & Motion</div>
+      <div class="svc-desc">Objetos 3D de producto, renders fotorrealistas, motion graphics y environments.</div>
+      <div class="svc-price">desde $3,800</div>
+    </div>
+    <div class="svc-card">
+      <span class="svc-icon">✦</span>
+      <div class="svc-title">Dirección Creativa</div>
+      <div class="svc-desc">Estrategia, concepto y brief creativo generado por IA y refinado por expertos.</div>
+      <div class="svc-price">desde $2,800</div>
+    </div>
+  </div>
+</div>
+
+<!-- NOSOTROS -->
+<div class="about" id="nosotros">
+  <div class="about-text">
+    <div class="section-label">Quiénes somos</div>
+    <h2 class="section-h" style="font-size:clamp(1.8rem,3vw,2.8rem)">Diseñamos<br><em>territorios,</em><br>no solo marcas.</h2>
+    <div class="about-body">${proposalText.substring(0,220)||'KIMERICA construye sistemas visuales que comunican autoridad antes de que el cliente diga una palabra. Cada decisión estética es deliberada, cada elemento gana su lugar.'}</div>
+    <button class="btn-primary" style="font-size:.68rem" onclick="showContact()">Hablemos de tu proyecto</button>
+  </div>
+  <div class="about-visual">
+    <div class="about-brand-big"><em>${INITIAL}</em>${BRAND.substring(1)}</div>
+  </div>
+</div>
+
+<!-- PORTAFOLIO -->
+<div class="portfolio" id="portafolio">
+  <div class="section-label">Trabajo selecto</div>
+  <h2 class="section-h" style="margin-bottom:32px">Portafolio<br><em>curado.</em></h2>
+  <div class="port-grid">
+    ${['Brand Identity','Digital Experience','3D Environment','Campaign System','Visual Direction','Motion Design'].map((item,i)=>`
+    <div class="port-item" onclick="toast_site('${item}')">
+      <div class="port-num">0${i+1}</div>
+      <div class="port-label">${item}</div>
+    </div>`).join('')}
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section" id="contacto">
+  <h2 class="cta-h">¿Listo para<br><em>construir</em> algo<br>extraordinario?</h2>
+  <p class="cta-sub">Tu propuesta personalizada está lista. El siguiente paso es tuyo.</p>
+  <button class="btn-primary" style="font-size:.8rem;padding:16px 48px" onclick="showContact()">Iniciar Ahora →</button>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">${BRAND}</div>
+  <div class="footer-links">
+    <a href="#">Instagram</a>
+    <a href="#">Behance</a>
+    <a href="#">LinkedIn</a>
+    <a href="#">Contacto</a>
+  </div>
+  <div style="font-size:.6rem;color:rgba(248,246,242,.2);letter-spacing:.1em">&copy; 2025 ${BRAND} · Todos los derechos reservados</div>
+</footer>
+
+<!-- CONTACT MODAL -->
+<div id="contact-modal" style="display:none;position:fixed;inset:0;background:rgba(6,6,8,.95);z-index:500;align-items:center;justify-content:center;padding:40px">
+  <div style="background:#0d0d10;border:1px solid ${PRIMARY}44;max-width:480px;width:100%;padding:40px;position:relative">
+    <button onclick="document.getElementById('contact-modal').style.display='none'" style="position:absolute;top:16px;right:16px;background:transparent;border:none;color:rgba(255,255,255,.4);font-size:18px;cursor:pointer;font-family:monospace">✕</button>
+    <div style="font-size:.65rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:${PRIMARY};margin-bottom:6px">CONSULTA</div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;margin-bottom:24px">Hablemos.</h3>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <input placeholder="Tu nombre" style="padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx,#f8f6f2);font-family:'Syne',sans-serif;font-size:.82rem;outline:none;width:100%" onfocus="this.style.borderColor='${PRIMARY}'" onblur="this.style.borderColor='rgba(255,255,255,.1)'">
+      <input placeholder="Tu email" style="padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx,#f8f6f2);font-family:'Syne',sans-serif;font-size:.82rem;outline:none;width:100%" onfocus="this.style.borderColor='${PRIMARY}'" onblur="this.style.borderColor='rgba(255,255,255,.1)'">
+      <textarea placeholder="Describe tu proyecto..." rows="4" style="padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx,#f8f6f2);font-family:'Syne',sans-serif;font-size:.82rem;outline:none;width:100%;resize:none" onfocus="this.style.borderColor='${PRIMARY}'" onblur="this.style.borderColor='rgba(255,255,255,.1)'"></textarea>
+      <button onclick="toast_site('Mensaje enviado — te contactamos en 24h');document.getElementById('contact-modal').style.display='none'" style="padding:14px;background:${PRIMARY};border:none;color:#000;font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer">ENVIAR CONSULTA →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function showContact(){document.getElementById('contact-modal').style.display='flex'}
+function scrollTo_(a){const t=a.getAttribute('href');const el=document.querySelector(t);if(el){el.scrollIntoView({behavior:'smooth'});return false}return true}
+function toast_site(msg){
+  let t=document.getElementById('site-toast');
+  if(!t){t=document.createElement('div');t.id='site-toast';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:${PRIMARY};color:#000;font-family:Syne,sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:10px 24px;z-index:9999;pointer-events:none';document.body.appendChild(t)}
+  t.textContent=msg;t.style.opacity='1';setTimeout(()=>t.style.opacity='0',2500);
+}
+// Reveal on scroll
+const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('reveal')}),{threshold:.1});
+document.querySelectorAll('.svc-card,.port-item,.metric').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>`;
+
+  iframe.srcdoc = siteHTML;
+  iframe.style.background = '#fff';
+}
   const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(W,H);renderer.setClearColor(0x060608);
   const scene=new THREE.Scene();const cam=new THREE.PerspectiveCamera(44,W/H,.1,200);cam.position.set(0,3,11);cam.lookAt(0,0,0);
@@ -1870,103 +1791,267 @@ function dbtab(tab,el){
 function toast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className=`${type} show`;setTimeout(()=>t.className='',3600)}
 
 // ══════════════════════════════════════════
-// BRAND PANEL INTERACTIONS
+// LIVE MOODBOARD — branding sub-screens
 // ══════════════════════════════════════════
-const BP_LABELS = {
-  website: 'Website · kimerica.studio',
-  '3d': '3D Brand Environment · Three.js',
-  social: 'Social Media Campaigns',
-  logo: 'Logo & Identity System'
-};
-function bpSwitch(view, btn) {
-  // hide all views
-  ['website','3d','social','logo'].forEach(v => {
-    const el = document.getElementById('bpv-'+v);
-    if (el) el.style.display = 'none';
-  });
-  const target = document.getElementById('bpv-'+view);
-  if (target) { target.style.display = (view==='logo'?'flex':'block'); target.style.display='flex'; }
-  // For website and 3d specifically override
-  if(view==='website'||view==='3d'||view==='social') {
-    if(target) { target.style.display='block'; }
-  }
-  document.querySelectorAll('.bp-nav-btn').forEach(b=>b.classList.remove('on'));
-  if(btn) btn.classList.add('on');
-  const lbl = document.getElementById('bp-main-label-txt');
-  if(lbl) lbl.textContent = BP_LABELS[view]||'';
-  // init 3D if switching to it
-  if(view==='3d') { setTimeout(()=>_mbCell6_Wave(), 100); }
-}
-
-let _bpExpanded = null;
-function bpExpand(event, id) {
-  event.stopPropagation();
-  const el = document.getElementById(id);
-  if(!el) return;
-  if(_bpExpanded === id) {
-    // collapse
-    el.classList.remove('expanded');
-    el.onclick = (e) => bpExpand(e, id);
-    _bpExpanded = null;
-    return;
-  }
-  if(_bpExpanded) {
-    const prev = document.getElementById(_bpExpanded);
-    if(prev) prev.classList.remove('expanded');
-  }
-  el.classList.add('expanded');
-  _bpExpanded = id;
-  // Click outside to close
-  setTimeout(()=>{
-    document.addEventListener('click', function _close(e){
-      if(!el.contains(e.target)){
-        el.classList.remove('expanded');
-        _bpExpanded=null;
-        document.removeEventListener('click',_close);
-      }
-    });
-  }, 10);
-}
-
-// Mini 3D for sub-panel
-function _initBpMini3D(){
-  const cv = document.getElementById('bp-cv-3d');
-  if(!cv || !window.THREE) return;
-  const W=cv.parentElement.offsetWidth||120, H=cv.parentElement.offsetHeight||80;
-  const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
-  renderer.setSize(W,H);renderer.setClearColor(0x060608);
-  const scene=new THREE.Scene();
-  const cam=new THREE.PerspectiveCamera(50,W/H,.1,100);cam.position.set(0,0,3.5);
-  scene.add(new THREE.AmbientLight(0xffffff,.15));
-  const rl=new THREE.PointLight(0xFF1A1A,6,20);rl.position.set(3,3,3);scene.add(rl);
-  scene.add(new THREE.PointLight(0xFF1A1A,2,8));
-  const geo=new THREE.IcosahedronGeometry(1,1);
-  const mesh=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0xdddddd,metalness:.98,roughness:.02}));
-  scene.add(mesh);
-  scene.add(new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0xFF1A1A,wireframe:true,transparent:true,opacity:.08})));
-  let f=0;(function loop(){requestAnimationFrame(loop);f+=.008;mesh.rotation.y=f;mesh.rotation.x=Math.sin(f*.5)*.3;renderer.render(scene,cam)})();
-}
-
-
 let _mbStarted=false;
+let _mb3dRenderer=null, _mb3dAF=null, _mb3dCurrentShape='torus';
+
 function initLiveMoodboard(){
-  if(_mbStarted)return;_mbStarted=true;
+  if(_mbStarted)return; _mbStarted=true;
   const v=document.getElementById('claude-out')?.textContent||'';
-  _mbCell1_3D();_mbCell2_Code(v);_mbCell3_Typography(v);_mbCell4_Particles();_mbCell5_Grid();_mbCell6_Wave();
-  setTimeout(_initBpMini3D, 400);
+  _mbCell1_3D_Product();
+  _mbCell4_Typography(v);
+  _mbCell6_Motion();
+  // Sync brand labels from proposal
+  setTimeout(()=>{ _syncMoodboardBrand(); },200);
 }
-function _mbCell1_3D(){const cv=document.getElementById('mb-cv-1');if(!cv||!window.THREE)return;const W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(W,H);renderer.setClearColor(0x060608);const scene=new THREE.Scene();const cam=new THREE.PerspectiveCamera(46,W/H,.1,100);cam.position.set(0,0,5.5);scene.add(new THREE.AmbientLight(0xffffff,.1));const rl=new THREE.PointLight(0xFF1A1A,5,20);rl.position.set(4,4,4);scene.add(rl);scene.add(new THREE.PointLight(0xFF1A1A,1.5,10));const geo=new THREE.TorusKnotGeometry(1.2,.3,200,18);const mesh=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0xeeeeee,metalness:.95,roughness:.04}));scene.add(mesh);scene.add(new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0xFF1A1A,wireframe:true,opacity:.07,transparent:true})));for(let i=0;i<4;i++){const s=new THREE.Mesh(new THREE.SphereGeometry(.045,8,8),new THREE.MeshStandardMaterial({color:0xFF1A1A,emissive:0xFF1A1A,emissiveIntensity:.9}));s.userData={a:i*(Math.PI*2/4),r:2.1,sp:.009+Math.random()*.006};scene.add(s);(function orbit(s){let f=0;(function l(){requestAnimationFrame(l);f+=s.userData.sp;s.position.x=Math.cos(f+s.userData.a)*s.userData.r;s.position.z=Math.sin(f+s.userData.a)*s.userData.r;s.position.y=Math.sin(f*1.3)*.8})()} )(s)}let f=0;(function loop(){requestAnimationFrame(loop);f+=.005;mesh.rotation.y=f;mesh.rotation.x=Math.sin(f*.4)*.25;renderer.render(scene,cam)})()}
-function _mbCell2_Code(v){const cv=document.getElementById('mb-cv-2');if(!cv)return;const W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;cv.width=W;cv.height=H;const ctx=cv.getContext('2d');const words=v.split(/\s+/).filter(w=>w.length>4).slice(0,8);const defs=['brand.identity','render()','motion.path','const scarlet','system.init','deploy()','WebGL.scene','AI.generate'];const lines=words.length>=4?words.map((w,i)=>`${['const','let','fn','class','import','export','async','type'][i%8]} ${w.toLowerCase().replace(/[^a-z]/g,'')} = ${['true','{}','[]','null','0xFF1A1A','()=>{}','"KIMERICA"','new Scene()'][i%8]}`):defs.map((l,i)=>`${['//','const','let','fn','→','class','import','export'][i%8]} ${l}`);let tick=0,charI=Array(lines.length).fill(0);const lh=Math.floor(H/lines.length)*0.9,fs=Math.max(10,Math.floor(lh*.55));function draw(){ctx.fillStyle='rgba(6,6,8,.18)';ctx.fillRect(0,0,W,H);ctx.font=`${fs}px 'Courier New',monospace`;lines.forEach((line,i)=>{const shown=line.substring(0,charI[i]);const y=18+i*(lh+2);ctx.fillStyle=i%3===0?'rgba(255,26,26,.85)':i%3===1?'rgba(248,246,242,.45)':'rgba(248,246,242,.2)';ctx.fillText(shown,10,y);if(i===Math.floor(tick/8)%lines.length&&charI[i]<line.length)charI[i]++});tick++;if(charI.every((c,i)=>c>=lines[i].length))setTimeout(()=>{charI=Array(lines.length).fill(0);tick=0},1400);requestAnimationFrame(draw)}ctx.fillStyle='#060608';ctx.fillRect(0,0,W,H);draw()}
-function _mbCell3_Typography(v){const cv=document.getElementById('mb-cv-3');if(!cv)return;const W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;cv.width=W;cv.height=H;const ctx=cv.getContext('2d');const word=v.split(/\s+/).find(w=>w.length>5)||'KIMERICA';const brand=word.toUpperCase().substring(0,9);let t=0;function draw(){ctx.fillStyle='rgba(6,6,8,.12)';ctx.fillRect(0,0,W,H);const ms=Math.floor(W*.18);ctx.font=`300 ${ms}px 'Cormorant Garamond',serif`;ctx.fillStyle=`rgba(248,246,242,${.55+Math.sin(t*.02)*.15})`;ctx.textAlign='center';ctx.fillText(brand,W/2,H*.5+ms*.35);const uw=ctx.measureText(brand).width;const ux=W/2-uw/2;const g=ctx.createLinearGradient(ux,0,ux+uw,0);g.addColorStop(0,'transparent');g.addColorStop(.3+Math.sin(t*.03)*.2,'rgba(255,26,26,.9)');g.addColorStop(1,'transparent');ctx.strokeStyle=g;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(ux,H*.5+ms*.42);ctx.lineTo(ux+uw,H*.5+ms*.42);ctx.stroke();ctx.font=`700 ${Math.floor(W*.055)}px 'Syne',sans-serif`;ctx.fillStyle='rgba(255,26,26,.7)';ctx.fillText('IDENTITY SYSTEM',W/2,H*.75);ctx.textAlign='left';t++;requestAnimationFrame(draw)}ctx.fillStyle='#060608';ctx.fillRect(0,0,W,H);draw()}
-function _mbCell4_Particles(){const cv=document.getElementById('mb-cv-4');if(!cv)return;const W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;cv.width=W;cv.height=H;const ctx=cv.getContext('2d');const N=80;const pts=Array.from({length:N},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.6+.4,pulse:Math.random()*Math.PI*2}));function draw(){ctx.fillStyle='rgba(6,6,8,.25)';ctx.fillRect(0,0,W,H);pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.pulse+=.04;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1});for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<80){ctx.strokeStyle=`rgba(255,26,26,${(.4-d/200)*.7})`;ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke()}}pts.forEach(p=>{const a=.5+Math.sin(p.pulse)*.3;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,26,26,${a})`;ctx.fill()});requestAnimationFrame(draw)}ctx.fillStyle='#060608';ctx.fillRect(0,0,W,H);draw()}
-function _mbCell5_Grid(){const cv=document.getElementById('mb-cv-5');if(!cv)return;const W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;cv.width=W;cv.height=H;const ctx=cv.getContext('2d');const COLS=10,ROWS=6,cw=W/COLS,ch=H/ROWS;let t=0;const cells=Array.from({length:COLS*ROWS},()=>({active:Math.random()>.7,flash:Math.random()*Math.PI*2,speed:.02+Math.random()*.04,val:Math.floor(Math.random()*99)}));function draw(){ctx.fillStyle='rgba(6,6,8,.3)';ctx.fillRect(0,0,W,H);t+=.02;cells.forEach((c,i)=>{c.flash+=c.speed;const col=i%COLS,row=Math.floor(i/COLS);const x=col*cw,y=row*ch;const b=c.active?(0.15+Math.sin(c.flash)*.12):0.04;ctx.strokeStyle=`rgba(255,26,26,${b})`;ctx.lineWidth=1;ctx.strokeRect(x+1,y+1,cw-2,ch-2);if(c.active){ctx.font=`${Math.floor(ch*.28)}px 'Courier New',monospace`;ctx.fillStyle=`rgba(255,26,26,${b*3})`;ctx.textAlign='center';ctx.fillText(c.val.toString().padStart(2,'0'),x+cw/2,y+ch/2+4);ctx.textAlign='left';if(Math.random()<.004)c.val=Math.floor(Math.random()*99)}});const scanY=(Math.sin(t*.5)+1)/2*H;const sg=ctx.createLinearGradient(0,scanY-12,0,scanY+12);sg.addColorStop(0,'transparent');sg.addColorStop(.5,'rgba(255,26,26,.25)');sg.addColorStop(1,'transparent');ctx.fillStyle=sg;ctx.fillRect(0,scanY-12,W,24);requestAnimationFrame(draw)}ctx.fillStyle='#060608';ctx.fillRect(0,0,W,H);draw()}
-function _mbCell6_Wave(){const cv=document.getElementById('mb-cv-6');if(!cv)return;const W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;cv.width=W;cv.height=H;const ctx=cv.getContext('2d');let t=0;function draw(){ctx.fillStyle='rgba(6,6,8,.22)';ctx.fillRect(0,0,W,H);t+=.022;const waves=[{amp:H*.22,freq:.018,speed:1,alpha:.7,lw:1.5},{amp:H*.14,freq:.028,speed:1.4,alpha:.4,lw:1},{amp:H*.08,freq:.042,speed:.7,alpha:.25,lw:.8}];waves.forEach(w=>{ctx.beginPath();for(let x=0;x<=W;x+=2){const y=H/2+Math.sin(x*w.freq+t*w.speed)*w.amp+Math.sin(x*.009+t*.3)*H*.06;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y)}ctx.strokeStyle=`rgba(255,26,26,${w.alpha})`;ctx.lineWidth=w.lw;ctx.stroke()});for(let i=1;i<5;i++){const mx=W*(i/5);const mh=H*.3+Math.sin(t+i)*H*.12;ctx.strokeStyle=`rgba(255,26,26,${.15+Math.sin(t*.8+i)*.08})`;ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(mx,H/2-mh);ctx.lineTo(mx,H/2+mh);ctx.stroke()}ctx.font=`700 ${Math.floor(W*.06)}px 'Syne',sans-serif`;ctx.fillStyle='rgba(255,26,26,.35)';ctx.textAlign='center';ctx.fillText('MOTION',W/2,H*.2);ctx.textAlign='left';requestAnimationFrame(draw)}ctx.fillStyle='#060608';ctx.fillRect(0,0,W,H);draw()}
+
+function _syncMoodboardBrand(){
+  const vision=document.getElementById('vision')?.value||'';
+  const proposal=document.getElementById('claude-out')?.textContent||'';
+  const allText=vision+' '+proposal;
+  const words=allText.split(/\s+/).filter(w=>w.length>3&&/^[A-Z]/.test(w));
+  const BRAND=(words[0]||'LUXE').replace(/[^A-Za-z0-9]/g,'').toUpperCase().substring(0,10)||'LUXE';
+  const INITIAL=BRAND[0];
+  // Tagline
+  const tm=proposal.match(/[""]([^""]{10,50})[""]/);
+  const TAG=tm?tm[1]:'Elegance Redefined';
+  // Update logo cell
+  const ld=document.getElementById('mb-logo-display'); if(ld)ld.textContent=BRAND;
+  const md=document.getElementById('mb-mono-display'); if(md)md.textContent=INITIAL;
+  const td=document.getElementById('mb-tagline-display'); if(td)td.textContent=TAG.substring(0,22);
+  // Social cell
+  const sb=document.getElementById('mb-social-brand'); if(sb)sb.textContent=BRAND;
+  const st=document.getElementById('mb-social-tag'); if(st)st.textContent='#'+BRAND;
+}
+
+// ── MB CELL 1: Three.js 3D product object ────────────────────────────────────
+function _mbCell1_3D_Product(){
+  const cv=document.getElementById('mb-cv-1');
+  if(!cv||!window.THREE)return;
+  _mb3dCurrentShape='torus';
+  _buildMb3d(cv,'torus');
+}
+
+window.mb3dShape=function(shape){
+  const cv=document.getElementById('mb-cv-1');
+  if(!cv||!window.THREE)return;
+  _mb3dCurrentShape=shape;
+  _buildMb3d(cv,shape);
+};
+
+function _buildMb3d(cv,shape){
+  if(_mb3dRenderer){_mb3dRenderer.dispose();cancelAnimationFrame(_mb3dAF)}
+  const W=cv.parentElement.offsetWidth||400, H=cv.parentElement.offsetHeight||400;
+  const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(W,H);
+  renderer.setClearColor(0x060608);
+  _mb3dRenderer=renderer;
+  const scene=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(46,W/H,.1,100);
+  cam.position.set(0,0,6);
+  // Lights
+  scene.add(new THREE.AmbientLight(0xffffff,.1));
+  const rl=new THREE.PointLight(0xFF1A1A,6,20); rl.position.set(4,4,4); scene.add(rl);
+  scene.add(new THREE.PointLight(0xFF1A1A,2,12));
+  const wl=new THREE.PointLight(0xffffff,1.5,15); wl.position.set(-3,-2,3); scene.add(wl);
+  // Main geometry
+  let geo;
+  const mat=new THREE.MeshStandardMaterial({color:0xdddddd,metalness:.95,roughness:.04,envMapIntensity:1});
+  const wireMat=new THREE.MeshBasicMaterial({color:0xFF1A1A,wireframe:true,opacity:.07,transparent:true});
+  if(shape==='torus'){
+    geo=new THREE.TorusKnotGeometry(1.2,.3,200,18);
+  } else if(shape==='gem'){
+    geo=new THREE.IcosahedronGeometry(1.4,2);
+    mat.metalness=.98; mat.roughness=.02;
+  } else if(shape==='bottle'){
+    // Lathe geometry simulating a bottle
+    const pts=[];
+    const profile=[[0,.05],[.18,.05],[.22,.2],[.22,.55],[.18,.62],[.12,.72],[.1,.9],[.09,1.1],[.11,1.3],[.09,1.35],[.06,1.4],[.05,1.5]];
+    profile.forEach(([r,y])=>pts.push(new THREE.Vector2(r,y-0.75)));
+    geo=new THREE.LatheGeometry(pts,32);
+  } else if(shape==='box'){
+    geo=new THREE.BoxGeometry(1.6,2.2,1.6,.8,.8,.8);
+    mat.roughness=.15; mat.metalness=.7;
+  } else {
+    geo=new THREE.TorusKnotGeometry(1.2,.3,200,18);
+  }
+  const mesh=new THREE.Mesh(geo,mat); scene.add(mesh);
+  const wire=new THREE.Mesh(geo,wireMat); scene.add(wire);
+  // Orbiting red spheres
+  for(let i=0;i<4;i++){
+    const s=new THREE.Mesh(
+      new THREE.SphereGeometry(.05,8,8),
+      new THREE.MeshStandardMaterial({color:0xFF1A1A,emissive:0xFF1A1A,emissiveIntensity:.9})
+    );
+    s.userData={a:i*(Math.PI*2/4),r:2.2,sp:.009+Math.random()*.006};
+    scene.add(s);
+    (function orb(s){
+      let f=0;
+      (function l(){requestAnimationFrame(l);f+=s.userData.sp;
+        s.position.x=Math.cos(f+s.userData.a)*s.userData.r;
+        s.position.z=Math.sin(f+s.userData.a)*s.userData.r;
+        s.position.y=Math.sin(f*1.3)*.8;
+      })();
+    })(s);
+  }
+  // Mouse influence
+  let mx=0,my=0;
+  const mbEl=document.getElementById('mb1');
+  if(mbEl){
+    mbEl.addEventListener('mousemove',e=>{
+      const r=mbEl.getBoundingClientRect();
+      mx=(e.clientX-r.left)/r.width-.5;
+      my=-((e.clientY-r.top)/r.height-.5);
+    });
+  }
+  let f=0;
+  (function loop(){
+    _mb3dAF=requestAnimationFrame(loop);
+    f+=.005;
+    mesh.rotation.y+=(mx*.8-mesh.rotation.y)*.03+.004;
+    mesh.rotation.x+=(my*.5-mesh.rotation.x)*.03;
+    wire.rotation.y=mesh.rotation.y;
+    wire.rotation.x=mesh.rotation.x;
+    renderer.render(scene,cam);
+  })();
+}
+
+// ── MB CELL 4: Typography animation ──────────────────────────────────────────
+function _mbCell4_Typography(v){
+  const cv=document.getElementById('mb-cv-4');
+  if(!cv)return;
+  const W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;
+  cv.width=W; cv.height=H;
+  const ctx=cv.getContext('2d');
+  const word=(v.split(/\s+/).find(w=>w.length>5)||'KIMERICA').toUpperCase().substring(0,9);
+  let t=0;
+  function draw(){
+    ctx.fillStyle='rgba(6,6,8,.12)'; ctx.fillRect(0,0,W,H);
+    const ms=Math.floor(W*.18);
+    ctx.font=`300 ${ms}px 'Cormorant Garamond',serif`;
+    ctx.fillStyle=`rgba(248,246,242,${.5+Math.sin(t*.02)*.15})`;
+    ctx.textAlign='center';
+    ctx.fillText(word,W/2,H*.5+ms*.35);
+    const uw=ctx.measureText(word).width;
+    const ux=W/2-uw/2;
+    const g=ctx.createLinearGradient(ux,0,ux+uw,0);
+    g.addColorStop(0,'transparent');
+    g.addColorStop(.3+Math.sin(t*.03)*.2,'rgba(255,26,26,.9)');
+    g.addColorStop(1,'transparent');
+    ctx.strokeStyle=g; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(ux,H*.5+ms*.42); ctx.lineTo(ux+uw,H*.5+ms*.42); ctx.stroke();
+    ctx.font=`700 ${Math.floor(W*.055)}px 'Syne',sans-serif`;
+    ctx.fillStyle='rgba(255,26,26,.6)';
+    ctx.fillText('TYPOGRAPHY SYSTEM',W/2,H*.8);
+    ctx.textAlign='left'; t++;
+    requestAnimationFrame(draw);
+  }
+  ctx.fillStyle='#060608'; ctx.fillRect(0,0,W,H); draw();
+}
+
+// ── MB CELL 6: Motion wave ───────────────────────────────────────────────────
+function _mbCell6_Motion(){
+  const cv=document.getElementById('mb-cv-6');
+  if(!cv)return;
+  const W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;
+  cv.width=W; cv.height=H;
+  const ctx=cv.getContext('2d');
+  let t=0;
+  function draw(){
+    ctx.fillStyle='rgba(6,6,8,.22)'; ctx.fillRect(0,0,W,H);
+    t+=.022;
+    [{amp:H*.22,freq:.018,speed:1,alpha:.7,lw:1.5},{amp:H*.14,freq:.028,speed:1.4,alpha:.4,lw:1},{amp:H*.08,freq:.042,speed:.7,alpha:.25,lw:.8}].forEach(w=>{
+      ctx.beginPath();
+      for(let x=0;x<=W;x+=2){const y=H/2+Math.sin(x*w.freq+t*w.speed)*w.amp+Math.sin(x*.009+t*.3)*H*.06;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y)}
+      ctx.strokeStyle=`rgba(255,26,26,${w.alpha})`; ctx.lineWidth=w.lw; ctx.stroke();
+    });
+    for(let i=1;i<5;i++){
+      const mx=W*(i/5),mh=H*.3+Math.sin(t+i)*H*.12;
+      ctx.strokeStyle=`rgba(255,26,26,${.15+Math.sin(t*.8+i)*.08})`; ctx.lineWidth=.7;
+      ctx.beginPath(); ctx.moveTo(mx,H/2-mh); ctx.lineTo(mx,H/2+mh); ctx.stroke();
+    }
+    ctx.font=`700 ${Math.floor(W*.06)}px 'Syne',sans-serif`;
+    ctx.fillStyle='rgba(255,26,26,.35)';
+    ctx.textAlign='center'; ctx.fillText('MOTION',W/2,H*.18); ctx.textAlign='left';
+    requestAnimationFrame(draw);
+  }
+  ctx.fillStyle='#060608'; ctx.fillRect(0,0,W,H); draw();
+}
+
+// ── Modal expand for sub-cells ───────────────────────────────────────────────
+const _mbModalData={
+  'logo':{title:'LOGO & IDENTITY SYSTEM',items:[
+    {i:'🖤',n:'Logotipo Dark',t:'SVG · EPS · PNG'},
+    {i:'🤍',n:'Logotipo Light',t:'SVG · EPS · PNG'},
+    {i:'🔴',n:'Monogram',t:'SVG · EPS · AI'},
+    {i:'📐',n:'Grid System',t:'PDF · AI'},
+    {i:'🎨',n:'Paleta de Color',t:'ASE · PDF · HEX'},
+    {i:'🔤',n:'Typography Spec',t:'PDF · GUIDELINE'},
+  ]},
+  'palette':{title:'COLOR SYSTEM',items:[
+    {i:'🔴',n:'Scarlet Primary',t:'#FF1A1A · RGB · CMYK'},
+    {i:'⬛',n:'Noir Background',t:'#060608 · RGB · CMYK'},
+    {i:'🤍',n:'Ivory Text',t:'#F8F6F2 · RGB · CMYK'},
+    {i:'🩸',n:'Deep Red Accent',t:'#8B0000 · RGB · CMYK'},
+    {i:'📋',n:'Brand Style Guide',t:'PDF · 24 páginas'},
+    {i:'🎨',n:'Swatch Export',t:'ASE · ACO · PDF'},
+  ]},
+  'type':{title:'TYPOGRAPHY SYSTEM',items:[
+    {i:'Aa',n:'Display Font',t:'Cormorant Garamond'},
+    {i:'Bb',n:'Body Font',t:'Syne Regular 400'},
+    {i:'Cc',n:'Accent Font',t:'Syne Bold 700'},
+    {i:'📏',n:'Type Scale',t:'PDF · CSS Variables'},
+    {i:'🔤',n:'Character Set',t:'Completo · OTF'},
+    {i:'📄',n:'Type Specimen',t:'PDF · A3'},
+  ]},
+  'social':{title:'SOCIAL & PACKAGING',items:[
+    {i:'📱',n:'IG Post 1:1',t:'PNG · 1080×1080'},
+    {i:'📲',n:'IG Story 9:16',t:'MP4 · 1080×1920'},
+    {i:'📦',n:'Gift Box',t:'DIELINE · PDF CMYK'},
+    {i:'🛍️',n:'Shopping Bag',t:'DIELINE · PDF CMYK'},
+    {i:'🕯️',n:'Candle Tin',t:'DIELINE · PDF CMYK'},
+    {i:'🎁',n:'Premium Set',t:'DIELINE · PDF CMYK'},
+  ]},
+  'motion':{title:'MOTION LANGUAGE',items:[
+    {i:'▶️',n:'Logo Animation',t:'LOTTIE · MP4 · GIF'},
+    {i:'🎬',n:'Intro Bumper 5s',t:'MP4 · ProRes'},
+    {i:'✨',n:'Transiciones',t:'AEP · LOTTIE'},
+    {i:'📺',n:'Lower Thirds',t:'AEP · MOGRT'},
+    {i:'🔄',n:'Loop de Fondo',t:'MP4 · WebM'},
+    {i:'🎞️',n:'Social Reel',t:'MP4 · 1080×1920'},
+  ]},
+};
+
+window.mbExpand=function(type){
+  const d=_mbModalData[type]; if(!d)return;
+  const modal=document.getElementById('mb-modal');
+  const title=document.getElementById('mb-modal-title');
+  const body=document.getElementById('mb-modal-body');
+  if(!modal)return;
+  title.textContent=d.title;
+  body.innerHTML=d.items.map(item=>`
+    <div onclick="if(typeof toast==='function')toast('${item.n} seleccionado','ok')" style="border:1px solid rgba(255,26,26,.18);background:#0e0408;padding:16px 20px;cursor:pointer;transition:all .25s;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:120px;flex:1"
+      onmouseover="this.style.borderColor='#FF1A1A';this.style.background='rgba(255,26,26,.08)';this.style.transform='translateY(-3px)'"
+      onmouseout="this.style.borderColor='rgba(255,26,26,.18)';this.style.background='#0e0408';this.style.transform='none'">
+      <div style="font-size:30px;line-height:1">${item.i}</div>
+      <div style="font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(248,246,242,.65);text-align:center">${item.n}</div>
+      <div style="font-size:6.5px;color:rgba(255,26,26,.55);letter-spacing:.1em;font-family:monospace;text-align:center">${item.t}</div>
+    </div>`).join('');
+  modal.style.display='flex';
+};
+
+window.mbClose=function(){
+  const modal=document.getElementById('mb-modal');
+  if(modal)modal.style.display='none';
+};
 
 // ══════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════
 window.addEventListener('load',()=>{go('home')});
-window.addEventListener('resize',()=>{if(S.step==='home')initHero();if(S.step==='about')initAbout();if(S.step==='project-preview')initProjectPreviewCanvas()});
+window.addEventListener('resize',()=>{if(S.step==='home')initHero();if(S.step==='about')initAbout();});
 </script>
 </body>
 </html>
