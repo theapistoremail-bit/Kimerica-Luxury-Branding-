@@ -41,7 +41,7 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
 .nav-cta::after{display:none!important}
 #prog{position:fixed;top:65px;left:0;width:100%;height:1px;background:rgba(255,255,255,0.04);z-index:999}
 #prog-fill{height:100%;background:var(--scarlet);box-shadow:0 0 10px var(--scarlet-glow);transition:width .9s cubic-bezier(.4,0,.2,1);width:0}
-.screen{min-height:100vh;display:none;flex-direction:column;position:relative;z-index:1}
+.screen{min-height:100vh;display:none;flex-direction:column;position:relative;z-index:1;animation:fup .45s ease both}
 .screen.on{display:flex}
 
 /* HERO */
@@ -360,22 +360,23 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
 <section id="s-home" class="screen on">
   <div class="hero-left">
     <div class="eyebrow">Creative Systems for Digital Presence</div>
-    <h1 class="hero-h1">We build<br><em>visual authority</em><br><span class="outline">for luxury brands.</span></h1>
-    <p class="hero-p">Strategy. Identity. Immersive 3D environments. Architecture, technology and conceptual art unified into one commanding system. AI-generated proposals — real creative execution.</p>
+    <h1 class="hero-h1">Construimos<br><em>autoridad visual</em><br><span class="outline">para marcas</span><br><span class="outline">de poder.</span></h1>
+    <p class="hero-p">Estrategia. Identidad. Entornos 3D inmersivos. Arquitectura, tecnología y arte conceptual unificados en un sistema visual de autoridad. Propuestas generadas por AI — ejecución creativa real.</p>
     <div class="hero-btns">
-      <button class="btn btn-blk" onclick="go('configure')">Configure Your Project</button>
-      <button class="btn btn-out" onclick="go('about')">About the Studio</button>
-      <button class="btn btn-out" onclick="go('portfolio')">View Work →</button>
+      <button class="btn btn-blk" onclick="go('configure')">Iniciar Proyecto →</button>
+      <button class="btn btn-out" onclick="go('proposal')">Demo AI Lab</button>
+      <button class="btn btn-out" onclick="go('portfolio')">Ver Trabajo</button>
     </div>
     <div class="hero-metrics">
-      <div><div class="m-num">47<sup>+</sup></div><div class="m-lbl">Global Brands</div></div>
-      <div><div class="m-num">3<sup>M</sup></div><div class="m-lbl">Digital Reach</div></div>
-      <div><div class="m-num">12<sup>y</sup></div><div class="m-lbl">Studio Experience</div></div>
-      <div><div class="m-num">8<sup>+</sup></div><div class="m-lbl">Countries</div></div>
+      <div><div class="m-num" id="cnt-brands">0<sup>+</sup></div><div class="m-lbl">Marcas Globales</div></div>
+      <div><div class="m-num" id="cnt-reach">0<sup>M</sup></div><div class="m-lbl">Alcance Digital</div></div>
+      <div><div class="m-num" id="cnt-years">0<sup>y</sup></div><div class="m-lbl">Años Estudio</div></div>
+      <div><div class="m-num" id="cnt-countries">0<sup>+</sup></div><div class="m-lbl">Países</div></div>
     </div>
     <div class="services-strip">
       <div class="svc">Creative Strategy</div><div class="svc">Digital Identity</div>
-      <div class="svc">Immersive 3D</div><div class="svc">AI Systems</div><div class="svc">Product Branding</div>
+      <div class="svc">Immersive 3D</div><div class="svc">AI Systems</div>
+      <div class="svc">Product Branding</div><div class="svc">Motion Design</div>
     </div>
   </div>
   <div class="hero-right"><canvas id="hero-cv"></canvas></div>
@@ -454,15 +455,23 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
     <div class="ft"><span class="tn">5</span>Download</div>
     <div class="ft"><span class="tn">6</span>Dashboard</div>
   </div>
-  <div class="step-label">Step 02 — Define Your Vision</div>
-  <h2 class="step-h">What are we<br><em>building together?</em></h2>
+  <div class="step-label">Paso 02 — Define Tu Visión</div>
+  <h2 class="step-h">¿Qué estamos<br><em>construyendo juntos?</em></h2>
+
+  <!-- Brand name input -->
+  <div style="max-width:520px;margin-bottom:36px">
+    <div class="sec-label" style="margin-top:0">Nombre de Marca <span style="font-size:.52rem;color:rgba(255,255,255,.18);font-weight:400;letter-spacing:.04em;text-transform:none">— se usará para personalizar el website generado</span></div>
+    <input id="brand-name-input" type="text" placeholder="Ej: Noir Maison, Vertex Studio, Obsidian..." autocomplete="off" style="width:100%;padding:13px 18px;border:1px solid var(--border);font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:300;color:var(--white);background:rgba(13,13,16,.8);outline:none;transition:border-color .3s;letter-spacing:.05em" onfocus="this.style.borderColor='rgba(255,26,26,.55)'" onblur="this.style.borderColor='rgba(255,255,255,.07)'" oninput="S.brandName=this.value.trim()">
+  </div>
+
   <div class="sec-label">Primary Objective</div>
   <div class="c-grid">
-    <div class="c-card" data-g="obj" data-v="authority" onclick="pick(this)"><span class="c-icon">◈</span><div class="c-chk">✓</div><h4>Brand Authority</h4><p>Commanding digital presence positioning your brand as the definitive leader.</p></div>
-    <div class="c-card" data-g="obj" data-v="identity" onclick="pick(this)"><span class="c-icon">◉</span><div class="c-chk">✓</div><h4>Visual Identity</h4><p>Complete identity system — logo, typography, color palette, and all brand expressions.</p></div>
-    <div class="c-card" data-g="obj" data-v="immersive" onclick="pick(this)"><span class="c-icon">⬡</span><div class="c-chk">✓</div><h4>Immersive Experience</h4><p>3D environments, interactive web, and AI-driven spatial experiences.</p></div>
-    <div class="c-card" data-g="obj" data-v="product" onclick="pick(this)"><span class="c-icon">◇</span><div class="c-chk">✓</div><h4>Product Launch</h4><p>Campaign, visual assets, video direction, and digital storefront.</p></div>
+    <div class="c-card" data-g="obj" data-v="authority" onclick="pick(this)"><span class="c-icon">◈</span><div class="c-chk">✓</div><h4>Brand Authority</h4><p>Presencia digital dominante — posiciona tu marca como líder indiscutible en su categoría.</p></div>
+    <div class="c-card" data-g="obj" data-v="identity" onclick="pick(this)"><span class="c-icon">◉</span><div class="c-chk">✓</div><h4>Visual Identity</h4><p>Sistema completo — logo, tipografía, paleta, guías de marca y todas sus expresiones.</p></div>
+    <div class="c-card" data-g="obj" data-v="immersive" onclick="pick(this)"><span class="c-icon">⬡</span><div class="c-chk">✓</div><h4>Immersive Experience</h4><p>Entornos 3D, web interactivo y experiencias espaciales impulsadas por AI.</p></div>
+    <div class="c-card" data-g="obj" data-v="product" onclick="pick(this)"><span class="c-icon">◇</span><div class="c-chk">✓</div><h4>Product Launch</h4><p>Campaña, activos visuales, dirección de video y tienda digital.</p></div>
   </div>
+
   <div class="sec-label">Visual Direction</div>
   <div class="tag-row">
     <div class="tag" data-g="vis" data-v="minimal" onclick="ptag(this)">Minimal & Refined</div>
@@ -470,8 +479,28 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
     <div class="tag" data-g="vis" data-v="editorial" onclick="ptag(this)">Editorial & Elegant</div>
     <div class="tag" data-g="vis" data-v="futuristic" onclick="ptag(this)">Futuristic</div>
     <div class="tag" data-g="vis" data-v="abstract" onclick="ptag(this)">Conceptual / Abstract</div>
-    <div class="tag" data-g="vis" data-v="luxury" onclick="ptag(this)">Luxury Black</div>
+    <div class="tag" data-g="vis" data-v="luxury" onclick="ptag(this)">Luxury Black · Gold</div>
   </div>
+
+  <div class="sec-label">Industry / Sector</div>
+  <div class="tag-row">
+    <div class="tag" data-g="ind" data-v="fashion" onclick="ptag(this)">Fashion & Luxury</div>
+    <div class="tag" data-g="ind" data-v="tech" onclick="ptag(this)">Tech & Fintech</div>
+    <div class="tag" data-g="ind" data-v="hospitality" onclick="ptag(this)">Hospitality & Real Estate</div>
+    <div class="tag" data-g="ind" data-v="beauty" onclick="ptag(this)">Beauty & Wellness</div>
+    <div class="tag" data-g="ind" data-v="art" onclick="ptag(this)">Art & Culture</div>
+    <div class="tag" data-g="ind" data-v="food" onclick="ptag(this)">Food & Beverage</div>
+  </div>
+
+  <div class="sec-label">Brand Tone</div>
+  <div class="tag-row">
+    <div class="tag" data-g="tone" data-v="authoritative" onclick="ptag(this)">Authoritative</div>
+    <div class="tag" data-g="tone" data-v="intimate" onclick="ptag(this)">Intimate & Human</div>
+    <div class="tag" data-g="tone" data-v="provocative" onclick="ptag(this)">Provocative</div>
+    <div class="tag" data-g="tone" data-v="serene" onclick="ptag(this)">Serene & Refined</div>
+    <div class="tag" data-g="tone" data-v="bold" onclick="ptag(this)">Bold & Disruptive</div>
+  </div>
+
   <div class="sec-label">Estimated Budget</div>
   <div class="tag-row">
     <div class="tag" data-g="bud" data-v="3k" onclick="ptag(this)">$1k – $3k</div>
@@ -479,7 +508,11 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
     <div class="tag" data-g="bud" data-v="20k" onclick="ptag(this)">$8k – $20k</div>
     <div class="tag" data-g="bud" data-v="open" onclick="ptag(this)">$20k+ / Open Scope</div>
   </div>
-  <div class="btn-row"><button class="btn btn-red" onclick="go('proposal')">Continue to AI Proposal →</button></div>
+
+  <div class="btn-row">
+    <button class="btn btn-red" onclick="go('proposal')">Continue to AI Proposal →</button>
+    <button class="btn btn-out" onclick="go('home')">← Back</button>
+  </div>
 </div></section>
 
 <!-- AI PROPOSAL -->
@@ -509,11 +542,42 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
     <div class="sec-label" style="margin-top:24px">Select Model</div>
     <div class="model-grid" id="model-grid"><div class="model-opt disabled"><h5>Loading...</h5><p>Checking active providers</p></div></div>
   </div>
-  <label style="font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:12px">Your Project Vision</label>
-  <textarea class="lux-ta" id="vision" placeholder="Describe your brand, audience, aspirations, and the feeling you want to create. The more specific, the more precise the AI proposal."></textarea>
-  <div style="display:flex;gap:14px;flex-wrap:wrap;margin:20px 0">
-    <button class="btn btn-blk" id="gen-btn" onclick="runProposal()">Generate AI Proposal</button>
-    <button class="btn btn-out" onclick="demoProposal()">Demo (Offline)</button>
+
+  <!-- Config summary -->
+  <div style="margin-bottom:20px;padding:12px 18px;border:1px solid var(--border);background:rgba(13,13,16,.7);display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+    <div style="font-size:.56rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)">Config:</div>
+    <div id="cfg-obj" style="font-size:.64rem;color:var(--scarlet)">— Objetivo</div>
+    <div id="cfg-vis" style="font-size:.64rem;color:rgba(255,255,255,.4)">— Visual</div>
+    <div id="cfg-ind" style="font-size:.64rem;color:rgba(255,255,255,.3)">— Industria</div>
+    <div id="cfg-tone" style="font-size:.64rem;color:rgba(255,255,255,.3)">— Tono</div>
+    <button onclick="go('configure')" style="margin-left:auto;padding:5px 14px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Syne',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .3s" onmouseover="this.style.borderColor='rgba(255,26,26,.4)';this.style.color='var(--scarlet)'" onmouseout="this.style.borderColor='rgba(255,255,255,.07)';this.style.color='var(--muted)'">Editar →</button>
+  </div>
+
+  <!-- Config summary chips -->
+  <div id="config-summary" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;padding:14px 18px;border:1px solid var(--border);background:rgba(13,13,16,.5)">
+    <span style="font-size:.55rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);align-self:center;margin-right:4px">Config:</span>
+    <span id="cs-brand" style="display:none;padding:4px 12px;border:1px solid rgba(255,26,26,.35);font-size:.6rem;font-weight:700;letter-spacing:.08em;color:var(--scarlet)"></span>
+    <span id="cs-obj" style="display:none;padding:4px 12px;border:1px solid var(--border);font-size:.6rem;color:var(--muted)"></span>
+    <span id="cs-vis" style="display:none;padding:4px 12px;border:1px solid var(--border);font-size:.6rem;color:var(--muted)"></span>
+    <span id="cs-ind" style="display:none;padding:4px 12px;border:1px solid var(--border);font-size:.6rem;color:var(--muted)"></span>
+    <span id="cs-bud" style="display:none;padding:4px 12px;border:1px solid var(--border);font-size:.6rem;color:var(--muted)"></span>
+    <span style="font-size:.55rem;color:rgba(255,255,255,.18);align-self:center;margin-left:auto"><a href="#" onclick="go('configure');return false" style="color:rgba(255,26,26,.45);text-decoration:none;font-weight:700;letter-spacing:.1em;font-size:.58rem">← Editar</a></span>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
+    <label style="font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)">Tu Visión del Proyecto</label>
+    <span id="vision-counter" style="font-size:.58rem;color:rgba(255,255,255,.2);letter-spacing:.06em">0 palabras</span>
+  </div>
+  <textarea class="lux-ta" id="vision" placeholder="Describe tu marca con detalle: industria, audiencia objetivo, competidores, sentimiento deseado, aspiraciones y qué te hace único. Incluye nombre de marca, productos/servicios, y la respuesta emocional que quieres crear. Cuanto más específico, más precisa y personalizada será la propuesta AI y el website generado." oninput="var w=this.value.trim().split(/\s+/).filter(Boolean).length;var el=document.getElementById('vision-counter');el.textContent=w+' palabra'+(w!==1?'s':'');el.style.color=w>=30?'rgba(255,26,26,.7)':w>=15?'rgba(255,200,26,.5)':'rgba(255,255,255,.2)'"></textarea>
+  <div style="font-size:.6rem;color:rgba(255,255,255,.18);margin-top:8px;margin-bottom:20px;display:flex;align-items:center;gap:6px">
+    <span style="color:rgba(255,26,26,.35)">✦</span> 30+ palabras generan sitios web significativamente más ricos y personalizados.
+    <button onclick="document.getElementById('vision').value='Somos una destilería de mezcal artesanal fundada en Oaxaca, México. Nos enfocamos en el mercado internacional de lujo — compradores europeos y norteamericanos con alto poder adquisitivo. Nuestra marca se llama NOCTUA y nace de la dualidad entre la sabiduría ancestral zapoteca y la estética contemporánea. Queremos una identidad oscura, sofisticada, con referencias a la noche, los búhos y las raíces prehispánicas. Tipografía editorial serif, paleta de negro profundo con dorado y terracota. El sitio debe ser inmersivo, lento, contemplativo.';this.parentElement.parentElement.querySelector('#vision').dispatchEvent(new Event('input'))" style="margin-left:auto;padding:4px 12px;border:1px solid rgba(255,26,26,.25);background:transparent;color:rgba(255,26,26,.5);font-family:'Syne',sans-serif;font-size:.56rem;font-weight:600;letter-spacing:.1em;cursor:pointer;text-transform:uppercase">Ver ejemplo</button>
+  </div>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;align-items:center">
+    <button class="btn btn-blk" id="gen-btn" onclick="runProposal()">⚡ Generar Propuesta AI</button>
+    <button class="btn btn-out" onclick="demoProposal()" style="font-size:.66rem">Demo rápido (offline)</button>
+    <span style="font-size:.56rem;color:rgba(255,255,255,.18);letter-spacing:.06em">~15-25s · claude-sonnet-4</span>
   </div>
   <div class="loader" id="loader"><div class="dots"><div class="dot-anim"></div><div class="dot-anim"></div><div class="dot-anim"></div></div><span id="loader-txt">Connecting to AI backend...</span></div>
   <div class="out" id="proposal-out">
@@ -533,7 +597,7 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
       </div>
     </div>
     <div class="scope-box">
-      <div class="out-label">Project Scope Estimate</div>
+      <div class="out-label">Estimado de Alcance del Proyecto</div>
       <div class="scope-row"><span>Creative Direction & Strategy</span><span id="sc1">—</span></div>
       <div class="scope-row"><span>Visual Identity System</span><span id="sc2">—</span></div>
       <div class="scope-row"><span>Digital Experience Design</span><span id="sc3">—</span></div>
@@ -545,8 +609,8 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
       <div class="p-amt"><sup>$</sup><span id="p-total">—</span></div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-red" onclick="go('project-preview')">Preview Project Package →</button>
-      <button class="btn btn-out" onclick="demoProposal()">Regenerate</button>
+      <button class="btn btn-red" onclick="go('project-preview')">Ver Preview del Proyecto →</button>
+      <button class="btn btn-out" onclick="demoProposal()">Regenerar</button>
     </div>
   </div>
 </div></section>
@@ -561,7 +625,13 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
       <div class="ft"><span class="tn">5</span>Download</div>
       <div class="ft"><span class="tn">6</span>Dashboard</div>
     </div>
-    <div class="preview-badge">Project Package Ready · AI Generated</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;animation:fup .6s .1s both">
+      <div class="preview-badge" style="margin-bottom:0">Project Package Ready · AI Generated</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="_ppBuild();toast('Regenerando todos los paneles...','ok')" style="padding:7px 16px;border:1px solid rgba(255,26,26,.4);background:transparent;color:var(--scarlet);font-family:'Syne',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .3s" onmouseover="this.style.background='rgba(255,26,26,.1)'" onmouseout="this.style.background='transparent'">&#8635; Regenerar</button>
+        <button onclick="go('proposal')" style="padding:7px 16px;border:1px solid rgba(255,255,255,.1);background:transparent;color:var(--muted);font-family:'Syne',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .3s" onmouseover="this.style.borderColor='rgba(255,26,26,.3)';this.style.color='var(--white)'" onmouseout="this.style.borderColor='rgba(255,255,255,.1)';this.style.color='var(--muted)'">&#8592; Editar</button>
+      </div>
+    </div>
     <h1 class="preview-main-title">Your brand<br><em>universe.</em><br><span class="ghost">Complete.</span></h1>
 
     <!-- ══════════════════════════════════════════ -->
@@ -587,9 +657,13 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
           </div>
         </div>
         <!-- Loading state -->
-        <div id="pp-site-loading" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#060608">
-          <div style="display:flex;gap:6px"><div class="dot-anim"></div><div class="dot-anim"></div><div class="dot-anim"></div></div>
-          <div id="pp-site-loading-txt" style="font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,26,26,.5)">Generating website with Claude AI...</div>
+        <div id="pp-site-loading" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#060608">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+            <div style="display:flex;gap:6px"><div class="dot-anim"></div><div class="dot-anim"></div><div class="dot-anim"></div></div>
+            <div class="pp-loading-bar"></div>
+          </div>
+          <div id="pp-site-loading-txt" style="font-size:.58rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,26,26,.45);text-align:center;max-width:200px;line-height:1.6">Generating website with Claude AI...</div>
+          <div style="font-size:.52rem;color:rgba(255,255,255,.15);letter-spacing:.08em">claude-sonnet-4 · max quality</div>
         </div>
         <!-- The actual generated website -->
         <iframe id="pp-site-frame" style="flex:1;width:100%;border:none;background:#060608;display:none" sandbox="allow-scripts allow-same-origin"></iframe>
@@ -608,38 +682,33 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
           <div style="position:absolute;top:8px;left:10px;z-index:5;font-size:7px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.5)">3D PRODUCT RENDERINGS</div>
           <canvas id="pp-cv-3d-main" style="position:absolute;inset:0;width:100%!important;height:100%!important"></canvas>
           <div style="position:absolute;bottom:6px;left:6px;right:6px;display:flex;gap:3px;z-index:5">
-            <button onclick="pp3dSwitch('torus',this)" class="pp3btn on">TORUS</button>
+            <button onclick="pp3dSwitch('torus',this)" class="pp3btn on">KNOT</button>
             <button onclick="pp3dSwitch('gem',this)" class="pp3btn">GEM</button>
             <button onclick="pp3dSwitch('bottle',this)" class="pp3btn">BOTTLE</button>
+            <button onclick="pp3dSwitch('box',this)" class="pp3btn">BOX</button>
           </div>
           <div style="position:absolute;top:8px;right:8px;z-index:5;font-size:7px;font-weight:700;letter-spacing:.1em;color:rgba(255,26,26,.5);display:flex;align-items:center;gap:4px">
             <div style="width:4px;height:4px;border-radius:50%;background:var(--scarlet);animation:pulse-red 2s infinite"></div>MESHY
           </div>
         </div>
 
-        <!-- LOGO & IDENTITY -->
-        <div id="pp-logo-panel" onclick="ppModal('logo')" style="background:var(--surface);border:1px solid var(--border);cursor:pointer;transition:border-color .25s;position:relative;overflow:hidden;min-height:200px;display:flex;flex-direction:column">
+        <!-- LOGO & IDENTITY — canvas animado -->
+        <div id="pp-logo-panel" onclick="ppModal('logo')" style="background:var(--surface);border:1px solid var(--border);cursor:pointer;transition:border-color .25s;position:relative;overflow:hidden;min-height:200px;display:flex;flex-direction:column" onmouseover="this.style.borderColor='rgba(255,26,26,.5)'" onmouseout="this.style.borderColor='rgba(255,255,255,.07)'">
           <div style="padding:8px 12px;font-size:7px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.4);border-bottom:1px solid rgba(255,255,255,.04);flex-shrink:0;display:flex;justify-content:space-between;align-items:center">LOGO & IDENTITY <span style="color:rgba(255,26,26,.4)">⊕</span></div>
-          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;gap:10px">
-            <!-- Logo wordmark -->
-            <div id="pp-logo-wm" style="font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:300;letter-spacing:.1em;color:var(--white);line-height:1">BRAND</div>
-            <div style="height:1px;width:70%;background:linear-gradient(90deg,transparent,var(--scarlet),transparent)"></div>
-            <div id="pp-logo-tag" style="font-size:7px;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.3)">TAGLINE</div>
-            <!-- Monogram -->
-            <div style="display:flex;gap:8px;align-items:center">
-              <div id="pp-mono-a" style="width:36px;height:36px;border:1px solid rgba(255,26,26,.5);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--white)">B</div>
-              <div id="pp-mono-b" style="width:28px;height:28px;background:rgba(255,26,26,.15);border:1px solid rgba(255,26,26,.3);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:11px;font-weight:800;color:var(--scarlet)">B</div>
-            </div>
-            <!-- Color swatches mini -->
-            <div style="display:flex;gap:3px">
-              <div id="pp-sw1" style="width:18px;height:18px;background:#FF1A1A;border-radius:50%"></div>
-              <div style="width:18px;height:18px;background:#060608;border:1px solid rgba(255,255,255,.1);border-radius:50%"></div>
-              <div style="width:18px;height:18px;background:#f8f6f2;border-radius:50%"></div>
-              <div id="pp-sw4" style="width:18px;height:18px;background:#8b0000;border-radius:50%"></div>
-            </div>
-            <!-- OpenAI badge -->
-            <div style="position:absolute;bottom:6px;right:8px;font-size:6px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.2)">OPENAI · DALLE</div>
+          <canvas id="pp-logo-cv" style="position:absolute;inset:32px 0 0 0;width:100%;height:calc(100% - 32px)"></canvas>
+          <div id="pp-logo-wm" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:300;letter-spacing:.12em;color:var(--white);white-space:nowrap;pointer-events:none;z-index:2;text-shadow:0 0 30px rgba(255,26,26,.2)">BRAND</div>
+          <div id="pp-logo-tag" style="position:absolute;top:50%;left:50%;transform:translate(-50%,60%);font-size:5.5px;letter-spacing:.38em;text-transform:uppercase;color:rgba(255,255,255,.28);pointer-events:none;z-index:2;white-space:nowrap">TAGLINE</div>
+          <div style="position:absolute;bottom:10px;left:10px;display:flex;gap:5px;z-index:2">
+            <div id="pp-mono-a" style="width:28px;height:28px;border:1px solid rgba(255,26,26,.5);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;color:var(--white)">B</div>
+            <div id="pp-mono-b" style="width:22px;height:22px;background:rgba(255,26,26,.18);border:1px solid rgba(255,26,26,.4);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:10px;font-weight:800;color:var(--scarlet)">B</div>
           </div>
+          <div style="position:absolute;bottom:10px;right:8px;display:flex;gap:3px;z-index:2">
+            <div id="pp-sw1" style="width:13px;height:13px;background:#FF1A1A;border-radius:50%"></div>
+            <div style="width:13px;height:13px;background:#060608;border:1px solid rgba(255,255,255,.15);border-radius:50%"></div>
+            <div style="width:13px;height:13px;background:#f8f6f2;border-radius:50%"></div>
+            <div id="pp-sw4" style="width:13px;height:13px;background:#8b0000;border-radius:50%"></div>
+          </div>
+          <div style="position:absolute;top:38px;right:8px;font-size:5.5px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.18)">OPENAI · DALLE</div>
         </div>
       </div>
 
@@ -668,11 +737,10 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
 
         <!-- PRINT MATERIALS + MOODBOARD stacked -->
         <div style="display:flex;flex-direction:column;gap:6px">
-          <!-- PRINT MATERIALS -->
+          <!-- TYPOGRAPHY SYSTEM -->
           <div onclick="ppModal('logo')" style="background:var(--surface);border:1px solid var(--border);cursor:pointer;transition:border-color .25s;position:relative;overflow:hidden;flex:1;min-height:84px" onmouseover="this.style.borderColor='rgba(255,26,26,.5)'" onmouseout="this.style.borderColor='rgba(255,255,255,.07)'">
-            <img src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&auto=format&fit=crop&q=80" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.4) saturate(.8)">
-            <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(6,6,8,.8),transparent)"></div>
-            <div style="position:absolute;bottom:6px;left:8px;font-size:7px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.6)">PRINT MATERIALS</div>
+            <canvas id="pp-cv-typo" style="position:absolute;inset:0;width:100%!important;height:100%!important"></canvas>
+            <div style="position:absolute;bottom:6px;left:8px;font-size:7px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.6);z-index:2">TIPOGRAFÍA</div>
           </div>
           <!-- MOODBOARD CONCEPTS -->
           <div onclick="ppModal('color')" style="background:var(--surface);border:1px solid var(--border);cursor:pointer;transition:border-color .25s;position:relative;overflow:hidden;flex:1;min-height:84px" onmouseover="this.style.borderColor='rgba(255,26,26,.5)'" onmouseout="this.style.borderColor='rgba(255,255,255,.07)'">
@@ -689,6 +757,12 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
     .pp3btn{flex:1;padding:3px 0;background:rgba(255,26,26,.1);border:1px solid rgba(255,26,26,.3);color:var(--scarlet);font-family:'Syne',sans-serif;font-size:6.5px;font-weight:700;letter-spacing:.08em;cursor:pointer;transition:all .2s;text-transform:uppercase}
     .pp3btn:hover,.pp3btn.on{background:rgba(255,26,26,.25);border-color:var(--scarlet);box-shadow:0 0 6px var(--scarlet-glow)}
     #pp-asset-grid img{transition:transform .4s,filter .4s}
+    #pp-asset-grid>div{transition:box-shadow .3s}
+    #pp-logo-panel:hover{box-shadow:0 0 24px rgba(255,26,26,.08)}
+    .pp-panel-hover:hover{border-color:rgba(255,26,26,.45)!important;box-shadow:0 0 18px rgba(255,26,26,.06)}
+    /* Loading shimmer for iframe */
+    @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+    .pp-loading-bar{height:2px;background:linear-gradient(90deg,transparent,var(--scarlet),transparent);background-size:200% 100%;animation:shimmer 1.5s infinite;margin-top:8px;width:60%}
     </style>
 
     <!-- ══ MODAL ══ -->
@@ -898,6 +972,7 @@ const S = {
   proposal: {},
   selectedModel: 'claude-sonnet-4-6',
   providerStatus: null,
+  brandName: '',
 };
 const PROG = { home:0, about:10, portfolio:15, process:18, configure:30, proposal:50, 'project-preview':70, checkout:85, confirm:100, dash:100 };
 
@@ -997,10 +1072,11 @@ async function _ppBuild(){
   var proposal = document.getElementById('claude-out')?.textContent||'';
   var all      = vision+' '+proposal;
 
-  // Brand name: first meaningful capitalized word
+  // Brand name: prefer explicit input, then extract from text
   var STOPWORDS=/^(The|And|For|With|That|This|Your|From|Into|Over|When|Where|Create|Build|Design|Visual|Brand|Using|Their|About|Have|Will|Does|Should|Would|Could|Been|Studio|Agency|Creative|Digital|Luxury|Premium|System|Project|Portfolio|Our|We|Us|Is|In|On|To|Of|A|An)$/i;
   var caps = all.split(/\s+/).filter(w=>/^[A-Z][A-Za-z]{2,}/.test(w)&&w.length<16&&!STOPWORDS.test(w));
-  var BRAND = (caps[0]||'LUXE').replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,10)||'LUXE';
+  var rawBrand = S.brandName || caps[0] || 'LUXE';
+  var BRAND = rawBrand.replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,10)||'LUXE';
   var INIT  = BRAND[0];
 
   // Tagline: look in proposal for quoted phrases, or derive from vision
@@ -1013,6 +1089,7 @@ async function _ppBuild(){
 
   // Visual direction
   var VIS = (S.sel.vis||'luxury').toLowerCase();
+  var IND = S.sel.ind||'other';
 
   // Primary color — scarlet is the KIMERICA default when no vis selected
   var P='#FF1A1A';
@@ -1030,19 +1107,34 @@ async function _ppBuild(){
   const s4=document.getElementById('pp-sw4');if(s4)s4.style.background=P==='#c9a96e'?'#8b6914':P==='#1a6eff'?'#003cb3':'#8b0000';
 
   // ── Packaging image: pick based on visual direction ──
-  const pkgImgs = {
+  // Industry-aware packaging images
+  const indPkgImgs = {
+    fashion: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&auto=format&fit=crop&q=80',
+    tech:    'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&auto=format&fit=crop&q=80',
+    food:    'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&auto=format&fit=crop&q=80',
+    real:    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&auto=format&fit=crop&q=80',
+    health:  'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=400&auto=format&fit=crop&q=80',
+    finance: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&auto=format&fit=crop&q=80',
+    art:     'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&auto=format&fit=crop&q=80',
+  };
+  const colorPkgImgs = {
     gold:  'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=400&auto=format&fit=crop&q=80',
     blue:  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop&q=80',
     green: 'https://images.unsplash.com/photo-1542992015-4a27be5db55b?w=400&auto=format&fit=crop&q=80',
     red:   'https://images.unsplash.com/photo-1547592180-85f173990554?w=400&auto=format&fit=crop&q=80',
   };
-  const pkgKey = VIS.includes('gold')||VIS.includes('luxury')?'gold':VIS.includes('blue')?'blue':VIS.includes('green')?'green':'red';
-  const pkgEl=document.getElementById('pp-pkg-img'); if(pkgEl)pkgEl.src=pkgImgs[pkgKey];
+  const pkgImgs = {...colorPkgImgs};
+  // Use industry image if available, fallback to color-based
+  const industryPkg = indPkgImgs[S.sel.ind];
+  const pkgKey = VIS==='luxury'||VIS.includes('gold')?'gold':VIS.includes('blue')?'blue':VIS.includes('green')?'green':'red';
+  const pkgEl=document.getElementById('pp-pkg-img'); if(pkgEl)pkgEl.src=industryPkg||pkgImgs[pkgKey];
 
   // ── Start 3D (Meshy-style) ──
   _pp3dInit('torus');
 
   // ── Start animated canvases ──
+  _ppLogoCanvas(BRAND,INIT,P);
+  _ppTypoCanvas(BRAND,P);
   _ppSocialCanvas(BRAND,P);
   _ppMoodCanvas(P);
 
@@ -1078,70 +1170,82 @@ async function _ppGenerateWebsite(BRAND,INIT,TAG,P,OBJ,VIS,vision,proposal){
   },2200);
 
   const visDescMap={
-    minimal:'Minimal & Refined — extreme whitespace, hairline borders, restrained typography',
-    bold:'Bold & High Contrast — heavy type, large scale, stark black/white contrast',
-    editorial:'Editorial & Elegant — magazine layout, serif type hierarchy, refined grid',
-    futuristic:'Futuristic — geometric shapes, monospace accents, tech-forward UI',
-    abstract:'Conceptual / Abstract — unexpected layouts, artistic grid-breaking elements',
-    luxury:'Luxury Black — dark gold on black, premium materials aesthetic, opulent',
+    minimal:'Minimal & Refined — extreme whitespace, hairline borders, restrained typography, lots of breathing room',
+    bold:'Bold & High Contrast — heavy type, large scale, stark black/white contrast, aggressive grid',
+    editorial:'Editorial & Elegant — magazine layout, serif type hierarchy, refined grid, sophisticated',
+    futuristic:'Futuristic — geometric shapes, monospace accents, tech-forward UI, grid overlays',
+    abstract:'Conceptual / Abstract — unexpected layouts, artistic grid-breaking elements, asymmetry',
+    luxury:'Luxury Black — dark gold on black, premium materials aesthetic, opulent and restrained',
   };
   const visDesc = visDescMap[VIS]||'Luxury dark premium aesthetic';
+  const indMap={fashion:'Fashion & Luxury',tech:'Technology & SaaS',food:'Food & Beverage',real:'Real Estate & Architecture',health:'Health & Wellness',finance:'Finance & Legal',art:'Art & Culture',other:'Premium Brand'};
+  const industry = indMap[S.sel.ind]||'Premium Brand';
 
-  // ── Ultra-detailed system prompt for maximum quality ──
-  const systemPrompt = `You are a world-class frontend developer and luxury brand designer.
-Generate an EXTRAORDINARY, COMPLETE, SELF-CONTAINED single-file HTML website.
-This must be production-quality, visually stunning, and highly detailed.
+  const systemPrompt = `You are a world-class frontend developer and luxury brand designer with 15+ years of experience.
+Generate an EXTRAORDINARY, COMPLETE, SELF-CONTAINED single-file HTML website for a ${industry} brand.
+This must be production-quality, visually stunning, highly detailed, and completely unique.
 
-DESIGN REQUIREMENTS:
-- Visual style: ${visDesc}
-- Primary accent color: ${P} — use it for glow effects, borders, text accents, hover states
-- Background: #060608 (near-black) with subtle texture via CSS
-- Typography: Google Fonts — Cormorant Garamond (headings, 300/400 weight) + Syne (UI, 600/700/800)
-- Include Google Fonts <link> tag in <head>
+DESIGN PHILOSOPHY: ${visDesc}
+Primary accent color: ${P} — use for glows (box-shadow with blur), borders, text accents, SVG elements, hover states
+Background: #060608 near-black with grain texture via CSS body::before SVG data URL
+Typography: Google Fonts — must include <link> tag: Cormorant Garamond (300/400 weight, headings/body-serif) + Syne (600/700/800, UI/nav)
 
-SECTIONS TO INCLUDE (all required, rich content):
-1. STICKY NAV — logo with monogram, links, CTA button with border glow
-2. HERO — full viewport, large Cormorant heading (4+ lines), eyebrow label, subtext, 2 buttons, floating metric counters at bottom
-3. MARQUEE STRIP — scrolling service names with CSS animation (no JS needed)
-4. SERVICES GRID — 6 cards with icon, title, description, price, hover reveal with bottom border animation
-5. ABOUT SPLIT — 2 columns: left with large heading + body text + testimonial quote block; right with abstract CSS art shape (gradient box with overlay text)
-6. NUMBERS STRIP — 4 stats with large number + label (e.g. "47+ / Global Brands")  
-7. PORTFOLIO GRID — 6 project cards in asymmetric grid, each with gradient background + category + title + arrow
-8. PROCESS — 3 numbered steps with large number, title, description
-9. TESTIMONIALS — 2 testimonial cards side by side with quote, name, company
-10. CTA BANNER — full-width with background radial glow, large text, button
-11. FOOTER — 4 columns: logo+tagline, links, services list, contact; bottom bar with copyright
+MANDATORY SECTIONS (all 11, no exceptions, rich content):
+1. STICKY NAV — logo (serif initial + brand name), 5 links, CTA button with glow border + hover fill
+2. HERO — full viewport height, large Cormorant heading (4 lines with ghost outline text), eyebrow label with decorative lines, subheading 2 sentences, 2 buttons (primary filled + secondary outline), floating metrics bar at bottom (4 stats: projects, countries, years, reach)
+3. MARQUEE STRIP — infinitely scrolling service names, CSS-only animation, separator symbols (✦)
+4. SERVICES GRID — 6 cards, 3-column, each: large number (01-06), title, 2-line description, price, bottom-border reveal on hover
+5. ABOUT SPLIT — 2 columns: left = heading 3 lines + italic serif body + testimonial quote block with author; right = abstract CSS shape with radial gradient + large ghost text overlay
+6. STATS STRIP — 4 numbers in border grid: project count, countries, team size, years
+7. PORTFOLIO GRID — 6 project cards, 3-column, gradient bg, number overlay (01-06), category + title + hover arrow reveal
+8. PROCESS — 3 numbered steps, accent top border, large faded number, step title, description
+9. TESTIMONIALS — 2 quote cards side by side, opening quote mark (CSS), client name + company
+10. CTA BANNER — full-width, radial glow background, 2-line heading, subtext, primary CTA button
+11. FOOTER — 4 columns: logo+tagline+social links, navigation, services list, contact info; bottom bar copyright
 
-CSS REQUIREMENTS:
-- Use CSS custom properties (--p, --bg, --tx, --mu, --border, etc.)
-- Smooth scroll behavior
-- Hover effects on all interactive elements
-- CSS keyframe animations: fadeUp for sections, shimmer for buttons, marquee for strip
-- Subtle noise texture overlay using SVG data URL on body::before
-- Glassmorphism nav (backdrop-filter blur)
-- Custom scrollbar (3px, accent color)
-- All transitions 0.3s-0.5s cubic-bezier
+CSS DETAILS:
+- CSS custom properties: --p, --bg, --surf (#0d0d10), --tx (#f8f6f2), --mu (38% alpha white), --border (7% alpha white)
+- body::before: fixed noise texture SVG, z-index 0, opacity .55
+- Custom scrollbar: 3px width, accent color thumb
+- All hover transitions: .3s-.4s cubic-bezier(.4,0,.2,1)  
+- Button primary: background var(--p), box-shadow 0 0 24px accent44, hover: translateY(-2px) + stronger glow
+- Cards: 1px solid border, ::after pseudo-element for bottom color reveal on hover
+- Glassmorphism nav: backdrop-filter blur(24px) rgba background
+- Intersection Observer scroll reveals (class .reveal → .visible with opacity + translateY transition)
+- @keyframes: fadeUp (for initial sections), marquee (CSS scroll), shimmer (button optional)
 
-JS REQUIREMENTS (inline, minimal):
-- Intersection Observer for scroll-triggered fadeUp animations
-- Smooth scroll for nav links
-- Contact form modal (show/hide)
-- All text in SPANISH
+JAVASCRIPT (inline, minimal — no external libs):
+- Smooth scroll for all anchor links
+- IntersectionObserver for .reveal elements
+- Contact modal: show/hide, click outside to close
+- All UI text in SPANISH
 
-Brand: ${BRAND} | Tagline: "${TAG}" | Objective: ${OBJ}
+BRAND SPECIFICS:
+- Name: ${BRAND} | Initial: ${INIT} | Tagline: "${TAG}"
+- Industry: ${industry}
+- Objective: ${OBJ}
+- Vision: ${vision.slice(0,400)||'Premium brand with luxury positioning and digital authority'}
+- Creative direction: ${proposal.slice(0,600)||'Authority through restraint. Precision over decoration.'}
 
-CRITICAL: Output ONLY raw HTML starting with <!DOCTYPE html>. Zero markdown. Zero backticks. Zero explanation.`;
+CRITICAL: Output ONLY raw HTML starting with <!DOCTYPE html>. Absolutely NO markdown. NO backticks. NO explanation. NO preamble. Start directly with <!DOCTYPE html>.`;
 
-  const userPrompt = `Build the complete luxury website now.
-Brand name: ${BRAND}
-Initial: ${INIT}
-Tagline: "${TAG}"
-Vision: ${vision||OBJ}
-Creative direction: ${proposal.slice(0,500)||'Authority through restraint. Luxury through precision.'}
-Accent color: ${P}
-Style: ${visDesc}
+  const userPrompt = `Generate the complete luxury ${industry} website now. Make it extraordinary — every section full, detailed, and visually stunning.
 
-Make it extraordinary. Full detail. Every section complete.`;
+BRAND: ${BRAND}
+MONOGRAM: ${INIT}
+TAGLINE: "${TAG}"
+PRIMARY COLOR: ${P}
+VISUAL STYLE: ${visDesc}
+INDUSTRY: ${industry}
+OBJECTIVE: ${OBJ}
+
+CLIENT VISION: ${vision||OBJ+' — premium positioning and visual authority'}
+
+AI CREATIVE DIRECTION: ${proposal.slice(0,600)||'Authority through restraint. Luxury through precision. Every element earns its presence or is removed.'}
+
+Execute all 11 sections completely. Rich content, real Spanish copy, no placeholders.`;
+
+
 
   // ── Fetch with retry (up to 2 retries for unstable connections) ──
   async function fetchWithRetry(url, opts, retries=2, delay=2000){
@@ -1563,7 +1667,7 @@ function ts(m){var t=document.getElementById('_t');if(!t){t=document.createEleme
 // Intersection observer for reveal
 var ob=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');ob.unobserve(e.target)}})},{threshold:.08});
 document.querySelectorAll('.reveal').forEach(function(el){ob.observe(el)});
-</script>
+<\/script>
 </body></html>`);
 
   var blob=new Blob([h.join('')],{type:'text/html'});
@@ -1597,6 +1701,7 @@ function _pp3dInit(shape){
   var geo;
   if(shape==='gem'){geo=new THREE.IcosahedronGeometry(1.4,3);mat.metalness=.99;mat.roughness=.01;}
   else if(shape==='bottle'){var pts=[[0,.05],[.18,.05],[.22,.2],[.22,.55],[.18,.62],[.12,.72],[.1,.9],[.09,1.1],[.11,1.3],[.09,1.35],[.06,1.4],[.05,1.5]].map(v=>new THREE.Vector2(v[0],v[1]-.75));geo=new THREE.LatheGeometry(pts,32);}
+  else if(shape==='box'){geo=new THREE.BoxGeometry(1.4,2,1.0);mat.roughness=.2;mat.metalness=.75;}
   else{geo=new THREE.TorusKnotGeometry(1.1,.28,200,18);}
   var mesh=new THREE.Mesh(geo,mat); scene.add(mesh);
   scene.add(new THREE.Mesh(geo,wmat));
@@ -1617,6 +1722,91 @@ window.pp3dSwitch=function(s,btn){
   _pp3dInit(s);
 };
 
+// ─── Animated logo canvas ──────────────────────────────────────────
+function _ppLogoCanvas(brand,init,accentColor){
+  var cv=document.getElementById('pp-logo-cv');
+  if(!cv)return;
+  var par=cv.parentElement;
+  var W=par.offsetWidth||200,H=Math.max(par.offsetHeight-32,120);
+  cv.width=W;cv.height=H;
+  var ctx=cv.getContext('2d');
+  var aR=255,aG=26,aB=26;
+  if(accentColor==='#c9a96e'){aR=201;aG=169;aB=110;}
+  else if(accentColor==='#1a6eff'){aR=26;aG=110;aB=255;}
+  else if(accentColor==='#22d464'){aR=34;aG=212;aB=100;}
+  else if(accentColor==='#9b5de5'){aR=155;aG=93;aB=229;}
+  var t=0;
+  function draw(){
+    ctx.fillStyle='rgba(6,6,8,.06)';ctx.fillRect(0,0,W,H);
+    t+=.01;
+    // Radial glow
+    var grd=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,W*.45);
+    grd.addColorStop(0,`rgba(${aR},${aG},${aB},${.05+Math.sin(t)*.025})`);
+    grd.addColorStop(1,'transparent');
+    ctx.fillStyle=grd;ctx.fillRect(0,0,W,H);
+    // Animated divider line under wordmark
+    var lineY=H*.57;
+    var prog=.5+Math.sin(t*.7)*.12;
+    var lineW=W*prog;var lineX=(W-lineW)/2;
+    var lg=ctx.createLinearGradient(lineX,0,lineX+lineW,0);
+    lg.addColorStop(0,'transparent');
+    lg.addColorStop(.35+Math.sin(t*.5)*.1,`rgba(${aR},${aG},${aB},.85)`);
+    lg.addColorStop(1,'transparent');
+    ctx.strokeStyle=lg;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(lineX,lineY);ctx.lineTo(lineX+lineW,lineY);ctx.stroke();
+    // Corner marks
+    var sz=9;
+    [[2,2,1,1],[W-2,2,-1,1],[2,H-2,1,-1],[W-2,H-2,-1,-1]].forEach((c,i)=>{
+      var a=.18+Math.sin(t*1.1+i)*.08;
+      ctx.strokeStyle=`rgba(${aR},${aG},${aB},${a})`;ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(c[0],c[1]+c[3]*sz);ctx.lineTo(c[0],c[1]);ctx.lineTo(c[0]+c[2]*sz,c[1]);ctx.stroke();
+    });
+    // Subtle grid
+    ctx.strokeStyle=`rgba(${aR},${aG},${aB},.04)`;ctx.lineWidth=.5;
+    for(var gx=0;gx<W;gx+=W/6){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,H);ctx.stroke();}
+    for(var gy=0;gy<H;gy+=H/4){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke();}
+    requestAnimationFrame(draw);
+  }
+  ctx.fillStyle='#060608';ctx.fillRect(0,0,W,H);draw();
+}
+
+// ─── Typography system canvas ───────────────────────────────────────
+function _ppTypoCanvas(brand,accentColor){
+  var cv=document.getElementById('pp-cv-typo');
+  if(!cv)return;
+  var W=cv.parentElement.offsetWidth||200,H=cv.parentElement.offsetHeight||84;
+  cv.width=W;cv.height=H;
+  var ctx=cv.getContext('2d');
+  var aR=255,aG=26,aB=26;
+  if(accentColor==='#c9a96e'){aR=201;aG=169;aB=110;}
+  else if(accentColor==='#1a6eff'){aR=26;aG=110;aB=255;}
+  else if(accentColor==='#22d464'){aR=34;aG=212;aB=100;}
+  else if(accentColor==='#9b5de5'){aR=155;aG=93;aB=229;}
+  var t=0,B=brand||'LUXE';
+  function draw(){
+    ctx.fillStyle='rgba(6,6,8,.1)';ctx.fillRect(0,0,W,H);
+    t+=.012;
+    var fs=Math.floor(H*.55);
+    ctx.font=`300 ${fs}px 'Cormorant Garamond',serif`;
+    ctx.fillStyle=`rgba(248,246,242,${.32+Math.sin(t*.4)*.06})`;
+    ctx.textAlign='left';ctx.fillText(B.slice(0,5),4,H*.68);
+    var fs2=Math.floor(H*.16);
+    ctx.font=`700 ${fs2}px 'Syne',sans-serif`;
+    ctx.fillStyle=`rgba(${aR},${aG},${aB},${.55+Math.sin(t*.6)*.12})`;
+    ctx.fillText('Aa Bb Cc 123',4,H*.93);
+    ctx.strokeStyle=`rgba(${aR},${aG},${aB},.28)`;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(W*.62,4);ctx.lineTo(W*.62,H-4);ctx.stroke();
+    ['300','400','700'].forEach((w,i)=>{
+      ctx.font=`${w} ${Math.floor(H*.13)}px 'Syne',sans-serif`;
+      ctx.fillStyle=`rgba(248,246,242,${.12+i*.07})`;
+      ctx.fillText(w,W*.65,H*(.24+i*.3));
+    });
+    ctx.textAlign='left';
+    requestAnimationFrame(draw);
+  }
+  ctx.fillStyle='#060608';ctx.fillRect(0,0,W,H);draw();
+}
+
 // ─── Social media animated canvas ──────────────────────────────────
 function _ppSocialCanvas(brand,accentColor){
   var cv=document.getElementById('pp-cv-social');
@@ -1625,54 +1815,61 @@ function _ppSocialCanvas(brand,accentColor){
   cv.width=W;cv.height=H;
   var ctx=cv.getContext('2d');
   var t=0;
-  var posts=[
-    {x:W*.12,y:H*.18,w:W*.28,h:W*.28,label:'POST'},
-    {x:W*.5,y:H*.08,w:W*.22,h:W*.22,label:'STORY'},
-    {x:W*.14,y:H*.6,w:W*.18,h:W*.18,label:'REEL'},
-    {x:W*.6,y:H*.52,w:W*.32,h:W*.32,label:'AD'},
-  ];
-  // Parse accent for rgba use
   var aR=255,aG=26,aB=26;
   if(accentColor==='#c9a96e'){aR=201;aG=169;aB=110;}
   else if(accentColor==='#1a6eff'){aR=26;aG=110;aB=255;}
   else if(accentColor==='#22d464'){aR=34;aG=212;aB=100;}
   else if(accentColor==='#9b5de5'){aR=155;aG=93;aB=229;}
-
+  var B=(brand||'LUXE').slice(0,6);
+  // 3 post mockups: IG square, Story, Wide
+  var posts=[
+    {x:W*.05,y:H*.08,w:H*.44,h:H*.44,label:'POST 1:1',type:'sq'},
+    {x:W*.05+H*.46,y:H*.05,w:H*.26,h:H*.5,label:'STORY',type:'story'},
+    {x:W*.05,y:H*.08+H*.46,w:H*.7+W*.05,h:H*.32,label:'BANNER',type:'wide'},
+  ];
   function draw(){
-    ctx.fillStyle='rgba(6,6,8,.22)';ctx.fillRect(0,0,W,H);
-    t+=.018;
+    ctx.fillStyle='rgba(6,6,8,.2)';ctx.fillRect(0,0,W,H);
+    t+=.016;
     posts.forEach((p,i)=>{
-      const pulse=.5+Math.sin(t*1.4+i)*.15;
+      var pulse=.45+Math.sin(t*1.2+i*1.1)*.12;
+      // Post bg
+      var pg=ctx.createLinearGradient(p.x,p.y,p.x+p.w,p.y+p.h);
+      pg.addColorStop(0,`rgba(${aR},${aG},${aB},${pulse*.18})`);
+      pg.addColorStop(1,`rgba(6,6,8,${pulse*.1})`);
+      ctx.fillStyle=pg;ctx.fillRect(p.x,p.y,p.w,p.h);
+      // Border
       ctx.strokeStyle=`rgba(${aR},${aG},${aB},${pulse*.7})`;
-      ctx.lineWidth=1;
-      ctx.strokeRect(p.x,p.y,p.w,p.h);
-      // Inner gradient
-      const g=ctx.createLinearGradient(p.x,p.y,p.x+p.w,p.y+p.h);
-      g.addColorStop(0,`rgba(${aR},${aG},${aB},${pulse*.08})`);
-      g.addColorStop(1,`rgba(6,6,8,${pulse*.05})`);
-      ctx.fillStyle=g;ctx.fillRect(p.x+1,p.y+1,p.w-2,p.h-2);
-      // Label
-      ctx.font=`700 ${Math.floor(p.w*.1)}px 'Syne',sans-serif`;
-      ctx.fillStyle=`rgba(${aR},${aG},${aB},${.5+Math.sin(t+i)*.2})`;
+      ctx.lineWidth=.8;ctx.strokeRect(p.x,p.y,p.w,p.h);
+      // Brand text inside
+      var fs=Math.floor(Math.min(p.w,p.h)*.14);
+      ctx.font=`300 ${fs}px 'Cormorant Garamond',serif`;
+      ctx.fillStyle=`rgba(248,246,242,${.25+Math.sin(t*.8+i)*.08})`;
       ctx.textAlign='center';
-      ctx.fillText(p.label,p.x+p.w/2,p.y+p.h/2+4);
-      // Brand name mini
-      ctx.font=`300 ${Math.floor(p.w*.08)}px 'Cormorant Garamond',serif`;
-      ctx.fillStyle=`rgba(248,246,242,${.25+Math.sin(t*.8+i)*.1})`;
-      ctx.fillText((brand||'BRAND').slice(0,6),p.x+p.w/2,p.y+p.h-6);
+      ctx.fillText(B,p.x+p.w/2,p.y+p.h*.52+fs*.15);
+      // Label
+      ctx.font=`700 ${Math.floor(Math.min(p.w,p.h)*.1)}px 'Syne',sans-serif`;
+      ctx.fillStyle=`rgba(${aR},${aG},${aB},${.4+Math.sin(t+i)*.12})`;
+      ctx.fillText(p.label,p.x+p.w/2,p.y+p.h*.85);
+      // Accent line
+      var lw=p.w*.45;
+      var lx=p.x+(p.w-lw)/2;
+      var lineG=ctx.createLinearGradient(lx,0,lx+lw,0);
+      lineG.addColorStop(0,'transparent');
+      lineG.addColorStop(.5,`rgba(${aR},${aG},${aB},${pulse*.8})`);
+      lineG.addColorStop(1,'transparent');
+      ctx.strokeStyle=lineG;ctx.lineWidth=.7;
+      ctx.beginPath();ctx.moveTo(lx,p.y+p.h*.65);ctx.lineTo(lx+lw,p.y+p.h*.65);ctx.stroke();
     });
-    // Scan line
-    const scanX=(Math.sin(t*.4)+1)/2*W;
-    const sg=ctx.createLinearGradient(scanX-20,0,scanX+20,0);
-    sg.addColorStop(0,'transparent');sg.addColorStop(.5,`rgba(${aR},${aG},${aB},.18)`);sg.addColorStop(1,'transparent');
-    ctx.fillStyle=sg;ctx.fillRect(scanX-20,0,40,H);
+    // Scan pulse
+    var scanX=(Math.sin(t*.3)+1)/2*(W*.9)+W*.05;
+    var sg=ctx.createLinearGradient(scanX-18,0,scanX+18,0);
+    sg.addColorStop(0,'transparent');sg.addColorStop(.5,`rgba(${aR},${aG},${aB},.12)`);sg.addColorStop(1,'transparent');
+    ctx.fillStyle=sg;ctx.fillRect(scanX-18,0,36,H);
     ctx.textAlign='left';
     requestAnimationFrame(draw);
   }
-  ctx.fillStyle='#060608';ctx.fillRect(0,0,W,H);
-  draw();
+  ctx.fillStyle='#060608';ctx.fillRect(0,0,W,H);draw();
 }
-
 // ─── Moodboard generative canvas ───────────────────────────────────
 function _ppMoodCanvas(accentColor){
   var cv=document.getElementById('pp-cv-mood');
@@ -1695,21 +1892,30 @@ function _ppMoodCanvas(accentColor){
     {x:W*.59,y:0,w:W*.41,h:H,alpha:.2},
   ];
   function draw(){
-    ctx.fillStyle='rgba(6,6,8,.18)';ctx.fillRect(0,0,W,H);
-    t+=.015;
+    ctx.fillStyle='rgba(6,6,8,.12)';ctx.fillRect(0,0,W,H);
+    t+=.016;
     blocks.forEach((b,i)=>{
-      const a=b.alpha+Math.sin(t*.7+i)*.05;
+      const a=b.alpha+Math.sin(t*.8+i*1.3)*.06;
       ctx.fillStyle=`rgba(${aR},${aG},${aB},${a})`;
       ctx.fillRect(b.x,b.y,b.w,b.h);
-      ctx.strokeStyle=`rgba(${aR},${aG},${aB},${a*2.5})`;
-      ctx.lineWidth=.5;ctx.strokeRect(b.x+1,b.y+1,b.w-2,b.h-2);
+      ctx.strokeStyle=`rgba(${aR},${aG},${aB},${a*2.8})`;
+      ctx.lineWidth=.6;ctx.strokeRect(b.x+1,b.y+1,b.w-2,b.h-2);
     });
-    // Diagonal slash accent
+    // Animated diagonal slashes
     ctx.save();
-    ctx.strokeStyle=`rgba(${aR},${aG},${aB},.45)`;
-    ctx.lineWidth=1.2;
-    ctx.beginPath();ctx.moveTo(W*.3,0);ctx.lineTo(W*.36,H);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(W*.57,0);ctx.lineTo(W*.63,H);ctx.stroke();
+    var dashA=.3+Math.sin(t*.9)*.12;
+    ctx.strokeStyle=`rgba(${aR},${aG},${aB},${dashA})`;
+    ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(W*.28,0);ctx.lineTo(W*.35,H);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(W*.55,0);ctx.lineTo(W*.62,H);ctx.stroke();
+    // Horizontal accent line
+    var ly=H*.5+Math.sin(t*.4)*H*.05;
+    var lg2=ctx.createLinearGradient(0,0,W,0);
+    lg2.addColorStop(0,'transparent');
+    lg2.addColorStop(.4,`rgba(${aR},${aG},${aB},.35)`);
+    lg2.addColorStop(1,'transparent');
+    ctx.strokeStyle=lg2;ctx.lineWidth=.8;
+    ctx.beginPath();ctx.moveTo(0,ly);ctx.lineTo(W,ly);ctx.stroke();
     ctx.restore();
     requestAnimationFrame(draw);
   }
@@ -1766,22 +1972,31 @@ function go(id){
   document.getElementById('prog-fill').style.width=(PROG[id]||0)+'%';
   window.scrollTo(0,0);
   setTimeout(()=>{
-    if(id==='home')initHero();
+    if(id==='home'){initHero();setTimeout(animateCounters,600);}
     if(id==='about')initAbout();
     if(id==='project-preview'){
       initProjectPreviewCanvas();
       startZipProgress();
       populatePreviewFromProposal();
     }
-    if(id==='proposal')checkProviderStatus();
+    if(id==='proposal'){
+      checkProviderStatus();
+      updateConfigSummary();
+      // Auto-seed vision with brand name
+      const vEl=document.getElementById('vision');
+      if(vEl&&S.brandName&&!vEl.value){
+        vEl.value=S.brandName+' — ';
+        setTimeout(()=>{vEl.focus();vEl.setSelectionRange(vEl.value.length,vEl.value.length);},200);
+      }
+    }
   },80);
 }
 
 // ══════════════════════════════════════════
 // SELECTION
 // ══════════════════════════════════════════
-function pick(el){document.querySelectorAll(`[data-g="${el.dataset.g}"]`).forEach(c=>c.classList.remove('sel'));el.classList.add('sel');S.sel[el.dataset.g]=el.dataset.v}
-function ptag(el){document.querySelectorAll(`[data-g="${el.dataset.g}"]`).forEach(c=>c.classList.remove('sel'));el.classList.add('sel');S.sel[el.dataset.g]=el.dataset.v}
+function pick(el){document.querySelectorAll(`[data-g="${el.dataset.g}"]`).forEach(c=>c.classList.remove('sel'));el.classList.add('sel');S.sel[el.dataset.g]=el.dataset.v;if(typeof updateConfigSummary==='function')updateConfigSummary();}
+function ptag(el){document.querySelectorAll(`[data-g="${el.dataset.g}"]`).forEach(c=>c.classList.remove('sel'));el.classList.add('sel');S.sel[el.dataset.g]=el.dataset.v;if(typeof updateConfigSummary==='function')updateConfigSummary();}
 
 // ══════════════════════════════════════════
 // PROVIDER STATUS
@@ -1905,22 +2120,33 @@ function renderImages(imgs){
 // ══════════════════════════════════════════
 async function runProposal(){
   const vision=document.getElementById('vision').value.trim();
-  if(!vision){toast('Please describe your project vision.','err');return}
-  setLoader(true,'Connecting to Vercel backend...');
+  if(!vision){toast('Por favor describe tu visión del proyecto.','err');return}
+  if(vision.split(/\s+/).filter(Boolean).length<5){
+    toast('Describe tu proyecto con más detalle para mejores resultados.','err');return;
+  }
+  setLoader(true,'Conectando al backend de Vercel...');
   document.getElementById('proposal-out').classList.remove('on');
   initLiveProposalCanvases();
   try{
-    setLoader(true,`Streaming from ${S.selectedModel}...`);
+    // Build enriched vision with all config selections
+    const indMap={fashion:'Fashion & Luxury',tech:'Tech & Fintech',hospitality:'Hospitality & Real Estate',beauty:'Beauty & Wellness',art:'Art & Culture',food:'Food & Beverage'};
+    const toneMap={authoritative:'Authoritative & commanding',intimate:'Intimate & human',provocative:'Provocative & edgy',serene:'Serene & refined',bold:'Bold & disruptive'};
+    const enrichedVision=[
+      vision,
+      S.sel.ind?`\nIndustria: ${indMap[S.sel.ind]||S.sel.ind}`:'',
+      S.sel.tone?`\nTono de marca: ${toneMap[S.sel.tone]||S.sel.tone}`:'',
+    ].join('');
+    setLoader(true,`Generando con ${S.selectedModel}...`);
     document.getElementById('proposal-out').classList.add('on');
-    const fullText=await streamFromBackend(vision);
+    const fullText=await streamFromBackend(enrichedVision);
+    // Parse scope from full text
     const scope=parseScope(fullText);
     populateScope(scope);
-    const dirMatch=fullText.match(/\[CREATIVE DIRECTION\]([\s\S]*?)(?:\[SCOPE\]|$)/i);
-    if(dirMatch)document.getElementById('claude-out').textContent=dirMatch[1].trim();
+    // Show full text in claude-out (already streamed there)
+    toast('Propuesta generada ✓','ok');
     fetchImages(vision).then(imgs=>{if(imgs)renderImages(imgs);});
-    toast('Proposal generated via backend ✓','ok');
   }catch(e){
-    toast(`${e.message.slice(0,55)}. Using demo.`,'err');
+    toast(`Error: ${e.message.slice(0,55)}. Usando demo.`,'err');
     demoProposal();return;
   }finally{setLoader(false)}
 }
@@ -2001,7 +2227,11 @@ function demoProposal(){
   setLoader(true,'Generating demo proposal...');
   document.getElementById('proposal-out').classList.remove('on');
   initLiveProposalCanvases();
-  const dirs=['KIMERICA proposes a creative direction built around "structured authority" — the deliberate communication of power through restraint. The visual system anchors in monochromatic architecture where typography becomes the primary voice: severe, confident, architectural. Every element earns its presence or is removed.\n\nThe digital experience will deploy scroll-driven storytelling with calculated motion that reveals rather than decorates. Three.js environments create spatial depth that feels inhabited — brand spaces that exist rather than display.\n\nThis is not a website. This is a territory.','The creative direction centers on "quiet dominance" — the capacity to communicate exceptional authority without announcement. Visual language draws from architectural photography and Bauhaus editorial: severe compositions, deliberate negative space, typography that feels inevitable.\n\nAn immersive web environment built on WebGL responds to user presence, creating environmental intelligence. The brand appears aware, calibrated, in complete control of every interaction.\n\nThe result: an experience that precedes conversation.'];
+  const BRAND_NAME = S.brandName || 'La Marca';
+  const dirs=[
+    `KIMERICA propone una dirección creativa construida alrededor de "autoridad estructurada" — la comunicación deliberada del poder a través de la contención. El sistema visual se ancla en arquitectura monocromática donde la tipografía se convierte en la voz principal: severa, confiada, arquitectónica. Cada elemento gana su presencia o es eliminado.\n\nLa experiencia digital desplegará narrativa impulsada por scroll con movimiento calculado que revela en lugar de decorar. Los entornos Three.js crean profundidad espacial que se siente habitada — espacios de marca que existen en lugar de exhibirse.\n\nEsto no es un sitio web. Es un territorio.\n\n[SCOPE]\nCreative Direction: $2,800\nVisual Identity: $4,200\nDigital Experience: $5,500\n3D / AI Elements: $3,800\nTimeline: 8–10 weeks\nTotal: $16,300`,
+    `La dirección creativa de ${BRAND_NAME} se centra en "dominio silencioso" — la capacidad de comunicar autoridad excepcional sin anunciarlo. El lenguaje visual toma referencia de la fotografía arquitectónica y el editorial Bauhaus: composiciones severas, espacio negativo deliberado, tipografía que se siente inevitable.\n\nUn entorno web inmersivo construido en WebGL responde a la presencia del usuario, creando inteligencia ambiental. La marca aparece consciente, calibrada, en control absoluto de cada interacción.\n\nEl resultado: una experiencia que precede a la conversación.\n\n[SCOPE]\nCreative Direction: $3,200\nVisual Identity: $4,800\nDigital Experience: $6,200\n3D / AI Elements: $4,400\nTimeline: 10–12 weeks\nTotal: $18,600`
+  ];
   setTimeout(()=>{
     document.getElementById('claude-out').textContent=dirs[Math.floor(Math.random()*dirs.length)];
     populateScope({});document.getElementById('proposal-out').classList.add('on');
@@ -2122,6 +2352,37 @@ window.addEventListener('resize',()=>{
   if(S.step==='home')initHero();
   if(S.step==='about')initAbout();
 });
+
+// ── Counter animation for hero metrics ──
+function animateCounters(){
+  const targets=[{id:'cnt-brands',val:47},{id:'cnt-reach',val:3},{id:'cnt-years',val:12},{id:'cnt-countries',val:8}];
+  targets.forEach(({id,val})=>{
+    const el=document.getElementById(id);if(!el)return;
+    const sup=el.querySelector('sup');const supTxt=sup?sup.textContent:'';
+    let cur=0;const dur=1400;const start=Date.now();
+    function tick(){
+      const progress=Math.min((Date.now()-start)/dur,1);
+      const ease=1-Math.pow(1-progress,3);
+      cur=Math.round(ease*val);
+      el.innerHTML=cur+(sup?`<sup>${supTxt}</sup>`:'');
+      if(progress<1)requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}
+
+// ── Update config summary on proposal screen ──
+function updateConfigSummary(){
+  const objMap={authority:'Brand Authority',identity:'Visual Identity',immersive:'Immersive 3D',product:'Product Launch'};
+  const visMap={minimal:'Minimal',bold:'Bold Contrast',editorial:'Editorial',futuristic:'Futuristic',abstract:'Abstract',luxury:'Luxury Gold'};
+  const indMap={fashion:'Fashion',tech:'Tech',hospitality:'Hospitality',beauty:'Beauty',art:'Art & Culture',food:'Food & Beverage'};
+  const toneMap={authoritative:'Authoritative',intimate:'Intimate',provocative:'Provocative',serene:'Serene',bold:'Disruptive'};
+  const set=(id,map,key,fallback)=>{const el=document.getElementById(id);if(el)el.textContent=map[key]||fallback;};
+  set('cfg-obj',objMap,S.sel.obj,'— Objetivo');
+  set('cfg-vis',visMap,S.sel.vis,'— Visual');
+  set('cfg-ind',indMap,S.sel.ind,'— Industria');
+  set('cfg-tone',toneMap,S.sel.tone,'— Tono');
+}
 </script>
 </body>
 </html>
