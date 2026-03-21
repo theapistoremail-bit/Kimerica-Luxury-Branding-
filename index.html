@@ -984,30 +984,43 @@ function initProjectPreviewCanvas(){
 }
 
 async function _ppBuild(){
+  // ── RESET iframe & loading state on every call ──
+  const _ifrReset = document.getElementById('pp-site-frame');
+  const _loadReset = document.getElementById('pp-site-loading');
+  const _loadTxtReset = document.getElementById('pp-site-loading-txt');
+  if(_ifrReset){ _ifrReset.style.display='none'; _ifrReset.src='about:blank'; if(_ifrReset._prev){URL.revokeObjectURL(_ifrReset._prev);_ifrReset._prev=null;} }
+  if(_loadReset){ _loadReset.style.display='flex'; }
+  if(_loadTxtReset){ _loadTxtReset.textContent='Claude is designing your website...'; }
+
   // ── Extract brand data from vision + proposal ──
   var vision   = document.getElementById('vision')?.value||'';
   var proposal = document.getElementById('claude-out')?.textContent||'';
   var all      = vision+' '+proposal;
 
-  // Brand name: first capitalized word 4+ chars
-  var caps = all.split(/\s+/).filter(w=>/^[A-Z][A-Za-z]{3,}/.test(w)&&w.length<15&&!/^(The|And|For|With|That|This|Your|From|Into|Over|When|Where|Create|Build|Design|Visual|Brand|Using|Their|About|Have|Will|Does|Should|Would|Could|Been)$/i.test(w));
+  // Brand name: first meaningful capitalized word
+  var STOPWORDS=/^(The|And|For|With|That|This|Your|From|Into|Over|When|Where|Create|Build|Design|Visual|Brand|Using|Their|About|Have|Will|Does|Should|Would|Could|Been|Studio|Agency|Creative|Digital|Luxury|Premium|System|Project|Portfolio|Our|We|Us|Is|In|On|To|Of|A|An)$/i;
+  var caps = all.split(/\s+/).filter(w=>/^[A-Z][A-Za-z]{2,}/.test(w)&&w.length<16&&!STOPWORDS.test(w));
   var BRAND = (caps[0]||'LUXE').replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,10)||'LUXE';
   var INIT  = BRAND[0];
 
-  // Tagline extraction
+  // Tagline: look in proposal for quoted phrases, or derive from vision
   var tqm = proposal.match(/["""]([^"""]{8,55})["""]/);
-  var TAG  = tqm?tqm[1]:'Elegance Redefined';
+  var TAG  = tqm ? tqm[1] : (vision.length>10 ? vision.split(/[.,!?]/)[0].slice(0,50) : 'Elegance Redefined');
 
-  // Objective & Visual
-  var OBJ = document.getElementById('pv-objective')?.textContent||'Brand Authority System';
+  // Objective from S.sel (always fresh, never stale DOM)
+  var objMap={authority:'Brand Authority System',identity:'Visual Identity System',immersive:'Immersive 3D Experience',product:'Product Launch System'};
+  var OBJ = objMap[S.sel.obj]||'Brand Authority System';
+
+  // Visual direction
   var VIS = (S.sel.vis||'luxury').toLowerCase();
 
-  // Primary color from visual direction
+  // Primary color — scarlet is the KIMERICA default when no vis selected
   var P='#FF1A1A';
-  if(VIS.includes('gold')||VIS.includes('luxury')) P='#c9a96e';
+  if(VIS==='luxury'||VIS.includes('gold')) P='#c9a96e';
   else if(VIS.includes('blue')||VIS.includes('corp')) P='#1a6eff';
   else if(VIS.includes('green')) P='#22d464';
   else if(VIS.includes('purple')) P='#9b5de5';
+  else if(VIS.includes('bold')||VIS.includes('contrast')||VIS.includes('futuristic')||VIS.includes('minimal')) P='#FF1A1A';
 
   // ── Update branding panels ──
   var urlEl=document.getElementById('pp-url'); if(urlEl)urlEl.textContent='www.'+BRAND.toLowerCase()+'.studio';
@@ -1037,156 +1050,528 @@ async function _ppBuild(){
   _ppGenerateWebsite(BRAND,INIT,TAG,P,OBJ,VIS,vision,proposal);
 }
 
-// ─── Generate full website HTML via Claude API ───────────────────────
+// ─── Generate full website HTML via Claude API ── with retry + resilience ──
 async function _ppGenerateWebsite(BRAND,INIT,TAG,P,OBJ,VIS,vision,proposal){
-  const loadEl   = document.getElementById('pp-site-loading');
-  const loadTxt  = document.getElementById('pp-site-loading-txt');
-  const iframe   = document.getElementById('pp-site-frame');
+  const loadEl  = document.getElementById('pp-site-loading');
+  const loadTxt = document.getElementById('pp-site-loading-txt');
+  const iframe  = document.getElementById('pp-site-frame');
   if(!loadEl||!iframe) return;
 
   loadEl.style.display='flex';
   iframe.style.display='none';
-  if(loadTxt) loadTxt.textContent='Claude is designing your website...';
 
-  const systemPrompt = `You are an expert frontend developer specializing in luxury brand websites.
-Generate a COMPLETE, SELF-CONTAINED single-file HTML website for a luxury brand.
-The website must:
-- Use Google Fonts (Cormorant Garamond + Syne or similar luxury pairing)
-- Have a dark/premium aesthetic with the brand color: ${P}
-- Include: Nav, Hero section, Services/Products grid, About section, Portfolio/Gallery, Contact/CTA, Footer
-- Be fully responsive and visually stunning
-- Include smooth scroll, hover effects, subtle animations
+  // ── Loading messages that cycle while waiting ──
+  const loadMsgs = [
+    'Claude is architecting your website...',
+    'Designing hero section and navigation...',
+    'Building services grid and portfolio...',
+    'Crafting contact section and footer...',
+    'Applying luxury typography and motion...',
+    'Finalizing color system and animations...',
+    'Almost ready — polishing final details...',
+  ];
+  let loadIdx=0;
+  if(loadTxt) loadTxt.textContent=loadMsgs[0];
+  const loadTimer = setInterval(()=>{
+    loadIdx=(loadIdx+1)%loadMsgs.length;
+    if(loadTxt) loadTxt.textContent=loadMsgs[loadIdx];
+  },2200);
+
+  const visDescMap={
+    minimal:'Minimal & Refined — extreme whitespace, hairline borders, restrained typography',
+    bold:'Bold & High Contrast — heavy type, large scale, stark black/white contrast',
+    editorial:'Editorial & Elegant — magazine layout, serif type hierarchy, refined grid',
+    futuristic:'Futuristic — geometric shapes, monospace accents, tech-forward UI',
+    abstract:'Conceptual / Abstract — unexpected layouts, artistic grid-breaking elements',
+    luxury:'Luxury Black — dark gold on black, premium materials aesthetic, opulent',
+  };
+  const visDesc = visDescMap[VIS]||'Luxury dark premium aesthetic';
+
+  // ── Ultra-detailed system prompt for maximum quality ──
+  const systemPrompt = `You are a world-class frontend developer and luxury brand designer.
+Generate an EXTRAORDINARY, COMPLETE, SELF-CONTAINED single-file HTML website.
+This must be production-quality, visually stunning, and highly detailed.
+
+DESIGN REQUIREMENTS:
+- Visual style: ${visDesc}
+- Primary accent color: ${P} — use it for glow effects, borders, text accents, hover states
+- Background: #060608 (near-black) with subtle texture via CSS
+- Typography: Google Fonts — Cormorant Garamond (headings, 300/400 weight) + Syne (UI, 600/700/800)
+- Include Google Fonts <link> tag in <head>
+
+SECTIONS TO INCLUDE (all required, rich content):
+1. STICKY NAV — logo with monogram, links, CTA button with border glow
+2. HERO — full viewport, large Cormorant heading (4+ lines), eyebrow label, subtext, 2 buttons, floating metric counters at bottom
+3. MARQUEE STRIP — scrolling service names with CSS animation (no JS needed)
+4. SERVICES GRID — 6 cards with icon, title, description, price, hover reveal with bottom border animation
+5. ABOUT SPLIT — 2 columns: left with large heading + body text + testimonial quote block; right with abstract CSS art shape (gradient box with overlay text)
+6. NUMBERS STRIP — 4 stats with large number + label (e.g. "47+ / Global Brands")  
+7. PORTFOLIO GRID — 6 project cards in asymmetric grid, each with gradient background + category + title + arrow
+8. PROCESS — 3 numbered steps with large number, title, description
+9. TESTIMONIALS — 2 testimonial cards side by side with quote, name, company
+10. CTA BANNER — full-width with background radial glow, large text, button
+11. FOOTER — 4 columns: logo+tagline, links, services list, contact; bottom bar with copyright
+
+CSS REQUIREMENTS:
+- Use CSS custom properties (--p, --bg, --tx, --mu, --border, etc.)
+- Smooth scroll behavior
+- Hover effects on all interactive elements
+- CSS keyframe animations: fadeUp for sections, shimmer for buttons, marquee for strip
+- Subtle noise texture overlay using SVG data URL on body::before
+- Glassmorphism nav (backdrop-filter blur)
+- Custom scrollbar (3px, accent color)
+- All transitions 0.3s-0.5s cubic-bezier
+
+JS REQUIREMENTS (inline, minimal):
+- Intersection Observer for scroll-triggered fadeUp animations
+- Smooth scroll for nav links
+- Contact form modal (show/hide)
 - All text in SPANISH
-- Brand name: ${BRAND}, Tagline: "${TAG}", Primary color: ${P}
-- Objective: ${OBJ}
-- Visual direction: ${VIS}
-CRITICAL: Output ONLY the raw HTML. No markdown, no backticks, no explanation. Start with <!DOCTYPE html>`;
 
-  const userPrompt = `Create a luxury brand website for: ${vision||BRAND+' — '+OBJ}
+Brand: ${BRAND} | Tagline: "${TAG}" | Objective: ${OBJ}
+
+CRITICAL: Output ONLY raw HTML starting with <!DOCTYPE html>. Zero markdown. Zero backticks. Zero explanation.`;
+
+  const userPrompt = `Build the complete luxury website now.
 Brand name: ${BRAND}
-Tagline: ${TAG}
-Primary accent color: ${P}
-Visual style: ${VIS}
-Creative direction extracted: ${proposal.slice(0,300)||'Luxury, authority, restraint'}
+Initial: ${INIT}
+Tagline: "${TAG}"
+Vision: ${vision||OBJ}
+Creative direction: ${proposal.slice(0,500)||'Authority through restraint. Luxury through precision.'}
+Accent color: ${P}
+Style: ${visDesc}
 
-Generate the complete HTML website now.`;
+Make it extraordinary. Full detail. Every section complete.`;
+
+  // ── Fetch with retry (up to 2 retries for unstable connections) ──
+  async function fetchWithRetry(url, opts, retries=2, delay=2000){
+    for(let i=0; i<=retries; i++){
+      try{
+        const controller = new AbortController();
+        const timeout = setTimeout(()=>controller.abort(), 55000); // 55s timeout
+        const res = await fetch(url, {...opts, signal:controller.signal});
+        clearTimeout(timeout);
+        return res;
+      }catch(err){
+        if(i===retries) throw err;
+        if(loadTxt) loadTxt.textContent=`Connection issue — retrying (${i+1}/${retries})...`;
+        await new Promise(r=>setTimeout(r,delay));
+        if(loadTxt) loadTxt.textContent=loadMsgs[loadIdx];
+      }
+    }
+  }
 
   try{
-    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+    const resp = await fetchWithRetry('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',
-        max_tokens:8000,
+        max_tokens:12000,
         system: systemPrompt,
         messages:[{role:'user',content:userPrompt}]
       })
     });
+
+    clearInterval(loadTimer);
+
+    if(!resp.ok){
+      const errData = await resp.json().catch(()=>({}));
+      throw new Error(errData?.error?.message||`API error ${resp.status}`);
+    }
+
     const data = await resp.json();
     let html = data?.content?.[0]?.text||'';
 
-    // Clean up any accidental markdown fences
-    html = html.replace(/^```html?\n?/i,'').replace(/\n?```$/,'').trim();
-
-    if(!html.includes('<!DOCTYPE')){
-      throw new Error('Invalid HTML response');
+    // Strip any accidental markdown fences
+    html = html.replace(/^```html?\r?\n?/i,'').replace(/\r?\n?```\s*$/,'').trim();
+    // Also strip if wrapped in code block mid-text
+    if(!html.startsWith('<!') && html.includes('<!DOCTYPE')){
+      html = html.slice(html.indexOf('<!DOCTYPE'));
     }
 
-    // Inject into iframe
+    if(!html.includes('<!DOCTYPE')||html.length<2000){
+      throw new Error('Response too short or invalid');
+    }
+
+    // ── Inject into iframe ──
     const blob = new Blob([html],{type:'text/html'});
     const url  = URL.createObjectURL(blob);
     if(iframe._prev) URL.revokeObjectURL(iframe._prev);
     iframe._prev = url;
     iframe.src   = url;
-    iframe.style.display = 'block';
-    loadEl.style.display  = 'none';
-    toast('Website generated by Claude ✓','ok');
+    iframe.onload = ()=>{ iframe.style.display='block'; loadEl.style.display='none'; };
+    toast(`Website generated by Claude ✓`,'ok');
 
   }catch(e){
-    // Fallback: use the built-in _ppWebsite function
-    console.warn('Claude API failed, using built-in website generator',e);
-    if(loadTxt) loadTxt.textContent='Using built-in generator...';
-    _ppWebsite(BRAND,INIT,TAG,P,OBJ,proposal);
+    clearInterval(loadTimer);
+    console.warn('Claude API failed, falling back to built-in generator. Error:',e.message);
+    if(loadTxt) loadTxt.textContent='Generating with built-in engine...';
+    _ppWebsite(BRAND,INIT,TAG,P,OBJ,vision,proposal);
   }
 }
 
-// ─── Fallback website builder (no API needed) ──────────────────────
-function _ppWebsite(B,I,T,P,OBJ,proposal){
+// ─── Fallback website builder — high quality, no API needed ──────────
+function _ppWebsite(B,I,T,P,OBJ,vision,proposal){
   const iframe=document.getElementById('pp-site-frame');
   const loadEl=document.getElementById('pp-site-loading');
   if(!iframe)return;
-
   var h=[],p=function(){for(var i=0;i<arguments.length;i++)h.push(String(arguments[i]));};
-  p('<!DOCTYPE html><html lang="es"><head>');
-  p('<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">');
-  p('<title>',B,'</title>');
-  p('<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">');
-  p('<style>*{margin:0;padding:0;box-sizing:border-box}');
-  p(':root{--p:',P,';--bg:#060608;--tx:#f8f6f2;--mu:rgba(248,246,242,.38)}');
-  p('body{background:var(--bg);color:var(--tx);font-family:Syne,sans-serif;overflow-x:hidden}');
-  p('nav{position:sticky;top:0;background:rgba(6,6,8,.93);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.07);padding:16px 5%;display:flex;align-items:center;gap:28px;z-index:100}');
-  p('.lg{font-family:"Cormorant Garamond",serif;font-size:1.7rem;font-weight:300;letter-spacing:.08em;color:var(--tx)}.lg em{color:var(--p);font-style:italic}');
-  p('.nl{display:flex;gap:24px;margin-left:auto}.nl a{font-size:.67rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(248,246,242,.35);text-decoration:none;transition:color .3s}.nl a:hover{color:var(--tx)}');
-  p('.nc{padding:9px 22px;border:1px solid var(--p);color:var(--p);font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:transparent;transition:all .3s;margin-left:8px}.nc:hover{background:var(--p);color:var(--bg)}');
-  p('.hero{min-height:92vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 5% 60px;position:relative;overflow:hidden}');
-  p('.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 22%,',P,'1e 0%,transparent 60%);pointer-events:none}');
-  p('.eb{font-size:.62rem;font-weight:700;letter-spacing:.4em;text-transform:uppercase;color:var(--p);margin-bottom:22px;display:flex;align-items:center;gap:14px}');
-  p('.eb::before,.eb::after{content:"";width:32px;height:1px;background:var(--p);opacity:.7}');
-  p('h1{font-family:"Cormorant Garamond",serif;font-size:clamp(4rem,11vw,9rem);font-weight:300;line-height:.9;letter-spacing:-.025em;margin-bottom:26px}');
-  p('h1 em{font-style:italic;color:var(--p)}h1 .g{-webkit-text-stroke:1px rgba(248,246,242,.15);color:transparent}');
-  p('.hp{font-size:.92rem;color:rgba(248,246,242,.4);max-width:500px;line-height:1.9;margin-bottom:44px}');
-  p('.hb{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}');
-  p('.bp{padding:14px 38px;background:var(--p);color:var(--bg);font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border:none;box-shadow:0 0 22px ',P,'44;transition:all .3s}.bp:hover{transform:translateY(-2px);box-shadow:0 10px 32px ',P,'66}');
-  p('.bo{padding:14px 38px;border:1px solid rgba(255,255,255,.18);color:var(--tx);font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;background:transparent;transition:all .3s}.bo:hover{border-color:var(--p);color:var(--p)}');
-  p('.sec{padding:80px 5%;max-width:1200px;margin:0 auto}');
-  p('.sl{font-size:.59rem;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--p);margin-bottom:10px;display:flex;align-items:center;gap:8px}.sl::before{content:"";width:18px;height:1px;background:var(--p)}');
-  p('h2{font-family:"Cormorant Garamond",serif;font-size:clamp(2rem,4.5vw,3.5rem);font-weight:300;line-height:1.02;margin-bottom:48px}h2 em{font-style:italic;color:var(--p)}');
-  p('.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);margin-bottom:80px}');
-  p('.sc{background:var(--bg);padding:30px 24px;cursor:pointer;position:relative;overflow:hidden;transition:background .3s}');
-  p('.sc::after{content:"";position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--p);transition:width .4s}.sc:hover::after{width:100%}.sc:hover{background:',P,'08}');
-  p('.si{font-size:1.5rem;margin-bottom:14px;display:block}.st{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tx);margin-bottom:9px}');
-  p('.sd{font-size:.77rem;color:rgba(248,246,242,.35);line-height:1.75}.sp{font-family:"Cormorant Garamond",serif;font-size:1.4rem;font-weight:300;color:var(--p);margin-top:16px}');
-  p('.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:80px}');
-  p('.pi{aspect-ratio:4/3;background:linear-gradient(135deg,var(--bg),',P,'1a);border:1px solid ',P,'20;display:flex;align-items:flex-end;padding:16px;cursor:pointer;transition:all .32s;position:relative;overflow:hidden}');
-  p('.pi::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(6,6,8,.78),transparent 55%)}.pi:hover{border-color:',P,'55;transform:scale(1.02)}');
-  p('.pl{position:relative;z-index:1;font-size:.61rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(248,246,242,.44)}');
-  p('.cta{background:linear-gradient(135deg,',P,'10,var(--bg));border-top:1px solid ',P,'20;padding:80px 5%;text-align:center;margin-bottom:60px}');
-  p('footer{padding:34px 5%;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}');
-  p('.fl{font-family:"Cormorant Garamond",serif;font-size:1.2rem;color:rgba(248,246,242,.28)}');
-  p('@keyframes su{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}.anim{animation:su .65s ease both}');
-  p('</style></head><body>');
-  p('<nav><div class="lg"><em>',I,'</em>',B.slice(1),'</div>');
-  p('<div class="nl"><a href="#servicios">Servicios</a><a href="#nosotros">Nosotros</a><a href="#portafolio">Portafolio</a></div>');
-  p('<button class="nc">Consulta Exclusiva</button></nav>');
-  p('<section class="hero"><div class="eb">',T.slice(0,36),'</div>');
-  p('<h1><em>',B,'</em><br><span class="g">Studio</span></h1>');
-  p('<p class="hp">',OBJ,'. Sistemas visuales de autoridad para marcas que no piden permiso.</p>');
-  p('<div class="hb"><button class="bp">Iniciar Proyecto</button><button class="bo">Ver Portafolio</button></div></section>');
-  p('<div class="sec" id="servicios"><div class="sl">Lo que construimos</div>');
-  p('<h2>Sistemas creativos<br><em>de autoridad.</em></h2><div class="sg">');
-  [['◈','Identidad Visual','Sistema completo — logo, tipografía, paleta, guías.','$4,200'],
-   ['⬡','Experiencia Digital','Sitios web que comunican poder. WebGL, animaciones.','$5,500'],
-   ['◉','3D & Motion','Objetos 3D, renders y motion graphics.','$3,800'],
-   ['◇','Dirección Creativa','Estrategia y brief generado por IA.','$2,800']
-  ].forEach(s=>p('<div class="sc"><span class="si">',s[0],'</span><div class="st">',s[1],'</div><div class="sd">',s[2],'</div><div class="sp">desde ',s[3],'</div></div>'));
-  p('</div></div>');
-  p('<div class="sec" id="portafolio" style="padding-top:0"><div class="sl">Trabajo selecto</div>');
-  p('<h2>Portafolio<br><em>curado.</em></h2><div class="pg">');
-  ['Brand Identity','Digital Experience','3D Environment','Campaign System','Visual Direction','Motion Design'].forEach((it,i)=>p('<div class="pi anim" style="animation-delay:',(i*.08),'s"><div class="pl">',it,'</div></div>'));
-  p('</div></div>');
-  p('<div class="cta"><h2 style="font-family:\'Cormorant Garamond\',serif;font-size:clamp(2.4rem,5vw,4.2rem);font-weight:300;line-height:1;margin-bottom:18px">¿Listo para<br><em style="color:var(--p)">construir</em> algo extraordinario?</h2>');
-  p('<button class="bp" style="font-size:.8rem;padding:15px 46px">Iniciar Ahora →</button></div>');
-  p('<footer><div class="fl">',B,'</div><div style="font-size:.57rem;color:rgba(248,246,242,.18)">&copy; 2025 ',B,'</div></footer>');
-  p('<script>document.querySelectorAll(".anim").forEach(el=>{el.style.opacity="0";new IntersectionObserver((e)=>{e.forEach(x=>{if(x.isIntersecting)x.target.style.opacity="1"})},{threshold:.08}).observe(el)})<\/script>');
-  p('</body></html>');
+  var VIS=(S.sel.vis||'luxury');
+  // Derive secondary color
+  var P2=P==='#c9a96e'?'rgba(201,169,110,.12)':P==='#1a6eff'?'rgba(26,110,255,.12)':P==='#22d464'?'rgba(34,212,100,.12)':'rgba(255,26,26,.12)';
+  var P3=P==='#c9a96e'?'rgba(201,169,110,.45)':P==='#1a6eff'?'rgba(26,110,255,.45)':P==='#22d464'?'rgba(34,212,100,.45)':'rgba(255,26,26,.45)';
+  var PH=P.replace('#','');
 
-  const blob=new Blob([h.join('')],{type:'text/html'});
-  const url=URL.createObjectURL(blob);
+  p(`<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${B} — ${T.slice(0,40)}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--p:${P};--p2:${P2};--p3:${P3};--bg:#060608;--surf:#0d0d10;--tx:#f8f6f2;--mu:rgba(248,246,242,.35);--border:rgba(255,255,255,.07);--border-p:${P3}}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Syne',sans-serif;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.6}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--p)}
+
+/* NAV */
+nav{position:fixed;top:0;width:100%;padding:18px 5%;display:flex;align-items:center;gap:32px;z-index:100;background:rgba(6,6,8,.88);backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+.logo{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;letter-spacing:.06em;color:var(--tx);text-decoration:none;display:flex;align-items:center;gap:10px}
+.logo-mono{width:32px;height:32px;border:1px solid var(--border-p);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--p)}
+.logo em{color:var(--p);font-style:italic}
+.nav-links{display:flex;gap:28px;margin-left:auto}
+.nav-links a{font-size:.65rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--mu);text-decoration:none;transition:color .3s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-3px;left:0;width:0;height:1px;background:var(--p);transition:width .3s}
+.nav-links a:hover{color:var(--tx)}.nav-links a:hover::after{width:100%}
+.nav-cta{padding:9px 22px;border:1px solid var(--border-p);color:var(--p);font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:transparent;cursor:pointer;transition:all .3s}
+.nav-cta:hover{background:var(--p);color:#000}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:140px 5% 80px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,${P}14 0%,transparent 65%);pointer-events:none}
+.hero::after{content:'';position:absolute;right:0;top:0;bottom:0;width:42%;background:linear-gradient(to left,${P}06,transparent);pointer-events:none}
+.eyebrow{font-size:.6rem;font-weight:700;letter-spacing:.4em;text-transform:uppercase;color:var(--p);margin-bottom:28px;display:flex;align-items:center;gap:12px;animation:fadeUp .7s .1s both}
+.eyebrow::before{content:'';width:36px;height:1px;background:var(--p);box-shadow:0 0 8px var(--p3)}
+h1{font-family:'Cormorant Garamond',serif;font-size:clamp(4rem,9vw,8.5rem);font-weight:300;line-height:.92;letter-spacing:-.03em;margin-bottom:32px;animation:fadeUp .7s .25s both}
+h1 em{font-style:italic;color:var(--p)}
+h1 .ghost{-webkit-text-stroke:1px rgba(248,246,242,.15);color:transparent}
+.hero-sub{font-size:1rem;color:var(--mu);max-width:520px;line-height:1.85;margin-bottom:48px;animation:fadeUp .7s .4s both}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;animation:fadeUp .7s .55s both}
+.btn-p{padding:14px 38px;background:var(--p);color:#000;font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;border:none;cursor:pointer;box-shadow:0 0 24px ${P}55;transition:all .35s}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 12px 36px ${P}77}
+.btn-o{padding:14px 38px;border:1px solid rgba(255,255,255,.2);color:var(--tx);font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;background:transparent;cursor:pointer;transition:all .35s}
+.btn-o:hover{border-color:var(--p);color:var(--p)}
+.hero-metrics{display:flex;gap:52px;margin-top:72px;padding-top:40px;border-top:1px solid var(--border);animation:fadeUp .7s .7s both}
+.met-n{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;color:var(--p);line-height:1}
+.met-l{font-size:.58rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--mu);margin-top:6px}
+
+/* MARQUEE */
+.marquee-wrap{border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;padding:14px 0;background:var(--surf)}
+.marquee{display:flex;gap:56px;animation:marquee 22s linear infinite;white-space:nowrap}
+.marquee span{font-size:.62rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--mu);display:flex;align-items:center;gap:18px}
+.marquee span::before{content:'✦';color:var(--p);font-size:.5rem}
+
+/* SERVICES */
+.services{padding:100px 5%;position:relative;z-index:1}
+.sec-label{font-size:.58rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--p);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.sec-label::before{content:'';width:24px;height:1px;background:var(--p)}
+h2{font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,4vw,4rem);font-weight:300;line-height:1.02;margin-bottom:56px}
+h2 em{font-style:italic;color:var(--p)}
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border)}
+.svc-card{background:var(--bg);padding:34px 28px;position:relative;overflow:hidden;transition:background .3s;cursor:pointer}
+.svc-card::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--p);box-shadow:0 0 8px var(--p3);transition:width .45s}
+.svc-card:hover::after{width:100%}.svc-card:hover{background:${P2}}
+.svc-icon{font-size:1.6rem;margin-bottom:18px;display:block}
+.svc-num{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:300;color:var(--border);line-height:1;margin-bottom:14px}
+.svc-title{font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tx);margin-bottom:10px}
+.svc-desc{font-size:.77rem;color:var(--mu);line-height:1.7;margin-bottom:16px}
+.svc-price{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;color:var(--p)}
+
+/* ABOUT */
+.about{padding:100px 5%;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.about-txt h2{margin-bottom:24px}
+.about-body{font-family:'Cormorant Garamond',serif;font-size:1.08rem;font-weight:300;line-height:1.85;color:rgba(248,246,242,.65);border-left:2px solid var(--p);padding-left:22px;margin:22px 0}
+.testimonial{border:1px solid var(--border);padding:24px;margin-top:28px;position:relative;background:${P2}}
+.testimonial::before{content:'❝';font-family:'Cormorant Garamond',serif;font-size:3.5rem;font-weight:300;color:${P3};position:absolute;top:12px;left:18px;line-height:1}
+.testimonial p{font-family:'Cormorant Garamond',serif;font-size:.95rem;font-style:italic;color:var(--mu);padding-left:14px;line-height:1.7}
+.testimonial cite{font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--p);display:block;margin-top:14px}
+.about-vis{background:linear-gradient(135deg,${P}18,${P}06);border:1px solid ${P3};min-height:420px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.about-vis::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,${P}22,transparent 65%)}
+.about-vis-text{font-family:'Cormorant Garamond',serif;font-size:clamp(4rem,8vw,7rem);font-weight:300;color:${P}28;letter-spacing:-.04em;line-height:1;z-index:1;text-align:center}
+.about-vis-text em{font-style:italic;color:${P}55;display:block}
+
+/* NUMBERS */
+.numbers{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.num-item{background:var(--surf);padding:36px 28px;text-align:center;transition:background .3s}
+.num-item:hover{background:${P2}}
+.num-n{font-family:'Cormorant Garamond',serif;font-size:3.2rem;font-weight:300;color:var(--p);line-height:1;margin-bottom:8px}
+.num-l{font-size:.58rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mu)}
+
+/* PORTFOLIO */
+.portfolio{padding:100px 5%}
+.port-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:44px}
+.port-card{border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:border-color .35s;position:relative;background:var(--surf)}
+.port-card:hover{border-color:var(--border-p)}
+.port-bg{aspect-ratio:4/3;background:linear-gradient(135deg,var(--bg),${P}18);display:flex;align-items:flex-end;padding:20px;position:relative;overflow:hidden;transition:all .4s}
+.port-card:hover .port-bg{background:linear-gradient(135deg,var(--bg),${P}28)}
+.port-n{position:absolute;top:12px;right:14px;font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:300;color:${P2};line-height:1}
+.port-info{position:relative;z-index:1}
+.port-cat{font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--p);margin-bottom:5px}
+.port-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:300;color:var(--tx)}
+.port-arrow{position:absolute;top:14px;left:16px;font-size:.8rem;color:${P3};opacity:0;transition:all .3s;transform:translateX(-6px)}
+.port-card:hover .port-arrow{opacity:1;transform:translateX(0)}
+
+/* PROCESS */
+.process{padding:80px 5%;border-top:1px solid var(--border)}
+.proc-list{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:52px}
+.proc-item{border-top:2px solid var(--p);padding-top:28px}
+.proc-n{font-family:'Cormorant Garamond',serif;font-size:4rem;font-weight:300;color:${P2};line-height:1;margin-bottom:14px}
+.proc-title{font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx);margin-bottom:10px}
+.proc-desc{font-size:.82rem;color:var(--mu);line-height:1.75}
+
+/* TESTIMONIALS */
+.testimonials{padding:80px 5%;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.testi-card{border:1px solid var(--border);padding:40px 36px;background:${P2};position:relative;overflow:hidden;transition:border-color .3s}
+.testi-card:hover{border-color:var(--border-p)}
+.testi-card::before{content:'❝';font-family:'Cormorant Garamond',serif;font-size:5rem;font-weight:300;color:${P}20;position:absolute;top:16px;left:24px;line-height:1}
+.testi-q{font-family:'Cormorant Garamond',serif;font-size:1.06rem;font-weight:300;font-style:italic;color:rgba(248,246,242,.7);line-height:1.8;margin-bottom:24px;padding-top:16px}
+.testi-name{font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--p)}
+.testi-co{font-size:.62rem;color:var(--mu);margin-top:3px}
+
+/* CTA */
+.cta{margin:0 5% 80px;border:1px solid var(--border-p);padding:80px 60px;text-align:center;position:relative;overflow:hidden;background:${P2}}
+.cta::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,${P}20,transparent 70%)}
+.cta h2{font-size:clamp(2.5rem,5vw,5rem);margin-bottom:20px;position:relative}
+.cta-sub{font-size:.92rem;color:var(--mu);margin-bottom:44px;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.8;position:relative}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:60px 5% 32px}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:52px}
+.foot-logo{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:var(--tx);margin-bottom:14px}
+.foot-logo em{color:var(--p);font-style:italic}
+.foot-tagline{font-size:.76rem;color:var(--mu);line-height:1.7;max-width:260px}
+.foot-h{font-size:.6rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--p);margin-bottom:18px}
+.foot-links{display:flex;flex-direction:column;gap:9px}
+.foot-links a{font-size:.76rem;color:var(--mu);text-decoration:none;transition:color .3s}
+.foot-links a:hover{color:var(--tx)}
+.foot-bar{display:flex;justify-content:space-between;align-items:center;padding-top:28px;border-top:1px solid var(--border)}
+.foot-copy{font-size:.6rem;color:rgba(248,246,242,.22);letter-spacing:.08em}
+
+/* MODAL */
+#cm{display:none;position:fixed;inset:0;background:rgba(6,6,8,.96);z-index:500;align-items:center;justify-content:center;padding:32px}
+#cm.on{display:flex}
+.cm-box{background:#0d0308;border:1px solid var(--border-p);max-width:480px;width:100%;padding:42px;position:relative}
+.cm-close{position:absolute;top:14px;right:16px;background:transparent;border:none;color:var(--mu);font-size:20px;cursor:pointer;transition:color .3s}
+.cm-close:hover{color:var(--p)}
+.cm-label{font-size:.58rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--p);margin-bottom:6px}
+.cm-h{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;margin-bottom:24px}
+input,textarea{width:100%;padding:12px 14px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--tx);font-family:'Syne',sans-serif;font-size:.8rem;outline:none;display:block;margin-bottom:12px;transition:border-color .3s}
+input:focus,textarea:focus{border-color:var(--border-p)}
+textarea{resize:none;min-height:90px}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:none}
+
+@media(max-width:900px){
+  .about,.testimonials,.foot-grid,.proc-list{grid-template-columns:1fr}
+  .svc-grid,.numbers,.port-grid{grid-template-columns:1fr 1fr}
+  h1{font-size:clamp(3rem,11vw,5rem)}
+  .cta{margin:0 0 60px;padding:60px 28px}
+}
+</style></head><body>
+
+<nav>
+  <a href="#" class="logo"><div class="logo-mono">${I}</div><span><em>${I}</em>${B.slice(1)}</span></a>
+  <div class="nav-links">
+    <a href="#servicios">Servicios</a>
+    <a href="#nosotros">Nosotros</a>
+    <a href="#portafolio">Portafolio</a>
+    <a href="#proceso">Proceso</a>
+    <a href="#contacto">Contacto</a>
+  </div>
+  <button class="nav-cta" onclick="showCM()">Consulta Exclusiva</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="eyebrow">${T.slice(0,44)}</div>
+  <h1><em>${B}</em><br>Studio<br><span class="ghost">Authority.</span></h1>
+  <p class="hero-sub">${OBJ}. Sistemas visuales de autoridad para marcas que no piden permiso — diseñados para dominar su territorio digital.</p>
+  <div class="hero-btns">
+    <button class="btn-p" onclick="showCM()">Iniciar Proyecto</button>
+    <button class="btn-o" onclick="scr('portafolio')">Ver Portafolio →</button>
+  </div>
+  <div class="hero-metrics">
+    <div><div class="met-n">48<sup style="font-size:1.2rem">+</sup></div><div class="met-l">Proyectos Globales</div></div>
+    <div><div class="met-n">12</div><div class="met-l">Países</div></div>
+    <div><div class="met-n">3M</div><div class="met-l">Alcance Digital</div></div>
+    <div><div class="met-n">∞</div><div class="met-l">Posibilidades</div></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee">
+    <span>Identidad Visual</span><span>Experiencia Digital</span><span>3D & Motion</span>
+    <span>Dirección Creativa</span><span>Branding de Producto</span><span>Sistemas AI</span>
+    <span>WebGL</span><span>Campañas de Lujo</span><span>Identidad Visual</span>
+    <span>Experiencia Digital</span><span>3D & Motion</span><span>Dirección Creativa</span>
+    <span>Branding de Producto</span><span>Sistemas AI</span><span>WebGL</span><span>Campañas de Lujo</span>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="services reveal" id="servicios">
+  <div class="sec-label">Lo que construimos</div>
+  <h2>Sistemas creativos<br><em>de autoridad.</em></h2>
+  <div class="svc-grid">
+    <div class="svc-card reveal"><div class="svc-num">01</div><div class="svc-title">Identidad Visual</div><div class="svc-desc">Sistema completo — logo, tipografía, paleta de color, guías de marca y papelería de lujo.</div><div class="svc-price">desde $4,200</div></div>
+    <div class="svc-card reveal"><div class="svc-num">02</div><div class="svc-title">Experiencia Digital</div><div class="svc-desc">Sitios web que comunican poder. WebGL, animaciones calculadas, interacciones memorables.</div><div class="svc-price">desde $5,500</div></div>
+    <div class="svc-card reveal"><div class="svc-num">03</div><div class="svc-title">3D & Motion</div><div class="svc-desc">Objetos 3D, renders fotorrealistas, motion graphics y animaciones para lanzamientos.</div><div class="svc-price">desde $3,800</div></div>
+    <div class="svc-card reveal"><div class="svc-num">04</div><div class="svc-title">Dirección Creativa AI</div><div class="svc-desc">Brief generado por IA multimodal. Claude, GPT-4o, Leonardo AI y Meshy integrados.</div><div class="svc-price">desde $2,800</div></div>
+    <div class="svc-card reveal"><div class="svc-num">05</div><div class="svc-title">Branding de Producto</div><div class="svc-desc">Identidad de producto completa, concepto de packaging, campaña de lanzamiento.</div><div class="svc-price">desde $6,200</div></div>
+    <div class="svc-card reveal"><div class="svc-num">06</div><div class="svc-title">Campañas de Lujo</div><div class="svc-desc">Campañas visuales desde concepto hasta ejecución para lanzamientos premium.</div><div class="svc-price">desde $4,800</div></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about reveal" id="nosotros">
+  <div class="about-txt">
+    <div class="sec-label">Quiénes somos</div>
+    <h2>Diseñamos<br><em>territorios,</em><br>no solo marcas.</h2>
+    <div class="about-body">KIMERICA construye sistemas visuales que comunican autoridad antes de que el cliente diga una palabra. Cada decisión estética es deliberada — arquitectura visual al servicio del poder de marca.</div>
+    <p style="font-size:.84rem;color:var(--mu);line-height:1.75;margin-bottom:24px">Nuestro trabajo existe en la intersección del lujo y la tecnología emergente — donde los briefs generados por IA se encuentran con la ejecución visual meticulosamente artesanal.</p>
+    <div class="testimonial">
+      <p>"Transformaron nuestra presencia digital completamente. El sistema de identidad que crearon comunica exactamente quiénes somos sin decir una palabra."</p>
+      <cite>— Directora de Marca, Maison Noir · París</cite>
+    </div>
+    <div style="margin-top:28px"><button class="btn-p" onclick="showCM()">Hablemos →</button></div>
+  </div>
+  <div class="about-vis reveal">
+    <div class="about-vis-text">${I}<em>${B.slice(1)}</em></div>
+  </div>
+</section>
+
+<!-- NUMBERS -->
+<div class="numbers">
+  <div class="num-item reveal"><div class="num-n">48<sup style="font-size:1rem">+</sup></div><div class="num-l">Marcas Globales</div></div>
+  <div class="num-item reveal"><div class="num-n">3M</div><div class="num-l">Alcance Digital</div></div>
+  <div class="num-item reveal"><div class="num-n">12<sup style="font-size:1rem">y</sup></div><div class="num-l">Años de Estudio</div></div>
+  <div class="num-item reveal"><div class="num-n">8<sup style="font-size:1rem">+</sup></div><div class="num-l">Países</div></div>
+</div>
+
+<!-- PORTFOLIO -->
+<section class="portfolio reveal" id="portafolio">
+  <div class="sec-label">Trabajo selecto</div>
+  <h2>Portafolio<br><em>curado.</em></h2>
+  <div class="port-grid">
+    ${['Noir Maison','Vertex Lab','Obsidian Brand System','Cipher Studio','Aurum Identity','Forma Digital'].map((name,i)=>
+      `<div class="port-card reveal"><div class="port-bg"><div class="port-n">0${i+1}</div><div class="port-arrow">→</div><div class="port-info"><div class="port-cat">${['Visual Identity · 3D','Digital Experience · AI','Product Branding','Immersive · WebGL','Brand Authority','Campaign Direction'][i]}</div><div class="port-title">${name}</div></div></div></div>`
+    ).join('')}
+  </div>
+  <div style="text-align:center"><button class="btn-o" onclick="showCM()">Ver todos los proyectos →</button></div>
+</section>
+
+<!-- PROCESS -->
+<section class="process reveal" id="proceso">
+  <div class="sec-label">Cómo trabajamos</div>
+  <h2>Un proceso<br><em>de precisión.</em></h2>
+  <div class="proc-list">
+    <div class="proc-item reveal"><div class="proc-n">01</div><div class="proc-title">Descubrimiento & Estrategia</div><div class="proc-desc">Auditoría de marca, mapeo de audiencia y marco de posicionamiento. Entendemos tu territorio antes de diseñar.</div></div>
+    <div class="proc-item reveal"><div class="proc-n">02</div><div class="proc-title">Propuesta AI & Dirección</div><div class="proc-desc">Multi-model AI traduce tu visión. Claude, GPT-4o, Leonardo AI y Meshy — todo en backend seguro Vercel.</div></div>
+    <div class="proc-item reveal"><div class="proc-n">03</div><div class="proc-title">Ejecución & Lanzamiento</div><div class="proc-desc">Revisión completa del paquete. Descarga el brief, guías, config y activos. Lanzamiento coordinado.</div></div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<div class="testimonials" id="testimonios">
+  <div class="testi-card reveal">
+    <p class="testi-q">"El nivel de detalle y la coherencia del sistema visual superaron todo lo que habíamos imaginado. Una experiencia de trabajo impecable."</p>
+    <div class="testi-name">Alejandro V.</div>
+    <div class="testi-co">CEO · Vertex Capital · Ciudad de México</div>
+  </div>
+  <div class="testi-card reveal">
+    <p class="testi-q">"KIMERICA entiende que el lujo no es decoración — es arquitectura. El resultado habla por sí mismo en cada punto de contacto."</p>
+    <div class="testi-name">Isabelle M.</div>
+    <div class="testi-co">Directora Creativa · Maison Lumière · París</div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta reveal" id="contacto">
+  <h2>¿Listo para construir<br><em>algo extraordinario?</em></h2>
+  <p class="cta-sub">Tu propuesta personalizada generada por AI está lista en minutos. El siguiente paso es tuyo.</p>
+  <button class="btn-p" onclick="showCM()" style="font-size:.8rem;padding:16px 52px">Iniciar Proyecto →</button>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-logo"><em>${I}</em>${B.slice(1)}</div>
+      <p class="foot-tagline">${T.slice(0,80)}. Sistemas creativos para la presencia digital de marcas de autoridad.</p>
+    </div>
+    <div>
+      <div class="foot-h">Estudio</div>
+      <div class="foot-links">
+        <a href="#nosotros">Sobre nosotros</a><a href="#portafolio">Portafolio</a>
+        <a href="#proceso">Proceso</a><a href="#contacto">Contacto</a>
+      </div>
+    </div>
+    <div>
+      <div class="foot-h">Servicios</div>
+      <div class="foot-links">
+        <a href="#">Identidad Visual</a><a href="#">Experiencia Digital</a>
+        <a href="#">3D & Motion</a><a href="#">Dirección AI</a><a href="#">Campañas</a>
+      </div>
+    </div>
+    <div>
+      <div class="foot-h">Contacto</div>
+      <div class="foot-links">
+        <a href="#">hola@${B.toLowerCase()}.studio</a>
+        <a href="#">Instagram</a><a href="#">Behance</a><a href="#">LinkedIn</a>
+      </div>
+    </div>
+  </div>
+  <div class="foot-bar">
+    <div class="foot-copy">© 2025 ${B} Studio · Todos los derechos reservados</div>
+    <div class="foot-copy">Powered by Claude AI · Three.js · KIMERICA</div>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div id="cm"><div class="cm-box">
+  <button class="cm-close" onclick="hideCM()">✕</button>
+  <div class="cm-label">Consulta</div>
+  <h3 class="cm-h">Hablemos.</h3>
+  <input placeholder="Tu nombre"><input placeholder="Tu email" type="email">
+  <input placeholder="Tu empresa / marca">
+  <textarea placeholder="Describe tu proyecto y objetivos..."></textarea>
+  <button class="btn-p" style="width:100%;font-size:.7rem" onclick="ts('Mensaje enviado — te contactamos en 24h ✓');hideCM()">ENVIAR →</button>
+</div></div>
+
+<script>
+function showCM(){document.getElementById('cm').classList.add('on')}
+function hideCM(){document.getElementById('cm').classList.remove('on')}
+document.getElementById('cm').addEventListener('click',function(e){if(e.target===this)hideCM()});
+function scr(id){var el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth'})}
+function ts(m){var t=document.getElementById('_t');if(!t){t=document.createElement('div');t.id='_t';t.style.cssText='position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:${P};color:#000;font-family:Syne,sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:10px 24px;z-index:9999;pointer-events:none;transition:opacity .5s';document.body.appendChild(t)}t.textContent=m;t.style.opacity='1';setTimeout(function(){t.style.opacity='0'},3000)}
+// Intersection observer for reveal
+var ob=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');ob.unobserve(e.target)}})},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(function(el){ob.observe(el)});
+</script>
+</body></html>`);
+
+  var blob=new Blob([h.join('')],{type:'text/html'});
+  var url=URL.createObjectURL(blob);
   if(iframe._prev)URL.revokeObjectURL(iframe._prev);
   iframe._prev=url;
   iframe.src=url;
-  iframe.style.display='block';
-  if(loadEl) loadEl.style.display='none';
+  iframe.onload=function(){iframe.style.display='block';if(loadEl)loadEl.style.display='none';};
 }
 
 // ─── Three.js 3D (Meshy-style) ─────────────────────────────────────
@@ -1627,21 +2012,23 @@ function demoProposal(){
 function setLoader(on,txt=''){const l=document.getElementById('loader');l.classList.toggle('on',on);if(txt)document.getElementById('loader-txt').textContent=txt}
 
 // ══════════════════════════════════════════
-// POPULATE PREVIEW
+// POPULATE PREVIEW — called every time preview section loads
 // ══════════════════════════════════════════
 function populatePreviewFromProposal(){
   const sc=S.proposal;
-  const def={sc1:'$2,800',sc2:'$4,200',sc3:'$5,500',sc4:'$3,800',time:'8–10 weeks',total:'16,300'};
   const objMap={authority:'Brand Authority System',identity:'Visual Identity System',immersive:'Immersive 3D Experience',product:'Product Launch System'};
   const visMap={minimal:'Minimal & Refined',bold:'Bold & High Contrast',editorial:'Editorial & Elegant',futuristic:'Futuristic',abstract:'Conceptual / Abstract',luxury:'Luxury Black'};
   const modelMap={'claude-opus-4-6':'Claude Opus 4','claude-sonnet-4-6':'Claude Sonnet 4','claude-haiku-4-5-20251001':'Claude Haiku 4.5','gpt-4o':'GPT-4o','gpt-4o-mini':'GPT-4o mini','deepseek-chat':'DeepSeek Chat'};
+
+  // Update pv-* elements (used in proposal text section)
   const pvObj=document.getElementById('pv-objective');if(pvObj)pvObj.textContent=objMap[S.sel.obj]||'Brand Authority System';
-  const pvVis=document.getElementById('pv-visual');if(pvVis)pvVis.textContent=visMap[S.sel.vis]||'Luxury Black · Minimal';
+  const pvVis=document.getElementById('pv-visual');if(pvVis)pvVis.textContent=visMap[S.sel.vis]||'Luxury Black';
   const ml=modelMap[S.selectedModel]||'Claude AI';
   ['pv-model','pv-model2','pv-model-label'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=ml;});
   const pvDate=document.getElementById('pv-date');if(pvDate)pvDate.textContent=new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
   const txt=document.getElementById('claude-out')?.textContent;
   const pvTxt=document.getElementById('pv-proposal-text');if(txt?.trim()&&pvTxt)pvTxt.textContent=txt;
+  // _ppBuild is called separately via initProjectPreviewCanvas — no need to call here
 }
 
 // ══════════════════════════════════════════
