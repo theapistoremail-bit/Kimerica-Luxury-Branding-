@@ -392,9 +392,6 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
   .preview-moodboard{grid-template-columns:repeat(3,1fr);grid-template-rows:auto}
   .mb-cell:first-child{grid-column:span 2}
 }
-@keyframes pulse-green{0%,100%{opacity:1}50%{opacity:.4}}
-.mb3d-btn{background:rgba(255,26,26,.12);border:1px solid rgba(255,26,26,.35);color:#FF1A1A;font-family:'Syne',sans-serif;font-size:7.5px;font-weight:700;letter-spacing:.1em;padding:5px 8px;cursor:pointer;transition:all .2s;text-transform:uppercase}
-.mb3d-btn:hover,.mb3d-btn.active{background:rgba(255,26,26,.28);border-color:#FF1A1A;box-shadow:0 0 8px rgba(255,26,26,.3)}
 </style>
 </head>
 <body>
@@ -662,132 +659,129 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
     </div>
     <div class="preview-badge">Project Package Ready · AI Generated</div>
     <h1 class="preview-main-title">Your brand<br><em>universe.</em><br><span class="ghost">Complete.</span></h1>
-    <div class="preview-deck">
-      <div class="preview-3d-stage" style="padding:0;overflow:hidden;position:relative;background:#060608;display:flex;flex-direction:column">
-        <!-- Browser chrome bar -->
-        <div style="height:30px;flex-shrink:0;background:#0a0a14;border-bottom:1px solid rgba(255,26,26,.2);display:flex;align-items:center;padding:0 12px;gap:8px;z-index:5">
-          <div style="display:flex;gap:5px;align-items:center">
-            <div style="width:9px;height:9px;border-radius:50%;background:#ff5f57;cursor:pointer" onclick="document.getElementById('brand-site-iframe').contentWindow?.scrollTo(0,0)"></div>
+    <div class="preview-deck" style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:32px">
+
+      <!-- ══ WEBSITE REAL DEL CLIENTE (panel grande izquierda) ══ -->
+      <div style="background:var(--surface);border:1px solid var(--border-red);border-radius:0;overflow:hidden;display:flex;flex-direction:column;min-height:520px">
+        <!-- Browser chrome -->
+        <div style="height:32px;flex-shrink:0;background:#08080f;border-bottom:1px solid rgba(255,26,26,.2);display:flex;align-items:center;padding:0 12px;gap:7px">
+          <div style="display:flex;gap:5px">
+            <div style="width:9px;height:9px;border-radius:50%;background:#ff5f57"></div>
             <div style="width:9px;height:9px;border-radius:50%;background:#febc2e"></div>
-            <div style="width:9px;height:9px;border-radius:50%;background:#28c840;cursor:pointer" onclick="document.getElementById('brand-site-iframe').contentWindow?.scrollTo(0,0)"></div>
+            <div style="width:9px;height:9px;border-radius:50%;background:#28c840"></div>
           </div>
-          <div style="flex:1;background:rgba(255,255,255,.05);border-radius:4px;height:17px;display:flex;align-items:center;padding:0 10px;margin:0 6px;gap:5px">
-            <div style="width:7px;height:7px;opacity:.3">🔒</div>
-            <span id="kbp-url" style="font-size:9px;font-family:monospace;color:rgba(255,255,255,.3);letter-spacing:.03em;overflow:hidden;white-space:nowrap">www.brand.studio</span>
+          <div style="flex:1;background:rgba(255,255,255,.05);border-radius:3px;height:18px;margin:0 8px;display:flex;align-items:center;padding:0 10px">
+            <span id="pp-url" style="font-size:9px;font-family:monospace;color:rgba(255,255,255,.3);letter-spacing:.02em;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">www.brand.studio</span>
           </div>
-          <div style="display:flex;align-items:center;gap:5px">
-            <div style="width:6px;height:6px;border-radius:50%;background:#22d464;animation:pulse-green 2s infinite;box-shadow:0 0 5px #22d464"></div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <div style="width:6px;height:6px;border-radius:50%;background:#22d464;box-shadow:0 0 5px #22d464;animation:pulse-green 2s infinite"></div>
             <span style="font-size:8px;font-weight:700;letter-spacing:.12em;color:rgba(34,212,100,.7)">LIVE</span>
           </div>
         </div>
-        <!-- The actual website iframe -->
-        <iframe id="brand-site-iframe" style="flex:1;width:100%;border:none;background:#060608" allowtransparency="true"></iframe>
-        <!-- Hidden canvas keeps the old JS guard happy -->
-        <canvas id="preview-main-cv" style="display:none;position:absolute"></canvas>
+        <!-- iframe con el website generado -->
+        <iframe id="pp-site-frame" style="flex:1;width:100%;border:none;background:#060608" sandbox="allow-scripts"></iframe>
       </div>
-      <div class="preview-sidebar">
-        <div class="prev-info-card"><div class="pic-label">Creative Objective</div><div class="pic-value" id="pv-objective">Brand Authority System</div></div>
-        <div class="prev-info-card"><div class="pic-label">Visual Direction</div><div class="pic-value" id="pv-visual">Luxury Black · Minimal</div></div>
-        <div class="prev-info-card"><div class="pic-label">Estimated Timeline</div><div class="pic-value" id="pv-timeline">8–10 weeks</div></div>
-        <div class="prev-info-card"><div class="pic-label">Investment</div><div class="pic-value red"><sup>$</sup><span id="pv-total">16,300</span></div></div>
-        <div class="prev-info-card"><div class="pic-label">AI Model Used</div><div class="pic-value" id="pv-model">Claude Sonnet 4</div></div>
-        <div class="prev-info-card"><div class="pic-label">Deliverables</div><div class="pic-value" style="font-size:.76rem;line-height:1.6">Identity System · 3D Assets · Campaign Kit · Brand Guidelines</div></div>
+
+      <!-- ══ PANELES DE BRANDING (columna derecha) ══ -->
+      <div style="display:flex;flex-direction:column;gap:8px">
+
+        <!-- Logo & Identidad -->
+        <div id="pp-logo-panel" onclick="ppModal('logo')" style="background:var(--surface);border:1px solid var(--border);padding:12px 14px;cursor:pointer;transition:border-color .25s;position:relative;overflow:hidden;flex:1">
+          <div style="font-size:7.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between">LOGO & IDENTIDAD <span style="color:rgba(255,26,26,.35)">⊕</span></div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div id="pp-logo-wm" style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;letter-spacing:.06em;color:var(--white);line-height:1">BRAND</div>
+            <div id="pp-logo-mono" style="width:30px;height:30px;border:1px solid rgba(255,26,26,.4);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--white);flex-shrink:0">B</div>
+            <div style="flex:1">
+              <div style="height:1px;background:var(--scarlet);box-shadow:0 0 4px var(--scarlet-glow);margin-bottom:4px"></div>
+              <div id="pp-logo-tag" style="font-size:6px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);overflow:hidden;white-space:nowrap">TAGLINE</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sistema de Color -->
+        <div onclick="ppModal('color')" style="background:var(--surface);border:1px solid var(--border);cursor:pointer;overflow:hidden;flex:1;display:flex;flex-direction:column">
+          <div style="padding:7px 12px;font-size:7.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between;flex-shrink:0">SISTEMA DE COLOR <span style="color:rgba(255,26,26,.35)">⊕</span></div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);flex:1">
+            <div id="pp-sw1" style="background:#FF1A1A;display:flex;align-items:flex-end;padding:3px 5px"><span style="font-size:5px;font-weight:700;letter-spacing:.1em;writing-mode:vertical-rl;color:rgba(0,0,0,.5)">PRIMARY</span></div>
+            <div id="pp-sw2" style="background:#060608;border-left:1px solid rgba(255,255,255,.05);display:flex;align-items:flex-end;padding:3px 5px"><span style="font-size:5px;font-weight:700;letter-spacing:.1em;writing-mode:vertical-rl;color:rgba(255,255,255,.3)">DARK</span></div>
+            <div id="pp-sw3" style="background:#f8f6f2;border-left:1px solid rgba(0,0,0,.08);display:flex;align-items:flex-end;padding:3px 5px"><span style="font-size:5px;font-weight:700;letter-spacing:.1em;writing-mode:vertical-rl;color:rgba(0,0,0,.35)">LIGHT</span></div>
+            <div id="pp-sw4" style="background:#8b0000;border-left:1px solid rgba(255,26,26,.15);display:flex;align-items:flex-end;padding:3px 5px"><span style="font-size:5px;font-weight:700;letter-spacing:.1em;writing-mode:vertical-rl;color:rgba(255,255,255,.35)">ACCENT</span></div>
+          </div>
+        </div>
+
+        <!-- 3D Objeto de Producto -->
+        <div id="pp-3d-wrap" style="background:var(--surface);border:1px solid var(--border);position:relative;overflow:hidden;flex:2">
+          <div style="position:absolute;top:6px;left:10px;font-size:7px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,26,26,.6);z-index:5;display:flex;align-items:center;gap:5px">
+            <div style="width:5px;height:5px;border-radius:50%;background:var(--scarlet);box-shadow:0 0 5px var(--scarlet-glow);animation:pulse-red 2s infinite"></div>
+            3D OBJETO LIVE
+          </div>
+          <canvas id="pp-cv-3d" style="position:absolute;inset:0;width:100%!important;height:100%!important"></canvas>
+          <div style="position:absolute;bottom:6px;left:6px;right:6px;display:flex;gap:3px;z-index:5">
+            <button onclick="pp3dSwitch('torus',this)" class="pp3btn on">TORUS</button>
+            <button onclick="pp3dSwitch('gem',this)" class="pp3btn">GEM</button>
+            <button onclick="pp3dSwitch('bottle',this)" class="pp3btn">BOTTLE</button>
+            <button onclick="pp3dSwitch('box',this)" class="pp3btn">BOX</button>
+          </div>
+        </div>
+
+        <!-- Papelería & Packaging -->
+        <div onclick="ppModal('mockup')" style="background:var(--surface);border:1px solid var(--border);padding:10px 12px;cursor:pointer;flex:1">
+          <div style="font-size:7.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between">PAPELERÍA · PACKAGING <span style="color:rgba(255,26,26,.35)">⊕</span></div>
+          <div style="display:flex;gap:5px;align-items:center">
+            <div style="flex:1;background:linear-gradient(135deg,#0d0408,#1c0a0a);border:1px solid rgba(255,26,26,.2);padding:6px 8px;position:relative;overflow:hidden">
+              <div style="position:absolute;top:-6px;right:-6px;width:22px;height:22px;background:rgba(255,26,26,.08);border-radius:50%"></div>
+              <div id="pp-mock-brand" style="font-family:'Cormorant Garamond',serif;font-size:12px;font-weight:300;color:var(--white);letter-spacing:.08em">BRAND</div>
+              <div style="height:1px;background:rgba(255,26,26,.3);margin:3px 0;width:65%"></div>
+              <div id="pp-mock-hash" style="font-size:6px;letter-spacing:.16em;color:rgba(255,26,26,.55)">#BRAND</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <div style="background:linear-gradient(135deg,#0d0408,#1c0a0a);border:1px solid rgba(255,26,26,.15);padding:3px 6px;font-size:13px;display:flex;align-items:center;justify-content:center">📦</div>
+              <div style="background:linear-gradient(135deg,#0d0408,#1c0a0a);border:1px solid rgba(255,26,26,.1);padding:3px 6px;font-size:13px;display:flex;align-items:center;justify-content:center">🛍️</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <div style="background:linear-gradient(135deg,#0d0408,#1c0a0a);border:1px solid rgba(255,26,26,.1);padding:3px 6px;font-size:13px;display:flex;align-items:center;justify-content:center">🕯️</div>
+              <div style="background:linear-gradient(135deg,#0d0408,#1c0a0a);border:1px solid rgba(255,26,26,.08);padding:3px 6px;font-size:13px;display:flex;align-items:center;justify-content:center">💳</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Motion Language -->
+        <div onclick="ppModal('motion')" style="background:var(--surface);border:1px solid var(--border);position:relative;overflow:hidden;cursor:pointer;flex:1">
+          <canvas id="pp-cv-wave" style="position:absolute;inset:0;width:100%!important;height:100%!important"></canvas>
+          <div style="position:absolute;top:6px;left:10px;font-size:7.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,26,26,.5)">MOTION LANGUAGE</div>
+          <div style="position:absolute;bottom:6px;right:10px;font-size:9px;color:rgba(255,26,26,.3)">⊕</div>
+        </div>
+
       </div>
+    </div><!-- /preview-deck -->
+
+    <!-- ══ CSS para los botones 3D y hover ══ -->
+    <style>
+    .pp3btn{flex:1;padding:3px 0;background:rgba(255,26,26,.1);border:1px solid rgba(255,26,26,.3);color:var(--scarlet);font-family:'Syne',sans-serif;font-size:6.5px;font-weight:700;letter-spacing:.08em;cursor:pointer;transition:all .2s;text-transform:uppercase}
+    .pp3btn:hover,.pp3btn.on{background:rgba(255,26,26,.25);border-color:var(--scarlet);box-shadow:0 0 6px var(--scarlet-glow)}
+    #pp-logo-panel:hover,
+    [onclick^="ppModal"]:hover{border-color:var(--border-red)!important}
+    @keyframes pulse-green{0%,100%{opacity:1}50%{opacity:.35}}
+    </style>
+
+    <!-- ══ MODAL de assets expandidos ══ -->
+    <div id="pp-modal" style="display:none;position:fixed;inset:0;background:rgba(6,3,8,.96);z-index:9999;flex-direction:column;backdrop-filter:blur(8px)">
+      <div style="height:48px;background:#0d0308;border-bottom:1px solid var(--border-red);display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0">
+        <div style="width:7px;height:7px;border-radius:50%;background:var(--scarlet);box-shadow:0 0 7px var(--scarlet-glow)"></div>
+        <div id="pp-modal-title" style="font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--white);flex:1">ASSETS</div>
+        <button onclick="document.getElementById('pp-modal').style.display='none'" style="padding:6px 16px;border:1px solid var(--border-red);background:transparent;color:var(--scarlet);font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;cursor:pointer">✕ CERRAR</button>
+      </div>
+      <div id="pp-modal-body" style="flex:1;overflow:auto;padding:28px;display:flex;gap:10px;flex-wrap:wrap;align-content:flex-start"></div>
     </div>
-    <div class="preview-scope-grid">
-      <div class="psg-item"><div class="psg-label">Creative Direction</div><div class="psg-val">Strategy & Brief</div><div class="psg-price" id="pv-sc1">$2,800</div></div>
-      <div class="psg-item"><div class="psg-label">Visual Identity</div><div class="psg-val">Full Brand System</div><div class="psg-price" id="pv-sc2">$4,200</div></div>
-      <div class="psg-item"><div class="psg-label">Digital Experience</div><div class="psg-val">Web + Interactions</div><div class="psg-price" id="pv-sc3">$5,500</div></div>
-      <div class="psg-item"><div class="psg-label">3D / AI Elements</div><div class="psg-val">Assets + Environments</div><div class="psg-price" id="pv-sc4">$3,800</div></div>
-    </div>
+
     <div class="out-label" style="margin-bottom:16px">Creative Environments — Generated Live</div>
     <div class="preview-moodboard" id="live-moodboard">
-
-      <!-- CELDA 1 (span 3 cols × 2 rows): Three.js objeto 3D del producto -->
-      <div class="mb-cell" id="mb1" style="cursor:default;overflow:hidden">
-        <canvas id="mb-cv-1"></canvas>
-        <!-- Controles de forma -->
-        <div style="position:absolute;bottom:10px;left:10px;right:10px;display:flex;gap:5px;z-index:5">
-          <button class="mb3d-btn" onclick="mb3dSwitch('torus')">TORUS</button>
-          <button class="mb3d-btn" onclick="mb3dSwitch('gem')">GEM</button>
-          <button class="mb3d-btn" onclick="mb3dSwitch('bottle')">BOTTLE</button>
-          <button class="mb3d-btn" onclick="mb3dSwitch('box')">BOX</button>
-        </div>
-        <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;z-index:5">
-          <div style="width:5px;height:5px;border-radius:50%;background:#FF1A1A;box-shadow:0 0 6px rgba(255,26,26,.8);animation:pulse-red 2s infinite"></div>
-          <span class="mb-tag" style="opacity:1;position:relative">3D BRAND OBJECT · LIVE</span>
-        </div>
-      </div>
-
-      <!-- CELDA 2 (span 2): Logo & Identidad -->
-      <div class="mb-cell" id="mb2" style="background:#060608;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;cursor:pointer" onclick="mbOpen('logo')">
-        <span class="mb-tag" style="opacity:1;position:relative;align-self:flex-start">LOGO & IDENTITY</span>
-        <div id="mb-brand-name" style="font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;letter-spacing:.06em;color:#f8f6f2;line-height:1;text-align:center">BRAND</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div id="mb-initial" style="width:38px;height:38px;border:1px solid rgba(255,26,26,.4);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:24px;color:#f8f6f2;flex-shrink:0">B</div>
-          <div style="display:flex;flex-direction:column;gap:3px">
-            <div style="width:64px;height:1px;background:#FF1A1A;box-shadow:0 0 4px rgba(255,26,26,.5)"></div>
-            <div id="mb-tagline" style="font-size:7px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.32);white-space:nowrap;overflow:hidden;max-width:100px">TAGLINE</div>
-          </div>
-          <div style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,26,26,.3);display:flex;align-items:center;justify-content:center;font-size:12px;color:rgba(255,26,26,.5)">◈</div>
-        </div>
-        <div class="mb-cell-overlay"></div>
-      </div>
-
-      <!-- CELDA 3: Sistema de color -->
-      <div class="mb-cell" id="mb3" style="cursor:pointer;overflow:hidden;display:flex;flex-direction:column" onclick="mbOpen('color')">
-        <div style="padding:8px 10px;background:rgba(6,6,8,.8);border-bottom:1px solid rgba(255,26,26,.12);flex-shrink:0">
-          <span class="mb-tag" style="opacity:1;position:relative">COLOR SYSTEM</span>
-        </div>
-        <div style="flex:1;display:flex;flex-direction:column">
-          <div id="mb-c1" style="flex:1;background:#FF1A1A;display:flex;align-items:flex-end;padding:4px 8px"><span style="font-size:7px;color:rgba(0,0,0,.55);font-weight:700;letter-spacing:.1em">SCARLET</span></div>
-          <div id="mb-c2" style="flex:1;background:#060608;border-top:1px solid rgba(255,255,255,.05);display:flex;align-items:flex-end;padding:4px 8px"><span style="font-size:7px;color:rgba(255,255,255,.3);font-weight:700;letter-spacing:.1em">NOIR</span></div>
-          <div id="mb-c3" style="flex:1;background:#f8f6f2;border-top:1px solid rgba(0,0,0,.08);display:flex;align-items:flex-end;padding:4px 8px"><span style="font-size:7px;color:rgba(0,0,0,.35);font-weight:700;letter-spacing:.1em">IVORY</span></div>
-          <div id="mb-c4" style="flex:1;background:#8b0000;border-top:1px solid rgba(255,26,26,.15);display:flex;align-items:flex-end;padding:4px 8px"><span style="font-size:7px;color:rgba(255,255,255,.35);font-weight:700;letter-spacing:.1em">DEEP RED</span></div>
-        </div>
-        <div class="mb-cell-overlay"></div>
-      </div>
-
-      <!-- CELDA 4: Tipografía animada en canvas -->
-      <div class="mb-cell" id="mb4" style="cursor:pointer" onclick="mbOpen('type')">
-        <canvas id="mb-cv-4"></canvas>
-        <div class="mb-cell-overlay"><div class="mb-tag">TYPOGRAPHY</div></div>
-      </div>
-
-      <!-- CELDA 5: Social + Packaging mockups -->
-      <div class="mb-cell" id="mb5" style="background:#060608;display:flex;flex-direction:column;gap:6px;padding:10px 12px;cursor:pointer;overflow:hidden" onclick="mbOpen('social')">
-        <span class="mb-tag" style="opacity:1;position:relative;flex-shrink:0">SOCIAL · PACK</span>
-        <div style="background:linear-gradient(135deg,#0d0408,#1c0a0a);border:1px solid rgba(255,26,26,.22);padding:8px;position:relative;overflow:hidden;flex-shrink:0">
-          <div style="position:absolute;top:-10px;right:-10px;width:36px;height:36px;background:rgba(255,26,26,.1);border-radius:50%"></div>
-          <div id="mb-social-name" style="font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:300;color:#f8f6f2;letter-spacing:.08em">BRAND</div>
-          <div id="mb-social-hash" style="font-size:6.5px;letter-spacing:.18em;color:rgba(255,26,26,.65);margin-top:1px">#BRAND</div>
-          <div style="margin-top:5px;width:75%;height:1px;background:rgba(255,26,26,.3)"></div>
-          <div style="margin-top:3px;font-size:6px;color:rgba(255,255,255,.2);line-height:1.4">Visual identity · Digital</div>
-        </div>
-        <div style="display:flex;gap:4px;flex:1">
-          <div style="flex:1;background:linear-gradient(135deg,#0d0408,#200a0a);border:1px solid rgba(255,26,26,.2);display:flex;align-items:center;justify-content:center;font-size:14px">📦</div>
-          <div style="flex:1;background:linear-gradient(135deg,#0d0408,#200a0a);border:1px solid rgba(255,26,26,.14);display:flex;align-items:center;justify-content:center;font-size:14px">🛍️</div>
-          <div style="flex:1;background:linear-gradient(135deg,#0d0408,#200a0a);border:1px solid rgba(255,26,26,.08);display:flex;align-items:center;justify-content:center;font-size:14px">🕯️</div>
-        </div>
-        <div class="mb-cell-overlay"></div>
-      </div>
-
-      <!-- CELDA 6: Motion wave -->
-      <div class="mb-cell" id="mb6" style="cursor:pointer" onclick="mbOpen('motion')">
-        <canvas id="mb-cv-6"></canvas>
-        <div class="mb-cell-overlay"><div class="mb-tag">MOTION</div></div>
-      </div>
-
-    </div>
-
-    <!-- Modal para sub-celdas expandidas -->
-    <div id="mb-modal" style="display:none;position:fixed;inset:0;background:rgba(6,6,8,.96);z-index:9000;flex-direction:column">
-      <div style="height:48px;background:#0d0308;border-bottom:1px solid rgba(255,26,26,.22);display:flex;align-items:center;padding:0 24px;gap:14px;flex-shrink:0">
-        <div style="width:7px;height:7px;border-radius:50%;background:#FF1A1A;box-shadow:0 0 8px rgba(255,26,26,.7)"></div>
-        <div id="mb-modal-ttl" style="font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#f8f6f2;flex:1">ASSETS</div>
-        <button onclick="document.getElementById('mb-modal').style.display='none'" style="padding:6px 14px;border:1px solid rgba(255,26,26,.35);background:transparent;color:#FF1A1A;font-size:9px;font-weight:700;letter-spacing:.1em;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,26,26,.1)'" onmouseout="this.style.background='transparent'">✕ CERRAR</button>
-      </div>
-      <div id="mb-modal-body" style="flex:1;overflow:auto;padding:28px;display:flex;gap:12px;flex-wrap:wrap;align-content:flex-start"></div>
+      <div class="mb-cell" id="mb1"><canvas id="mb-cv-1"></canvas><div class="mb-cell-overlay"><div class="mb-tag">3D Brand Object</div></div></div>
+      <div class="mb-cell" id="mb2"><canvas id="mb-cv-2"></canvas><div class="mb-cell-overlay"><div class="mb-tag">Code Architecture</div></div></div>
+      <div class="mb-cell" id="mb3"><canvas id="mb-cv-3"></canvas><div class="mb-cell-overlay"><div class="mb-tag">Identity System</div></div></div>
+      <div class="mb-cell" id="mb4"><canvas id="mb-cv-4"></canvas><div class="mb-cell-overlay"><div class="mb-tag">Digital Presence</div></div></div>
+      <div class="mb-cell" id="mb5"><canvas id="mb-cv-5"></canvas><div class="mb-cell-overlay"><div class="mb-tag">System Architecture</div></div></div>
+      <div class="mb-cell" id="mb6"><canvas id="mb-cv-6"></canvas><div class="mb-cell-overlay"><div class="mb-tag">Motion Language</div></div></div>
     </div>
     <div class="preview-proposal-text">
       <div class="out-label">Creative Direction — <span id="pv-model-label">AI</span></div>
@@ -1060,247 +1054,279 @@ function initAbout(){
   let f=0;(function loop(){requestAnimationFrame(loop);f+=.006;mesh.rotation.y=f;mesh.rotation.x=Math.sin(f*.5)*.3;wire.rotation.y=f*1.02;renderer.render(scene,cam)})();
 }
 function initProjectPreviewCanvas(){
-  // Canvas is hidden — website renders in iframe via Blob URL (no srcdoc escaping issues)
-  _buildBrandSite();
+  setTimeout(_ppBuild, 120);
 }
 
-function _buildBrandSite(){
-  const iframe=document.getElementById('brand-site-iframe');
+// ══════════════════════════════════════════
+// PP BUILD — website iframe + paneles branding
+// ══════════════════════════════════════════
+var _pp3dR=null,_pp3dAF=null;
+
+function _ppBuild(){
+  // ── Datos del proposal ──
+  var vision   = document.getElementById('vision')?.value||'';
+  var proposal = document.getElementById('claude-out')?.textContent||'';
+  var all      = vision+' '+proposal;
+  var caps     = all.split(/\s+/).filter(w=>/^[A-Z][A-Za-z]{2,}/.test(w)&&w.length<15);
+  var BRAND    = (caps[0]||'LUXE').replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,10)||'LUXE';
+  var INIT     = BRAND[0];
+  var tqm      = proposal.match(/["""]([^"""]{8,55})["""]/);
+  var TAG      = tqm?tqm[1]:'Elegance Redefined';
+  var OBJ      = document.getElementById('pv-objective')?.textContent||'Brand Authority System';
+  var VIS      = (document.getElementById('pv-visual')?.textContent||'').toLowerCase();
+  var P        = '#FF1A1A';
+  if(VIS.includes('gold')||VIS.includes('luxury')) P='#c9a96e';
+  else if(VIS.includes('blue')||VIS.includes('corp')) P='#1a6eff';
+  else if(VIS.includes('green')) P='#22d464';
+  else if(VIS.includes('purple')) P='#9b5de5';
+
+  // ── Sync labels ──
+  var el=document.getElementById('pp-url'); if(el)el.textContent='www.'+BRAND.toLowerCase()+'.studio';
+  [['pp-logo-wm',BRAND],['pp-logo-mono',INIT],['pp-logo-tag',TAG.slice(0,22)],
+   ['pp-mock-brand',BRAND],['pp-mock-hash','#'+BRAND.toLowerCase()]].forEach(([id,v])=>{
+    const e=document.getElementById(id);if(e)e.textContent=v;
+  });
+  const s1=document.getElementById('pp-sw1');if(s1)s1.style.background=P;
+  const s4=document.getElementById('pp-sw4');if(s4)s4.style.background=(VIS.includes('gold')?'#8b6914':VIS.includes('blue')?'#003cb3':'#8b0000');
+
+  // ── Build website ──
+  _ppWebsite(BRAND,INIT,TAG,P,OBJ,proposal);
+
+  // ── Build 3D ──
+  _pp3dInit('torus');
+
+  // ── Build wave ──
+  _ppWave();
+}
+
+function _ppWebsite(B,I,T,P,OBJ,proposal){
+  var iframe=document.getElementById('pp-site-frame');
   if(!iframe)return;
+  var h=[],p=function(){for(var i=0;i<arguments.length;i++)h.push(String(arguments[i]));};
+  p('<!DOCTYPE html><html lang="es"><head>');
+  p('<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">');
+  p('<title>',B,'</title>');
+  p('<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">');
+  p('<style>');
+  p('*{margin:0;padding:0;box-sizing:border-box}');
+  p(':root{--p:',P,';--bg:#060608;--tx:#f8f6f2;--mu:rgba(248,246,242,.38)}');
+  p('html{scroll-behavior:smooth}body{background:var(--bg);color:var(--tx);font-family:Syne,sans-serif;overflow-x:hidden}');
+  p('nav{position:sticky;top:0;background:rgba(6,6,8,.93);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.07);padding:16px 5%;display:flex;align-items:center;gap:28px;z-index:100}');
+  p('.lg{font-family:"Cormorant Garamond",serif;font-size:1.7rem;font-weight:300;letter-spacing:.08em;color:var(--tx)}.lg em{color:var(--p);font-style:italic}');
+  p('.nl{display:flex;gap:24px;margin-left:auto}.nl a{font-size:.67rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(248,246,242,.35);text-decoration:none;transition:color .3s}.nl a:hover{color:var(--tx)}');
+  p('.nc{padding:9px 22px;border:1px solid var(--p);color:var(--p);font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:transparent;transition:all .3s;margin-left:8px}.nc:hover{background:var(--p);color:var(--bg)}');
+  p('.hero{min-height:92vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 5% 60px;position:relative;overflow:hidden}');
+  p('.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 22%,',P,'1e 0%,transparent 60%);pointer-events:none}');
+  p('.eb{font-size:.62rem;font-weight:700;letter-spacing:.4em;text-transform:uppercase;color:var(--p);margin-bottom:22px;display:flex;align-items:center;gap:14px}');
+  p('.eb::before,.eb::after{content:"";width:32px;height:1px;background:var(--p);opacity:.7}');
+  p('h1{font-family:"Cormorant Garamond",serif;font-size:clamp(4rem,11vw,9rem);font-weight:300;line-height:.9;letter-spacing:-.025em;margin-bottom:26px}');
+  p('h1 em{font-style:italic;color:var(--p)}h1 .g{-webkit-text-stroke:1px rgba(248,246,242,.15);color:transparent}');
+  p('.hp{font-size:.92rem;color:rgba(248,246,242,.4);max-width:500px;line-height:1.9;margin-bottom:44px}');
+  p('.hb{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}');
+  p('.bp{padding:14px 38px;background:var(--p);color:var(--bg);font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border:none;box-shadow:0 0 22px ',P,'44;transition:all .3s}.bp:hover{transform:translateY(-2px);box-shadow:0 10px 32px ',P,'66}');
+  p('.bo{padding:14px 38px;border:1px solid rgba(255,255,255,.18);color:var(--tx);font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;background:transparent;transition:all .3s}.bo:hover{border-color:var(--p);color:var(--p)}');
+  p('.strip{display:flex;justify-content:center;border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07)}');
+  p('.met{flex:1;max-width:200px;padding:28px 18px;text-align:center;border-right:1px solid rgba(255,255,255,.07)}.met:last-child{border-right:none}');
+  p('.mn{font-family:"Cormorant Garamond",serif;font-size:2.6rem;font-weight:300;color:var(--p);line-height:1}.ml{font-size:.57rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:rgba(248,246,242,.26);margin-top:6px}');
+  p('.sec{padding:80px 5%;max-width:1200px;margin:0 auto}');
+  p('.sl{font-size:.59rem;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--p);margin-bottom:10px;display:flex;align-items:center;gap:8px}.sl::before{content:"";width:18px;height:1px;background:var(--p)}');
+  p('h2{font-family:"Cormorant Garamond",serif;font-size:clamp(2rem,4.5vw,3.5rem);font-weight:300;line-height:1.02;margin-bottom:48px}h2 em{font-style:italic;color:var(--p)}');
+  p('.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);margin-bottom:80px}');
+  p('.sc{background:var(--bg);padding:30px 24px;cursor:pointer;position:relative;overflow:hidden;transition:background .3s}');
+  p('.sc::after{content:"";position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--p);transition:width .4s;box-shadow:0 0 8px ',P,'88}.sc:hover::after{width:100%}.sc:hover{background:',P,'08}');
+  p('.si{font-size:1.5rem;margin-bottom:14px;display:block}.st{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tx);margin-bottom:9px}');
+  p('.sd{font-size:.77rem;color:rgba(248,246,242,.35);line-height:1.75}.sp{font-family:"Cormorant Garamond",serif;font-size:1.4rem;font-weight:300;color:var(--p);margin-top:16px}');
+  p('.ab{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;padding:0 5% 80px}');
+  p('.ab-body{font-family:"Cormorant Garamond",serif;font-size:1.06rem;font-weight:300;line-height:1.88;color:rgba(248,246,242,.7);border-left:2px solid var(--p);padding-left:20px;margin:18px 0 24px}');
+  p('.ab-vis{background:linear-gradient(135deg,',P,'0e,',P,'06);border:1px solid ',P,'2a;min-height:280px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}');
+  p('.ab-vis::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,',P,'15,transparent 65%)}');
+  p('.ab-big{font-family:"Cormorant Garamond",serif;font-size:5.5rem;font-weight:300;color:',P,'18;letter-spacing:-.04em;line-height:1}.ab-big em{font-style:italic;color:',P,'36}');
+  p('.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:80px}');
+  p('.pi{aspect-ratio:4/3;background:linear-gradient(135deg,var(--bg),',P,'1a);border:1px solid ',P,'20;display:flex;align-items:flex-end;padding:16px;cursor:pointer;transition:all .32s;position:relative;overflow:hidden}');
+  p('.pi::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(6,6,8,.78),transparent 55%)}.pi:hover{border-color:',P,'55;transform:scale(1.02)}');
+  p('.pn{position:absolute;top:12px;right:12px;font-family:"Cormorant Garamond",serif;font-size:2.8rem;font-weight:300;color:',P,'12;line-height:1}');
+  p('.pl{position:relative;z-index:1;font-size:.61rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(248,246,242,.44)}');
+  p('.cta{background:linear-gradient(135deg,',P,'10,var(--bg));border-top:1px solid ',P,'20;border-bottom:1px solid ',P,'20;padding:80px 5%;text-align:center;margin-bottom:60px}');
+  p('footer{padding:34px 5%;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}');
+  p('.fl{font-family:"Cormorant Garamond",serif;font-size:1.2rem;color:rgba(248,246,242,.28)}');
+  p('.fln{display:flex;gap:18px}.fln a{font-size:.59rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(248,246,242,.2);text-decoration:none;transition:color .3s}.fln a:hover{color:var(--p)}');
+  p('#cm{display:none;position:fixed;inset:0;background:rgba(6,6,8,.96);z-index:500;align-items:center;justify-content:center;padding:40px}#cm.on{display:flex}');
+  p('.cb{background:#0d0d10;border:1px solid ',P,'44;max-width:470px;width:100%;padding:38px;position:relative}');
+  p('input,textarea{width:100%;padding:11px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx);font-family:Syne,sans-serif;font-size:.8rem;outline:none;display:block;margin-bottom:11px;transition:border-color .3s}');
+  p('input:focus,textarea:focus{border-color:var(--p)}textarea{resize:none;min-height:85px}');
+  p('@keyframes su{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}.anim{animation:su .65s ease both}');
+  p('</style></head><body>');
 
-  const vision   = document.getElementById('vision')?.value||'';
-  const proposal = document.getElementById('claude-out')?.textContent||'';
-  const allText  = vision+' '+proposal;
+  // NAV
+  p('<nav><div class="lg"><em>',I,'</em>',B.slice(1),'</div>');
+  p('<div class="nl"><a href="#servicios">Servicios</a><a href="#nosotros">Nosotros</a><a href="#portafolio">Portafolio</a><a href="#contacto">Contacto</a></div>');
+  p('<button class="nc" onclick="showCM()">Consulta Exclusiva</button></nav>');
 
-  // Brand name: first capitalised word > 3 chars
-  const capWords = allText.split(/\s+/).filter(w=>/^[A-Z][A-Za-z]{2,}/.test(w));
-  const BRAND    = (capWords[0]||'LUXE').replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,10)||'LUXE';
-  const INIT     = BRAND[0];
+  // HERO
+  p('<section class="hero"><div class="eb">',T.slice(0,36),'</div>');
+  p('<h1><em>',B,'</em><br><span class="g">Studio</span></h1>');
+  p('<p class="hp">',OBJ,'. Sistemas visuales de autoridad para marcas que no piden permiso.</p>');
+  p('<div class="hb"><button class="bp" onclick="showCM()">Iniciar Proyecto</button><button class="bo" onclick="scr(\'portafolio\')">Ver Portafolio</button></div></section>');
 
-  // Tagline from quotes in proposal
-  const tqm  = proposal.match(/["""]([^"""]{10,55})["""]/);
-  const TAG  = tqm ? tqm[1] : 'Elegance Redefined';
+  // METRICS
+  p('<div class="strip">');
+  p('<div class="met"><div class="mn">48<sup style="font-size:1rem">+</sup></div><div class="ml">Proyectos</div></div>');
+  p('<div class="met"><div class="mn">12</div><div class="ml">Pa\xedses</div></div>');
+  p('<div class="met"><div class="mn">\u221e</div><div class="ml">Posibilidades</div></div>');
+  p('<div class="met"><div class="mn">1</div><div class="ml">Est\xe1ndar</div></div></div>');
 
-  // Objective & visual direction
-  const OBJ  = document.getElementById('pv-objective')?.textContent||'Brand Authority System';
-  const VIS  = (document.getElementById('pv-visual')?.textContent||'').toLowerCase();
+  // SERVICIOS
+  p('<div class="sec" id="servicios"><div class="sl">Lo que construimos</div>');
+  p('<h2>Sistemas creativos<br><em>de autoridad.</em></h2><div class="sg">');
+  [['◈','Identidad Visual','Sistema completo — logo, tipograf\xeda, paleta, gu\xedas y papeler\xeda.','$4,200'],
+   ['\u2b21','Experiencia Digital','Sitios web que comunican poder. WebGL, animaciones calculadas.','$5,500'],
+   ['\u25ed','3D & Motion','Objetos 3D, renders fotorrealistas y motion graphics.','$3,800'],
+   ['\u2726','Direcci\xf3n Creativa','Estrategia y brief generado por IA y refinado por expertos.','$2,800']
+  ].forEach(s=>{
+    p('<div class="sc"><span class="si">',s[0],'</span><div class="st">',s[1],'</div><div class="sd">',s[2],'</div><div class="sp">desde ',s[3],'</div></div>');
+  });
+  p('</div></div>');
 
-  // Primary colour from visual direction
-  let P='#FF1A1A';
-  if(VIS.includes('gold'))   P='#c9a96e';
-  if(VIS.includes('blue'))   P='#1a6eff';
-  if(VIS.includes('green'))  P='#22d464';
-  if(VIS.includes('purple')) P='#9b5de5';
+  // ABOUT
+  p('<div class="ab" id="nosotros">');
+  p('<div><div class="sl">Qui\xe9nes somos</div>');
+  p('<h2 style="font-size:clamp(1.9rem,3.5vw,3rem)">Dise\xf1amos<br><em>territorios,</em><br>no solo marcas.</h2>');
+  p('<div class="ab-body">',proposal.slice(0,220)||'KIMERICA construye sistemas visuales que comunican autoridad antes de que el cliente diga una palabra. Cada decisi\xf3n est\xe9tica es deliberada.','</div>');
+  p('<button class="bp" style="font-size:.66rem" onclick="showCM()">Hablemos</button></div>');
+  p('<div class="ab-vis"><div class="ab-big"><em>',I,'</em>',B.slice(1),'</div></div></div>');
 
-  // Update browser bar & moodboard labels
-  const urlEl=document.getElementById('kbp-url');
-  if(urlEl) urlEl.textContent='www.'+BRAND.toLowerCase()+'.studio';
-  ['mb-brand-name','mb-social-name'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=BRAND;});
-  const ini=document.getElementById('mb-initial');   if(ini)ini.textContent=INIT;
-  const tgl=document.getElementById('mb-tagline');   if(tgl)tgl.textContent=TAG.slice(0,24);
-  const hsh=document.getElementById('mb-social-hash');if(hsh)hsh.textContent='#'+BRAND;
+  // PORTFOLIO
+  p('<div class="sec" id="portafolio" style="padding-top:0"><div class="sl">Trabajo selecto</div>');
+  p('<h2>Portafolio<br><em>curado.</em></h2><div class="pg">');
+  ['Brand Identity','Digital Experience','3D Environment','Campaign System','Visual Direction','Motion Design'].forEach((it,i)=>{
+    p('<div class="pi anim" style="animation-delay:',(i*.08),'s"><div class="pn">0',(i+1),'</div><div class="pl">',it,'</div></div>');
+  });
+  p('</div></div>');
 
-  // Full website HTML — NO backticks inside the string, use concat/escape tricks
-  const html=[
-    '<!DOCTYPE html>',
-    '<html lang="es"><head>',
-    '<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">',
-    '<title>',BRAND,'</title>',
-    '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">',
-    '<style>',
-    '*{margin:0;padding:0;box-sizing:border-box}',
-    ':root{--p:',P,';--bg:#060608;--tx:#f8f6f2}',
-    'html{scroll-behavior:smooth;font-size:14px}',
-    'body{background:var(--bg);color:var(--tx);font-family:Syne,sans-serif;overflow-x:hidden}',
-    // NAV
-    'nav{position:sticky;top:0;background:rgba(6,6,8,.94);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.07);padding:12px 32px;display:flex;align-items:center;gap:24px;z-index:100}',
-    '.nl{font-family:"Cormorant Garamond",serif;font-size:1.55rem;font-weight:400;letter-spacing:.08em;color:var(--tx)}',
-    '.nl em{color:var(--p);font-style:italic}',
-    '.nv{display:flex;gap:20px;margin-left:auto}',
-    '.nv a{font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(248,246,242,.35);text-decoration:none;transition:color .3s}',
-    '.nv a:hover{color:var(--tx)}',
-    '.nc{padding:8px 20px;border:1px solid var(--p);color:var(--p);font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;background:transparent;transition:all .3s;margin-left:6px}',
-    '.nc:hover{background:var(--p);color:#000}',
-    // HERO
-    '.hero{min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 40px 60px;position:relative;overflow:hidden}',
-    '.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 25%,',P,'1a 0%,transparent 60%);pointer-events:none}',
-    '.eb{font-size:.62rem;font-weight:700;letter-spacing:.38em;text-transform:uppercase;color:var(--p);margin-bottom:18px;display:flex;align-items:center;gap:10px}',
-    '.eb::before,.eb::after{content:"";width:32px;height:1px;background:var(--p);opacity:.7}',
-    'h1{font-family:"Cormorant Garamond",serif;font-size:clamp(3.5rem,9vw,7.5rem);font-weight:300;line-height:.92;letter-spacing:-.02em;margin-bottom:22px}',
-    'h1 em{font-style:italic;color:var(--p)}',
-    'h1 .g{-webkit-text-stroke:1px rgba(248,246,242,.18);color:transparent}',
-    '.hp{font-size:.9rem;color:rgba(248,246,242,.45);max-width:460px;line-height:1.85;margin-bottom:38px}',
-    '.hb{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}',
-    '.bp{padding:13px 34px;background:var(--p);color:#000;font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border:none;transition:all .3s;box-shadow:0 0 18px ',P,'44}',
-    '.bp:hover{transform:translateY(-2px);box-shadow:0 8px 28px ',P,'66}',
-    '.bo{padding:13px 34px;border:1px solid rgba(255,255,255,.18);color:var(--tx);font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;background:transparent;transition:all .3s}',
-    '.bo:hover{border-color:var(--p);color:var(--p)}',
-    // METRICS
-    '.mets{display:flex;justify-content:center;border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07)}',
-    '.met{flex:1;max-width:180px;padding:26px 18px;text-align:center;border-right:1px solid rgba(255,255,255,.07)}',
-    '.met:last-child{border-right:none}',
-    '.mn{font-family:"Cormorant Garamond",serif;font-size:2.3rem;font-weight:300;color:var(--p);line-height:1}',
-    '.ml{font-size:.58rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:rgba(248,246,242,.28);margin-top:5px}',
-    // SERVICES
-    '.sec{padding:72px 5%;max-width:1180px;margin:0 auto}',
-    '.sl{font-size:.6rem;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--p);margin-bottom:10px;display:flex;align-items:center;gap:9px}',
-    '.sl::before{content:"";width:22px;height:1px;background:var(--p)}',
-    'h2{font-family:"Cormorant Garamond",serif;font-size:clamp(1.8rem,4vw,3.2rem);font-weight:300;line-height:1.05;margin-bottom:44px}',
-    'h2 em{font-style:italic;color:var(--p)}',
-    '.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);margin-bottom:72px}',
-    '.sc{background:var(--bg);padding:28px 24px;transition:background .3s;cursor:pointer;position:relative;overflow:hidden}',
-    '.sc::after{content:"";position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--p);transition:width .4s;box-shadow:0 0 8px ',P,'88}',
-    '.sc:hover::after{width:100%}.sc:hover{background:',P,'09}',
-    '.si{font-size:1.5rem;margin-bottom:14px;display:block}',
-    '.st{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tx);margin-bottom:8px}',
-    '.sd{font-size:.78rem;color:rgba(248,246,242,.38);line-height:1.7}',
-    '.sp{font-family:"Cormorant Garamond",serif;font-size:1.35rem;font-weight:300;color:var(--p);margin-top:14px}',
-    // ABOUT
-    '.ab{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;margin-bottom:72px;padding:0 5%}',
-    '.ab-body{font-family:"Cormorant Garamond",serif;font-size:1.05rem;font-weight:300;line-height:1.85;color:rgba(248,246,242,.72);border-left:1px solid var(--p);padding-left:18px;margin:18px 0 22px}',
-    '.ab-vis{background:linear-gradient(135deg,',P,'10,',P,'06);border:1px solid ',P,'33;min-height:260px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}',
-    '.ab-big{font-family:"Cormorant Garamond",serif;font-size:5.5rem;font-weight:300;color:',P,'18;letter-spacing:-.04em;line-height:1}',
-    '.ab-big em{font-style:italic;color:',P,'38}',
-    // PORTFOLIO
-    '.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:72px}',
-    '.pi{aspect-ratio:4/3;background:linear-gradient(135deg,var(--bg),',P,'18);border:1px solid ',P,'20;display:flex;align-items:flex-end;padding:14px;cursor:pointer;transition:all .32s;position:relative;overflow:hidden}',
-    '.pi::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(6,6,8,.75) 0%,transparent 55%)}',
-    '.pi:hover{border-color:',P,'55;transform:scale(1.022)}',
-    '.pn{position:absolute;top:10px;right:10px;font-family:"Cormorant Garamond",serif;font-size:2.6rem;font-weight:300;color:',P,'14;line-height:1}',
-    '.pl{position:relative;z-index:1;font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(248,246,242,.45)}',
-    // CTA
-    '.cta{background:linear-gradient(135deg,',P,'12,var(--bg));border-top:1px solid ',P,'22;border-bottom:1px solid ',P,'22;padding:72px 5%;text-align:center;margin-bottom:56px}',
-    '.ch{font-family:"Cormorant Garamond",serif;font-size:clamp(2.4rem,5vw,4.2rem);font-weight:300;line-height:1;margin-bottom:18px}',
-    '.ch em{font-style:italic;color:var(--p)}',
-    '.cs{font-size:.88rem;color:rgba(248,246,242,.38);margin-bottom:32px;max-width:380px;margin-left:auto;margin-right:auto}',
-    // FOOTER
-    'footer{padding:32px 5%;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}',
-    '.fl{font-family:"Cormorant Garamond",serif;font-size:1.15rem;color:rgba(248,246,242,.28)}',
-    '.fln{display:flex;gap:18px}',
-    '.fln a{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(248,246,242,.22);text-decoration:none;transition:color .3s}',
-    '.fln a:hover{color:var(--p)}',
-    // CONTACT MODAL
-    '#cm{display:none;position:fixed;inset:0;background:rgba(6,6,8,.95);z-index:500;align-items:center;justify-content:center;padding:40px}',
-    '#cm.on{display:flex}',
-    '.cb{background:#0d0d10;border:1px solid ',P,'44;max-width:460px;width:100%;padding:36px;position:relative}',
-    '.ci{width:100%;padding:11px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx);font-family:Syne,sans-serif;font-size:.8rem;outline:none;margin-bottom:10px;display:block;transition:border-color .3s}',
-    '.ci:focus{border-color:var(--p)}',
-    '.ci.ta{resize:none;min-height:90px}',
-    '@keyframes su{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}',
-    '.reveal{animation:su .65s ease both}',
-    '</style></head><body>',
+  // CTA
+  p('<div class="cta" id="contacto">');
+  p('<h2 style="font-family:\'Cormorant Garamond\',serif;font-size:clamp(2.4rem,5vw,4.2rem);font-weight:300;line-height:1;margin-bottom:18px">\xbfListo para<br><em style="font-style:italic;color:var(--p)">construir</em> algo<br>extraordinario?</h2>');
+  p('<p style="font-size:.88rem;color:rgba(248,246,242,.35);margin-bottom:34px;max-width:400px;margin-left:auto;margin-right:auto">Tu propuesta personalizada est\xe1 lista. El siguiente paso es tuyo.</p>');
+  p('<button class="bp" style="font-size:.8rem;padding:15px 46px" onclick="showCM()">Iniciar Ahora \u2192</button></div>');
 
-    // NAV
-    '<nav>',
-    '<div class="nl">',INIT,'<em>',BRAND.slice(1),'</em></div>',
-    '<div class="nv">',
-    '<a href="#servicios">Servicios</a>',
-    '<a href="#nosotros">Nosotros</a>',
-    '<a href="#portafolio">Portafolio</a>',
-    '<a href="#contacto">Contacto</a>',
-    '</div>',
-    '<button class="nc" onclick="showCM()">Consulta Exclusiva</button>',
-    '</nav>',
+  // FOOTER
+  p('<footer><div class="fl">',B,'</div>');
+  p('<div class="fln"><a href="#">Instagram</a><a href="#">Behance</a><a href="#">LinkedIn</a><a href="#">Contacto</a></div>');
+  p('<div style="font-size:.57rem;color:rgba(248,246,242,.18);letter-spacing:.1em">&copy; 2025 ',B,' \xb7 Todos los derechos reservados</div></footer>');
 
-    // HERO
-    '<section class="hero">',
-    '<div class="eb">',TAG.slice(0,34),'</div>',
-    '<h1><em>',BRAND,'</em><br><span class="g">Studio</span></h1>',
-    '<p class="hp">',OBJ,'. Sistemas visuales construidos para marcas que no piden permiso.</p>',
-    '<div class="hb">',
-    '<button class="bp" onclick="showCM()">Iniciar Proyecto</button>',
-    '<button class="bo" onclick="document.getElementById(\'portafolio\').scrollIntoView({behavior:\'smooth\'})">Ver Portafolio</button>',
-    '</div></section>',
+  // CONTACT MODAL
+  p('<div id="cm"><div class="cb">');
+  p('<button onclick="hideCM()" style="position:absolute;top:12px;right:14px;background:transparent;border:none;color:rgba(255,255,255,.35);font-size:18px;cursor:pointer">\u2715</button>');
+  p('<div style="font-size:.6rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:',P,';margin-bottom:5px">CONSULTA</div>');
+  p('<h3 style="font-family:Cormorant Garamond,serif;font-size:2rem;font-weight:300;margin-bottom:20px">Hablemos.</h3>');
+  p('<input placeholder="Tu nombre"><input placeholder="Tu email">');
+  p('<textarea placeholder="Describe tu proyecto..."></textarea>');
+  p('<button class="bp" style="width:100%;font-size:.7rem" onclick="ts(\'Mensaje enviado \u2014 te contactamos en 24h\');hideCM()">ENVIAR \u2192</button></div></div>');
 
-    // METRICS
-    '<div class="mets">',
-    '<div class="met"><div class="mn">48<sup style="font-size:1.1rem">+</sup></div><div class="ml">Proyectos</div></div>',
-    '<div class="met"><div class="mn">12</div><div class="ml">Pa\xedses</div></div>',
-    '<div class="met"><div class="mn">\u221e</div><div class="ml">Posibilidades</div></div>',
-    '<div class="met"><div class="mn">1</div><div class="ml">Est\xe1ndar</div></div>',
-    '</div>',
+  // JS
+  p('<script>');
+  p('function showCM(){document.getElementById("cm").classList.add("on")}');
+  p('function hideCM(){document.getElementById("cm").classList.remove("on")}');
+  p('document.getElementById("cm").addEventListener("click",function(e){if(e.target===this)hideCM()});');
+  p('function scr(id){var el=document.getElementById(id);if(el)el.scrollIntoView({behavior:"smooth"})}');
+  p('function ts(m){var t=document.getElementById("_t");if(!t){t=document.createElement("div");t.id="_t";');
+  p('t.style.cssText="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:',P,';color:#000;font-family:Syne,sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:9px 22px;z-index:9999;pointer-events:none;opacity:1;transition:opacity .5s";document.body.appendChild(t)}');
+  p('t.textContent=m;t.style.opacity="1";setTimeout(function(){t.style.opacity="0"},2700);}');
+  p('var ob=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting)x.target.style.opacity="1"})},{threshold:.08});');
+  p('document.querySelectorAll(".anim").forEach(function(el){el.style.opacity="0";ob.observe(el)});');
+  p('<\/script></body></html>');
 
-    // SERVICES
-    '<div class="sec" id="servicios">',
-    '<div class="sl">Lo que construimos</div>',
-    '<h2>Sistemas creativos<br><em>de autoridad.</em></h2>',
-    '<div class="sg">',
-    '<div class="sc"><span class="si">\u25c8</span><div class="st">Identidad Visual</div><div class="sd">Sistema completo de marca. Logo, tipograf\xeda, paleta, gu\xedas y papeler\xeda.</div><div class="sp">desde $4,200</div></div>',
-    '<div class="sc"><span class="si">\u2b21</span><div class="st">Experiencia Digital</div><div class="sd">Sitios web que comunican poder. WebGL, animaciones, interacciones calculadas.</div><div class="sp">desde $5,500</div></div>',
-    '<div class="sc"><span class="si">\u25ed</span><div class="st">3D & Motion</div><div class="sd">Objetos 3D de producto, renders fotorrealistas, motion graphics y environments.</div><div class="sp">desde $3,800</div></div>',
-    '<div class="sc"><span class="si">\u2726</span><div class="st">Direcci\xf3n Creativa</div><div class="sd">Estrategia, concepto y brief generado por IA y refinado por expertos.</div><div class="sp">desde $2,800</div></div>',
-    '</div></div>',
-
-    // ABOUT
-    '<div class="ab" id="nosotros">',
-    '<div>',
-    '<div class="sl">Qui\xe9nes somos</div>',
-    '<h2 style="font-size:clamp(1.7rem,3vw,2.7rem)">Dise\xf1amos<br><em>territorios,</em><br>no solo marcas.</h2>',
-    '<div class="ab-body">',proposal.slice(0,200)||'KIMERICA construye sistemas visuales que comunican autoridad antes de que el cliente diga una palabra. Cada decisi\xf3n est\xe9tica es deliberada.','</div>',
-    '<button class="bp" style="font-size:.66rem" onclick="showCM()">Hablemos</button>',
-    '</div>',
-    '<div class="ab-vis"><div class="ab-big"><em>',INIT,'</em>',BRAND.slice(1),'</div></div>',
-    '</div>',
-
-    // PORTFOLIO
-    '<div class="sec" id="portafolio" style="padding-top:0">',
-    '<div class="sl">Trabajo selecto</div>',
-    '<h2>Portafolio<br><em>curado.</em></h2>',
-    '<div class="pg">',
-    ['Brand Identity','Digital Experience','3D Environment','Campaign System','Visual Direction','Motion Design'].map((it,i)=>
-      '<div class="pi" onclick="ts(\''+it+'\')"><div class="pn">0'+(i+1)+'</div><div class="pl">'+it+'</div></div>'
-    ).join(''),
-    '</div></div>',
-
-    // CTA
-    '<div class="cta" id="contacto">',
-    '<h2 class="ch">\xbfListo para<br><em>construir</em> algo<br>extraordinario?</h2>',
-    '<p class="cs">Tu propuesta personalizada est\xe1 lista. El siguiente paso es tuyo.</p>',
-    '<button class="bp" style="font-size:.78rem;padding:14px 44px" onclick="showCM()">Iniciar Ahora \u2192</button>',
-    '</div>',
-
-    // FOOTER
-    '<footer>',
-    '<div class="fl">',BRAND,'</div>',
-    '<div class="fln"><a href="#">Instagram</a><a href="#">Behance</a><a href="#">LinkedIn</a><a href="#">Contacto</a></div>',
-    '<div style="font-size:.58rem;color:rgba(248,246,242,.18);letter-spacing:.1em">&copy; 2025 ',BRAND,' \xb7 Todos los derechos reservados</div>',
-    '</footer>',
-
-    // CONTACT MODAL
-    '<div id="cm"><div class="cb">',
-    '<button onclick="hideCM()" style="position:absolute;top:14px;right:14px;background:transparent;border:none;color:rgba(255,255,255,.35);font-size:17px;cursor:pointer;font-family:monospace">\u2715</button>',
-    '<div style="font-size:.62rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--p);margin-bottom:5px">CONSULTA</div>',
-    '<h3 style="font-family:Cormorant Garamond,serif;font-size:2rem;font-weight:300;margin-bottom:20px">Hablemos.</h3>',
-    '<input class="ci" placeholder="Tu nombre">',
-    '<input class="ci" placeholder="Tu email">',
-    '<textarea class="ci ta" placeholder="Describe tu proyecto..."></textarea>',
-    '<button class="bp" style="width:100%;justify-content:center;font-size:.7rem" onclick="ts(\'Mensaje enviado \u2014 te contactamos pronto\');hideCM()">ENVIAR CONSULTA \u2192</button>',
-    '</div></div>',
-
-    // JS
-    '<script>',
-    'function showCM(){document.getElementById("cm").classList.add("on")}',
-    'function hideCM(){document.getElementById("cm").classList.remove("on")}',
-    'document.getElementById("cm").addEventListener("click",function(e){if(e.target===this)hideCM()});',
-    'function ts(m){var t=document.getElementById("st");',
-    'if(!t){t=document.createElement("div");t.id="st";',
-    't.style.cssText="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:'+P+';color:#000;font-family:Syne,sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:9px 22px;z-index:9999;pointer-events:none;transition:opacity .5s";',
-    'document.body.appendChild(t)}',
-    't.textContent=m;t.style.opacity="1";setTimeout(function(){t.style.opacity="0"},2600)}',
-    'var obs=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting)x.target.classList.add("reveal")})},{threshold:.08});',
-    'document.querySelectorAll(".sc,.pi,.met").forEach(function(el){obs.observe(el)});',
-    '<\/script>',
-    '</body></html>'
-  ].join('');
-
-  // Use Blob URL — completely avoids srcdoc escaping issues
-  const blob = new Blob([html], {type:'text/html'});
-  const url  = URL.createObjectURL(blob);
-  // Revoke previous blob if any
-  if(iframe._blobUrl) URL.revokeObjectURL(iframe._blobUrl);
-  iframe._blobUrl = url;
-  iframe.src = url;
+  var blob=new Blob([h.join('')],{type:'text/html'});
+  var url=URL.createObjectURL(blob);
+  if(iframe._prev)URL.revokeObjectURL(iframe._prev);
+  iframe._prev=url;
+  iframe.src=url;
 }
+
+function _pp3dInit(shape){
+  var cv=document.getElementById('pp-cv-3d');
+  if(!cv||!window.THREE)return;
+  if(_pp3dR){_pp3dR.dispose();cancelAnimationFrame(_pp3dAF);}
+  var wrap=document.getElementById('pp-3d-wrap');
+  var W=wrap.offsetWidth,H=wrap.offsetHeight;
+  var renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(W,H);renderer.setClearColor(0x060608);
+  _pp3dR=renderer;
+  var scene=new THREE.Scene();
+  var cam=new THREE.PerspectiveCamera(46,W/H,.1,100);cam.position.set(0,0,5.5);
+  scene.add(new THREE.AmbientLight(0xffffff,.1));
+  var rl=new THREE.PointLight(0xFF1A1A,6,22);rl.position.set(4,4,4);scene.add(rl);
+  scene.add(new THREE.PointLight(0xFF1A1A,1.8,12));
+  scene.add(new THREE.PointLight(0xffffff,1.5,15)).position.set(-3,-2,3);
+  var mat=new THREE.MeshStandardMaterial({color:0xdddddd,metalness:.96,roughness:.04});
+  var wm=new THREE.MeshBasicMaterial({color:0xFF1A1A,wireframe:true,opacity:.07,transparent:true});
+  var geo;
+  if(shape==='gem'){geo=new THREE.IcosahedronGeometry(1.4,2);mat.metalness=.99;mat.roughness=.02;}
+  else if(shape==='bottle'){var pts=[[0,.05],[.18,.05],[.22,.2],[.22,.55],[.18,.62],[.12,.72],[.1,.9],[.09,1.1],[.11,1.3],[.09,1.35],[.06,1.4],[.05,1.5]].map(v=>new THREE.Vector2(v[0],v[1]-.75));geo=new THREE.LatheGeometry(pts,32);}
+  else if(shape==='box'){geo=new THREE.BoxGeometry(1.4,2,1.4);mat.roughness=.18;mat.metalness=.72;}
+  else{geo=new THREE.TorusKnotGeometry(1.2,.3,200,18);}
+  var mesh=new THREE.Mesh(geo,mat);scene.add(mesh);scene.add(new THREE.Mesh(geo,wm));
+  for(var i=0;i<4;i++){(function(idx){
+    var s=new THREE.Mesh(new THREE.SphereGeometry(.05,8,8),new THREE.MeshStandardMaterial({color:0xFF1A1A,emissive:0xFF1A1A,emissiveIntensity:.9}));
+    s.userData={a:idx*(Math.PI*2/4),r:2.2,sp:.009+Math.random()*.005};scene.add(s);
+    var f2=0;(function l(){requestAnimationFrame(l);f2+=s.userData.sp;s.position.x=Math.cos(f2+s.userData.a)*s.userData.r;s.position.z=Math.sin(f2+s.userData.a)*s.userData.r;s.position.y=Math.sin(f2*1.3)*.8;})();
+  })(i);}
+  var mx=0,my=0;wrap.addEventListener('mousemove',e=>{var r=wrap.getBoundingClientRect();mx=(e.clientX-r.left)/r.width-.5;my=-((e.clientY-r.top)/r.height-.5);});
+  var f=0;(function loop(){_pp3dAF=requestAnimationFrame(loop);f+=.004;mesh.rotation.y+=(mx*.7-mesh.rotation.y)*.04+.003;mesh.rotation.x+=(my*.4-mesh.rotation.x)*.04;renderer.render(scene,cam);})();
+}
+
+window.pp3dSwitch=function(s,btn){document.querySelectorAll('.pp3btn').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');_pp3dInit(s);};
+
+function _ppWave(){
+  var cv=document.getElementById('pp-cv-wave');if(!cv)return;
+  var W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;
+  cv.width=W;cv.height=H;var ctx=cv.getContext('2d');var t=0;
+  (function draw(){ctx.fillStyle='rgba(6,6,8,.22)';ctx.fillRect(0,0,W,H);t+=.022;
+    [{amp:H*.22,freq:.018,speed:1,a:.7,lw:1.5},{amp:H*.14,freq:.028,speed:1.4,a:.38,lw:1},{amp:H*.08,freq:.042,speed:.7,a:.2,lw:.7}].forEach(w=>{
+      ctx.beginPath();for(var x=0;x<=W;x+=2){var y=H/2+Math.sin(x*w.freq+t*w.speed)*w.amp+Math.sin(x*.009+t*.3)*H*.06;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+      ctx.strokeStyle='rgba(255,26,26,'+w.a+')';ctx.lineWidth=w.lw;ctx.stroke();});
+    ctx.font='700 '+Math.floor(W*.1)+'px "Syne",sans-serif';ctx.fillStyle='rgba(255,26,26,.25)';ctx.textAlign='center';ctx.fillText('MOTION',W/2,H*.25);ctx.textAlign='left';
+    requestAnimationFrame(draw);})();
+}
+
+// ── Modal assets ──
+var _ppAssets={
+  logo:{t:'LOGO & IDENTIDAD',items:[
+    {i:'🖤',n:'Logotipo Dark',g:'SVG · EPS · PNG'},{i:'🤍',n:'Logotipo Light',g:'SVG · EPS · PNG'},
+    {i:'⭕',n:'Monograma',g:'SVG · EPS · AI'},{i:'📐',n:'Grid System',g:'PDF · AI'},
+    {i:'🎨',n:'Paleta de Color',g:'ASE · PDF · HEX'},{i:'🔤',n:'Tipografía Spec',g:'PDF · Guideline'}]},
+  color:{t:'SISTEMA DE COLOR',items:[
+    {i:'🔴',n:'Color Primario',g:'HEX · RGB · CMYK · Pantone'},{i:'⬛',n:'Dark BG',g:'HEX · CMYK'},
+    {i:'🤍',n:'Light TX',g:'HEX · CMYK'},{i:'🩸',n:'Acento',g:'HEX · CMYK · Pantone'},
+    {i:'📋',n:'Style Guide',g:'PDF · 28 pp'},{i:'🎨',n:'Swatch Export',g:'ASE · ACO · SCSS'}]},
+  mockup:{t:'PAPELERÍA · PACKAGING · IDENTIDAD EN TIENDA',items:[
+    {i:'📦',n:'Gift Box Premium',g:'DIELINE · PDF CMYK · Render 3D'},{i:'🛍️',n:'Shopping Bag',g:'DIELINE · PDF CMYK · Render'},
+    {i:'🕯️',n:'Candle Tin',g:'DIELINE · PDF CMYK · Render'},{i:'💳',n:'Tarjeta de Presentación',g:'PDF · 9×5cm · CMYK'},
+    {i:'📄',n:'Membrete',g:'PDF · DOCX · A4 CMYK'},{i:'✉️',n:'Sobre y Folder',g:'DIELINE · PDF CMYK'},
+    {i:'📱',n:'IG Post 1:1',g:'PNG · 1080×1080px'},{i:'📲',n:'IG Story 9:16',g:'MP4 · 1080×1920px'},
+    {i:'🏪',n:'Visualización en Tienda',g:'Mockup PSD · 4K'},{i:'👕',n:'Merch / Textil',g:'Mockup PSD · Vector'},
+    {i:'📰',n:'Brand Book',g:'PDF · 48 pp editorial'},{i:'🖼️',n:'Moodboard',g:'PDF · JPEG · A1'}]},
+  motion:{t:'MOTION LANGUAGE',items:[
+    {i:'▶️',n:'Animación de Logo',g:'LOTTIE · MP4 · GIF'},{i:'🎬',n:'Intro Bumper 5s',g:'MP4 · ProRes · 4K'},
+    {i:'✨',n:'Transiciones',g:'AEP · LOTTIE'},{i:'📺',n:'Lower Thirds',g:'AEP · MOGRT'},
+    {i:'🔄',n:'Loop para Tienda',g:'MP4 · WebM · 4K'},{i:'🎞️',n:'Social Reel',g:'MP4 · 1080×1920'}]}
+};
+
+window.ppModal=function(k){
+  var d=_ppAssets[k];if(!d)return;
+  document.getElementById('pp-modal-title').textContent=d.t;
+  document.getElementById('pp-modal-body').innerHTML=d.items.map(it=>
+    '<div onclick="if(typeof toast===\'function\')toast(\''+it.n+' seleccionado\',\'ok\')" '+
+    'style="border:1px solid rgba(255,26,26,.16);background:#0e0408;padding:14px 16px;cursor:pointer;transition:all .22s;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:110px;flex:1" '+
+    'onmouseover="this.style.borderColor=\'#FF1A1A\';this.style.background=\'rgba(255,26,26,.08)\';this.style.transform=\'translateY(-2px)\'" '+
+    'onmouseout="this.style.borderColor=\'rgba(255,26,26,.16)\';this.style.background=\'#0e0408\';this.style.transform=\'none\'">' +
+    '<div style="font-size:28px;line-height:1">'+it.i+'</div>'+
+    '<div style="font-size:7.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(248,246,242,.6);text-align:center">'+it.n+'</div>'+
+    '<div style="font-size:6px;color:rgba(255,26,26,.5);letter-spacing:.1em;font-family:monospace;text-align:center">'+it.g+'</div>'+
+    '</div>'
+  ).join('');
+  document.getElementById('pp-modal').style.display='flex';
+};
 
 // ══════════════════════════════════════════
 // NAVIGATION
@@ -1731,150 +1757,20 @@ function dbtab(tab,el){
 function toast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className=`${type} show`;setTimeout(()=>t.className='',3600)}
 
 // ══════════════════════════════════════════
-// LIVE MOODBOARD — branding sub-screens
+// LIVE MOODBOARD
 // ══════════════════════════════════════════
 let _mbStarted=false;
-let _mb3dR=null,_mb3dAF=null;
-
 function initLiveMoodboard(){
-  if(_mbStarted)return; _mbStarted=true;
+  if(_mbStarted)return;_mbStarted=true;
   const v=document.getElementById('claude-out')?.textContent||'';
-  _mb3dBuild('torus');      // celda 1: Three.js objeto 3D
-  _mbTypo(v);               // celda 4: tipografía animada
-  _mbWave();                // celda 6: motion wave
-  setTimeout(_mbSyncLabels,300);
+  _mbCell1_3D();_mbCell2_Code(v);_mbCell3_Typography(v);_mbCell4_Particles();_mbCell5_Grid();_mbCell6_Wave();
 }
-
-function _mbSyncLabels(){
-  const vision  =document.getElementById('vision')?.value||'';
-  const proposal=document.getElementById('claude-out')?.textContent||'';
-  const txt=vision+' '+proposal;
-  const caps=txt.split(/\s+/).filter(w=>/^[A-Z][A-Za-z]{2,}/.test(w));
-  const B=(caps[0]||'LUXE').replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,10)||'LUXE';
-  const I=B[0];
-  const tq=proposal.match(/["""]([^"""]{10,50})["""]/);
-  const TAG=tq?tq[1]:'Elegance Redefined';
-  [['mb-brand-name',B],['mb-social-name',B],['mb-initial',I],
-   ['mb-tagline',TAG.slice(0,24)],['mb-social-hash','#'+B]].forEach(([id,v])=>{
-    const e=document.getElementById(id);if(e)e.textContent=v;
-  });
-}
-
-// ── 3D Product object (celda 1) ──────────────────────────────────────────────
-function _mb3dBuild(shape){
-  const cv=document.getElementById('mb-cv-1');
-  if(!cv||!window.THREE)return;
-  if(_mb3dR){_mb3dR.dispose();cancelAnimationFrame(_mb3dAF)}
-  document.querySelectorAll('.mb3d-btn').forEach(b=>{b.classList.toggle('active',b.textContent.toLowerCase()===shape)});
-  const W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;
-  const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(W,H);renderer.setClearColor(0x060608);
-  _mb3dR=renderer;
-  const scene=new THREE.Scene();
-  const cam=new THREE.PerspectiveCamera(46,W/H,.1,100);cam.position.set(0,0,6);
-  scene.add(new THREE.AmbientLight(0xffffff,.1));
-  const rl=new THREE.PointLight(0xFF1A1A,6,22);rl.position.set(4,4,4);scene.add(rl);
-  scene.add(new THREE.PointLight(0xFF1A1A,2,12));
-  scene.add(new THREE.PointLight(0xffffff,1.5,15)).position.set(-3,-2,3);
-  const mat=new THREE.MeshStandardMaterial({color:0xdddddd,metalness:.95,roughness:.04});
-  const wMat=new THREE.MeshBasicMaterial({color:0xFF1A1A,wireframe:true,opacity:.07,transparent:true});
-  let geo;
-  if(shape==='gem'){
-    geo=new THREE.IcosahedronGeometry(1.4,2);mat.metalness=.98;mat.roughness=.02;
-  } else if(shape==='bottle'){
-    const pts=[[0,.05],[.18,.05],[.22,.2],[.22,.55],[.18,.62],[.12,.72],[.1,.9],[.09,1.1],[.11,1.3],[.09,1.35],[.06,1.4],[.05,1.5]].map(([r,y])=>new THREE.Vector2(r,y-.75));
-    geo=new THREE.LatheGeometry(pts,32);
-  } else if(shape==='box'){
-    geo=new THREE.BoxGeometry(1.6,2.2,1.6);mat.roughness=.15;mat.metalness=.7;
-  } else {
-    geo=new THREE.TorusKnotGeometry(1.2,.3,200,18);
-  }
-  const mesh=new THREE.Mesh(geo,mat);scene.add(mesh);
-  scene.add(new THREE.Mesh(geo,wMat));
-  // Orbiting red spheres
-  for(let i=0;i<4;i++){
-    const s=new THREE.Mesh(new THREE.SphereGeometry(.05,8,8),new THREE.MeshStandardMaterial({color:0xFF1A1A,emissive:0xFF1A1A,emissiveIntensity:.9}));
-    s.userData={a:i*(Math.PI*2/4),r:2.2,sp:.009+Math.random()*.005};scene.add(s);
-    (function o(s){let f=0;(function l(){requestAnimationFrame(l);f+=s.userData.sp;s.position.x=Math.cos(f+s.userData.a)*s.userData.r;s.position.z=Math.sin(f+s.userData.a)*s.userData.r;s.position.y=Math.sin(f*1.3)*.8;})();})(s);
-  }
-  // Mouse follow
-  let mx=0,my=0;
-  const el=document.getElementById('mb1');
-  if(el)el.addEventListener('mousemove',e=>{const r=el.getBoundingClientRect();mx=(e.clientX-r.left)/r.width-.5;my=-((e.clientY-r.top)/r.height-.5);});
-  let f=0;
-  (function loop(){_mb3dAF=requestAnimationFrame(loop);f+=.004;
-    mesh.rotation.y+=(mx*.7-mesh.rotation.y)*.04+.003;
-    mesh.rotation.x+=(my*.4-mesh.rotation.x)*.04;
-    renderer.render(scene,cam);
-  })();
-}
-
-window.mb3dSwitch=function(s){_mb3dBuild(s);};
-
-// ── Typography canvas (celda 4) ───────────────────────────────────────────────
-function _mbTypo(v){
-  const cv=document.getElementById('mb-cv-4');if(!cv)return;
-  const W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;
-  cv.width=W;cv.height=H;const ctx=cv.getContext('2d');
-  const word=(v.split(/\s+/).find(w=>w.length>5)||'KIMERICA').toUpperCase().slice(0,9);
-  let t=0;
-  (function draw(){
-    ctx.fillStyle='rgba(6,6,8,.12)';ctx.fillRect(0,0,W,H);
-    const ms=Math.floor(W*.18);
-    ctx.font='300 '+ms+'px "Cormorant Garamond",serif';
-    ctx.fillStyle='rgba(248,246,242,'+(0.5+Math.sin(t*.02)*.15)+')';
-    ctx.textAlign='center';ctx.fillText(word,W/2,H*.5+ms*.35);
-    const uw=ctx.measureText(word).width,ux=W/2-uw/2;
-    const g=ctx.createLinearGradient(ux,0,ux+uw,0);
-    g.addColorStop(0,'transparent');g.addColorStop(0.3+Math.sin(t*.03)*.2,'rgba(255,26,26,.9)');g.addColorStop(1,'transparent');
-    ctx.strokeStyle=g;ctx.lineWidth=1.5;
-    ctx.beginPath();ctx.moveTo(ux,H*.5+ms*.42);ctx.lineTo(ux+uw,H*.5+ms*.42);ctx.stroke();
-    ctx.font='700 '+Math.floor(W*.055)+'px "Syne",sans-serif';
-    ctx.fillStyle='rgba(255,26,26,.55)';ctx.fillText('TYPOGRAPHY',W/2,H*.8);
-    ctx.textAlign='left';t++;requestAnimationFrame(draw);
-  })();
-}
-
-// ── Motion wave (celda 6) ────────────────────────────────────────────────────
-function _mbWave(){
-  const cv=document.getElementById('mb-cv-6');if(!cv)return;
-  const W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;
-  cv.width=W;cv.height=H;const ctx=cv.getContext('2d');let t=0;
-  (function draw(){
-    ctx.fillStyle='rgba(6,6,8,.22)';ctx.fillRect(0,0,W,H);t+=.022;
-    [{amp:H*.22,freq:.018,speed:1,a:.7,lw:1.5},{amp:H*.14,freq:.028,speed:1.4,a:.4,lw:1},{amp:H*.08,freq:.042,speed:.7,a:.22,lw:.7}].forEach(w=>{
-      ctx.beginPath();for(let x=0;x<=W;x+=2){const y=H/2+Math.sin(x*w.freq+t*w.speed)*w.amp+Math.sin(x*.009+t*.3)*H*.06;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
-      ctx.strokeStyle='rgba(255,26,26,'+w.a+')';ctx.lineWidth=w.lw;ctx.stroke();
-    });
-    for(let i=1;i<5;i++){const mx=W*(i/5),mh=H*.3+Math.sin(t+i)*H*.12;ctx.strokeStyle='rgba(255,26,26,'+(0.12+Math.sin(t*.8+i)*.07)+')';ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(mx,H/2-mh);ctx.lineTo(mx,H/2+mh);ctx.stroke();}
-    ctx.font='700 '+Math.floor(W*.06)+'px "Syne",sans-serif';ctx.fillStyle='rgba(255,26,26,.3)';ctx.textAlign='center';ctx.fillText('MOTION',W/2,H*.17);ctx.textAlign='left';
-    requestAnimationFrame(draw);
-  })();
-}
-
-// ── Modal expand ─────────────────────────────────────────────────────────────
-const _mbData={
-  logo:{t:'LOGO & IDENTITY',items:[{i:'🖤',n:'Logotipo Dark',g:'SVG · EPS · PNG'},{i:'🤍',n:'Logotipo Light',g:'SVG · EPS · PNG'},{i:'🔴',n:'Monogram',g:'SVG · EPS · AI'},{i:'📐',n:'Grid System',g:'PDF · AI'},{i:'🎨',n:'Color Palette',g:'ASE · PDF · HEX'},{i:'🔤',n:'Type Spec',g:'PDF · GUIDELINE'}]},
-  color:{t:'COLOR SYSTEM',items:[{i:'🔴',n:'Scarlet Primary',g:'#FF1A1A · RGB · CMYK'},{i:'⬛',n:'Noir Background',g:'#060608 · CMYK'},{i:'🤍',n:'Ivory Text',g:'#F8F6F2 · CMYK'},{i:'🩸',n:'Deep Red Accent',g:'#8B0000 · CMYK'},{i:'📋',n:'Style Guide',g:'PDF · 24 páginas'},{i:'🎨',n:'Swatch Export',g:'ASE · ACO · PDF'}]},
-  type:{t:'TYPOGRAPHY SYSTEM',items:[{i:'Aa',n:'Display Font',g:'Cormorant Garamond'},{i:'Bb',n:'Body Font',g:'Syne Regular 400'},{i:'Cc',n:'Accent Font',g:'Syne Bold 700'},{i:'📏',n:'Type Scale',g:'PDF · CSS Variables'},{i:'🔤',n:'Character Set',g:'OTF · Completo'},{i:'📄',n:'Type Specimen',g:'PDF · A3'}]},
-  social:{t:'SOCIAL & PACKAGING',items:[{i:'📱',n:'IG Post 1:1',g:'PNG · 1080×1080'},{i:'📲',n:'IG Story 9:16',g:'MP4 · 1080×1920'},{i:'📦',n:'Gift Box',g:'DIELINE · PDF CMYK'},{i:'🛍️',n:'Shopping Bag',g:'DIELINE · PDF CMYK'},{i:'🕯️',n:'Candle Tin',g:'DIELINE · PDF CMYK'},{i:'🎁',n:'Premium Set',g:'DIELINE · PDF CMYK'}]},
-  motion:{t:'MOTION LANGUAGE',items:[{i:'▶️',n:'Logo Animation',g:'LOTTIE · MP4 · GIF'},{i:'🎬',n:'Intro Bumper 5s',g:'MP4 · ProRes'},{i:'✨',n:'Transiciones',g:'AEP · LOTTIE'},{i:'📺',n:'Lower Thirds',g:'AEP · MOGRT'},{i:'🔄',n:'Loop de Fondo',g:'MP4 · WebM'},{i:'🎞️',n:'Social Reel',g:'MP4 · 1080×1920'}]},
-};
-window.mbOpen=function(k){
-  const d=_mbData[k];if(!d)return;
-  document.getElementById('mb-modal-ttl').textContent=d.t;
-  document.getElementById('mb-modal-body').innerHTML=d.items.map(it=>
-    '<div onclick="if(typeof toast===\'function\')toast(\''+it.n+' seleccionado\',\'ok\')" '+
-    'style="border:1px solid rgba(255,26,26,.18);background:#0e0408;padding:14px 18px;cursor:pointer;transition:all .22s;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:110px;flex:1" '+
-    'onmouseover="this.style.borderColor=\'#FF1A1A\';this.style.background=\'rgba(255,26,26,.08)\';this.style.transform=\'translateY(-2px)\'" '+
-    'onmouseout="this.style.borderColor=\'rgba(255,26,26,.18)\';this.style.background=\'#0e0408\';this.style.transform=\'none\'">' +
-    '<div style="font-size:28px;line-height:1">'+it.i+'</div>'+
-    '<div style="font-size:7.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(248,246,242,.6);text-align:center">'+it.n+'</div>'+
-    '<div style="font-size:6px;color:rgba(255,26,26,.5);letter-spacing:.1em;font-family:monospace;text-align:center">'+it.g+'</div>'+
-    '</div>'
-  ).join('');
-  document.getElementById('mb-modal').style.display='flex';
-};
+function _mbCell1_3D(){const cv=document.getElementById('mb-cv-1');if(!cv||!window.THREE)return;const W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(W,H);renderer.setClearColor(0x060608);const scene=new THREE.Scene();const cam=new THREE.PerspectiveCamera(46,W/H,.1,100);cam.position.set(0,0,5.5);scene.add(new THREE.AmbientLight(0xffffff,.1));const rl=new THREE.PointLight(0xFF1A1A,5,20);rl.position.set(4,4,4);scene.add(rl);scene.add(new THREE.PointLight(0xFF1A1A,1.5,10));const geo=new THREE.TorusKnotGeometry(1.2,.3,200,18);const mesh=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0xeeeeee,metalness:.95,roughness:.04}));scene.add(mesh);scene.add(new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0xFF1A1A,wireframe:true,opacity:.07,transparent:true})));for(let i=0;i<4;i++){const s=new THREE.Mesh(new THREE.SphereGeometry(.045,8,8),new THREE.MeshStandardMaterial({color:0xFF1A1A,emissive:0xFF1A1A,emissiveIntensity:.9}));s.userData={a:i*(Math.PI*2/4),r:2.1,sp:.009+Math.random()*.006};scene.add(s);(function orbit(s){let f=0;(function l(){requestAnimationFrame(l);f+=s.userData.sp;s.position.x=Math.cos(f+s.userData.a)*s.userData.r;s.position.z=Math.sin(f+s.userData.a)*s.userData.r;s.position.y=Math.sin(f*1.3)*.8})()} )(s)}let f=0;(function loop(){requestAnimationFrame(loop);f+=.005;mesh.rotation.y=f;mesh.rotation.x=Math.sin(f*.4)*.25;renderer.render(scene,cam)})()}
+function _mbCell2_Code(v){const cv=document.getElementById('mb-cv-2');if(!cv)return;const W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;cv.width=W;cv.height=H;const ctx=cv.getContext('2d');const words=v.split(/\s+/).filter(w=>w.length>4).slice(0,8);const defs=['brand.identity','render()','motion.path','const scarlet','system.init','deploy()','WebGL.scene','AI.generate'];const lines=words.length>=4?words.map((w,i)=>`${['const','let','fn','class','import','export','async','type'][i%8]} ${w.toLowerCase().replace(/[^a-z]/g,'')} = ${['true','{}','[]','null','0xFF1A1A','()=>{}','"KIMERICA"','new Scene()'][i%8]}`):defs.map((l,i)=>`${['//','const','let','fn','→','class','import','export'][i%8]} ${l}`);let tick=0,charI=Array(lines.length).fill(0);const lh=Math.floor(H/lines.length)*0.9,fs=Math.max(10,Math.floor(lh*.55));function draw(){ctx.fillStyle='rgba(6,6,8,.18)';ctx.fillRect(0,0,W,H);ctx.font=`${fs}px 'Courier New',monospace`;lines.forEach((line,i)=>{const shown=line.substring(0,charI[i]);const y=18+i*(lh+2);ctx.fillStyle=i%3===0?'rgba(255,26,26,.85)':i%3===1?'rgba(248,246,242,.45)':'rgba(248,246,242,.2)';ctx.fillText(shown,10,y);if(i===Math.floor(tick/8)%lines.length&&charI[i]<line.length)charI[i]++});tick++;if(charI.every((c,i)=>c>=lines[i].length))setTimeout(()=>{charI=Array(lines.length).fill(0);tick=0},1400);requestAnimationFrame(draw)}ctx.fillStyle='#060608';ctx.fillRect(0,0,W,H);draw()}
+function _mbCell3_Typography(v){const cv=document.getElementById('mb-cv-3');if(!cv)return;const W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;cv.width=W;cv.height=H;const ctx=cv.getContext('2d');const word=v.split(/\s+/).find(w=>w.length>5)||'KIMERICA';const brand=word.toUpperCase().substring(0,9);let t=0;function draw(){ctx.fillStyle='rgba(6,6,8,.12)';ctx.fillRect(0,0,W,H);const ms=Math.floor(W*.18);ctx.font=`300 ${ms}px 'Cormorant Garamond',serif`;ctx.fillStyle=`rgba(248,246,242,${.55+Math.sin(t*.02)*.15})`;ctx.textAlign='center';ctx.fillText(brand,W/2,H*.5+ms*.35);const uw=ctx.measureText(brand).width;const ux=W/2-uw/2;const g=ctx.createLinearGradient(ux,0,ux+uw,0);g.addColorStop(0,'transparent');g.addColorStop(.3+Math.sin(t*.03)*.2,'rgba(255,26,26,.9)');g.addColorStop(1,'transparent');ctx.strokeStyle=g;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(ux,H*.5+ms*.42);ctx.lineTo(ux+uw,H*.5+ms*.42);ctx.stroke();ctx.font=`700 ${Math.floor(W*.055)}px 'Syne',sans-serif`;ctx.fillStyle='rgba(255,26,26,.7)';ctx.fillText('IDENTITY SYSTEM',W/2,H*.75);ctx.textAlign='left';t++;requestAnimationFrame(draw)}ctx.fillStyle='#060608';ctx.fillRect(0,0,W,H);draw()}
+function _mbCell4_Particles(){const cv=document.getElementById('mb-cv-4');if(!cv)return;const W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;cv.width=W;cv.height=H;const ctx=cv.getContext('2d');const N=80;const pts=Array.from({length:N},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.6+.4,pulse:Math.random()*Math.PI*2}));function draw(){ctx.fillStyle='rgba(6,6,8,.25)';ctx.fillRect(0,0,W,H);pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.pulse+=.04;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1});for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<80){ctx.strokeStyle=`rgba(255,26,26,${(.4-d/200)*.7})`;ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke()}}pts.forEach(p=>{const a=.5+Math.sin(p.pulse)*.3;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,26,26,${a})`;ctx.fill()});requestAnimationFrame(draw)}ctx.fillStyle='#060608';ctx.fillRect(0,0,W,H);draw()}
+function _mbCell5_Grid(){const cv=document.getElementById('mb-cv-5');if(!cv)return;const W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;cv.width=W;cv.height=H;const ctx=cv.getContext('2d');const COLS=10,ROWS=6,cw=W/COLS,ch=H/ROWS;let t=0;const cells=Array.from({length:COLS*ROWS},()=>({active:Math.random()>.7,flash:Math.random()*Math.PI*2,speed:.02+Math.random()*.04,val:Math.floor(Math.random()*99)}));function draw(){ctx.fillStyle='rgba(6,6,8,.3)';ctx.fillRect(0,0,W,H);t+=.02;cells.forEach((c,i)=>{c.flash+=c.speed;const col=i%COLS,row=Math.floor(i/COLS);const x=col*cw,y=row*ch;const b=c.active?(0.15+Math.sin(c.flash)*.12):0.04;ctx.strokeStyle=`rgba(255,26,26,${b})`;ctx.lineWidth=1;ctx.strokeRect(x+1,y+1,cw-2,ch-2);if(c.active){ctx.font=`${Math.floor(ch*.28)}px 'Courier New',monospace`;ctx.fillStyle=`rgba(255,26,26,${b*3})`;ctx.textAlign='center';ctx.fillText(c.val.toString().padStart(2,'0'),x+cw/2,y+ch/2+4);ctx.textAlign='left';if(Math.random()<.004)c.val=Math.floor(Math.random()*99)}});const scanY=(Math.sin(t*.5)+1)/2*H;const sg=ctx.createLinearGradient(0,scanY-12,0,scanY+12);sg.addColorStop(0,'transparent');sg.addColorStop(.5,'rgba(255,26,26,.25)');sg.addColorStop(1,'transparent');ctx.fillStyle=sg;ctx.fillRect(0,scanY-12,W,24);requestAnimationFrame(draw)}ctx.fillStyle='#060608';ctx.fillRect(0,0,W,H);draw()}
+function _mbCell6_Wave(){const cv=document.getElementById('mb-cv-6');if(!cv)return;const W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;cv.width=W;cv.height=H;const ctx=cv.getContext('2d');let t=0;function draw(){ctx.fillStyle='rgba(6,6,8,.22)';ctx.fillRect(0,0,W,H);t+=.022;const waves=[{amp:H*.22,freq:.018,speed:1,alpha:.7,lw:1.5},{amp:H*.14,freq:.028,speed:1.4,alpha:.4,lw:1},{amp:H*.08,freq:.042,speed:.7,alpha:.25,lw:.8}];waves.forEach(w=>{ctx.beginPath();for(let x=0;x<=W;x+=2){const y=H/2+Math.sin(x*w.freq+t*w.speed)*w.amp+Math.sin(x*.009+t*.3)*H*.06;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y)}ctx.strokeStyle=`rgba(255,26,26,${w.alpha})`;ctx.lineWidth=w.lw;ctx.stroke()});for(let i=1;i<5;i++){const mx=W*(i/5);const mh=H*.3+Math.sin(t+i)*H*.12;ctx.strokeStyle=`rgba(255,26,26,${.15+Math.sin(t*.8+i)*.08})`;ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(mx,H/2-mh);ctx.lineTo(mx,H/2+mh);ctx.stroke()}ctx.font=`700 ${Math.floor(W*.06)}px 'Syne',sans-serif`;ctx.fillStyle='rgba(255,26,26,.35)';ctx.textAlign='center';ctx.fillText('MOTION',W/2,H*.2);ctx.textAlign='left';requestAnimationFrame(draw)}ctx.fillStyle='#060608';ctx.fillRect(0,0,W,H);draw()}
 
 // ══════════════════════════════════════════
 // INIT
