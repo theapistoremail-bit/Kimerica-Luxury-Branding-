@@ -597,6 +597,26 @@ nav{position:fixed;top:0;left:0;width:100%;padding:22px 5%;display:flex;justify-
       </div>
     </div>
     <div class="scope-box">
+      <div class="out-label">Color Palette</div>
+      <div id="palette-block" style="display:flex;gap:14px;flex-wrap:wrap"></div>
+    </div>
+    <div class="scope-box">
+      <div class="out-label">Typography</div>
+      <div id="typo-block"></div>
+    </div>
+    <div class="scope-box">
+      <div class="out-label">Logo Concepts</div>
+      <div class="img-grid" id="logo-gallery">
+        <div class="img-ph"></div><div class="img-ph"></div><div class="img-ph"></div><div class="img-ph"></div>
+      </div>
+    </div>
+    <div class="scope-box">
+      <div class="out-label">Packaging Examples</div>
+      <div class="img-grid" id="packaging-gallery">
+        <div class="img-ph"></div><div class="img-ph"></div>
+      </div>
+    </div>
+    <div class="scope-box">
       <div class="out-label">Project Scope Estimate</div>
       <div class="scope-row"><span>Creative Direction & Strategy</span><span id="sc1">—</span></div>
       <div class="scope-row"><span>Visual Identity System</span><span id="sc2">—</span></div>
@@ -2103,18 +2123,82 @@ async function streamFromBackend(vision){
   cursor.remove();outEl.textContent=fullText;return fullText;
 }
 
-async function fetchImages(vision){
+async function fetchImages(vision,category='moodboard'){
   try{
-    const res=await fetch('/api/images',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:`Luxury brand moodboard: ${vision}. Dark editorial aesthetic, high contrast, minimal, premium, accent on black background`,count:4})});
+    const res=await fetch('/api/images',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:vision,category,count:category==='packaging'?2:4})});
     if(!res.ok)return null;
     const{images}=await res.json();return images?.length?images:null;
   }catch(e){return null}
 }
 
-function renderImages(imgs){
+function renderImages(imgs,galleryId='leo-gallery'){
   if(!imgs||!imgs.length)return;
-  const cells=document.getElementById('leo-gallery').querySelectorAll('.img-ph');
+  const gallery=document.getElementById(galleryId);if(!gallery)return;
+  const cells=gallery.querySelectorAll('.img-ph');
   imgs.forEach((url,i)=>{if(!cells[i])return;const img=new Image();img.onload=()=>{img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;animation:fup .5s forwards';cells[i].appendChild(img)};img.src=url;});
+}
+
+// ══════════════════════════════════════════
+// COLOR PALETTE + TYPOGRAPHY PARSING
+// ══════════════════════════════════════════
+function parsePalette(text){
+  const roles=['Primary','Secondary','Accent','Neutral Dark','Neutral Light'];
+  const pal=[];
+  roles.forEach(role=>{
+    const rx=new RegExp(role.replace(' ','\\s+')+'\\s*:\\s*(#[0-9a-fA-F]{3,6})\\s*[—\\-:]\\s*([^\\n]+)','i');
+    const m=text.match(rx);
+    if(m)pal.push({role,hex:m[1],name:m[2].trim()});
+  });
+  return pal;
+}
+function parseTypography(text){
+  const typo={};
+  let m=text.match(/Display\s*:\s*([^—\-\n]+)[—\-]\s*([^\n]+)/i);
+  if(m)typo.display={font:m[1].trim(),desc:m[2].trim()};
+  m=text.match(/Body\s*:\s*([^—\-\n]+)[—\-]\s*([^\n]+)/i);
+  if(m)typo.body={font:m[1].trim(),desc:m[2].trim()};
+  return typo;
+}
+function loadGoogleFont(family){
+  const clean=family.replace(/["'()]/g,'').trim();
+  const id='gf-'+clean.replace(/\s+/g,'-').toLowerCase();
+  if(document.getElementById(id))return;
+  const link=document.createElement('link');link.id=id;link.rel='stylesheet';
+  link.href=`https://fonts.googleapis.com/css2?family=${encodeURIComponent(clean).replace(/%20/g,'+')}:wght@300;400;700&display=swap`;
+  document.head.appendChild(link);
+}
+function populatePalette(pal){
+  const el=document.getElementById('palette-block');if(!el)return;
+  if(!pal.length){el.innerHTML='<div style="font-size:.62rem;color:var(--muted)">Palette unavailable — try regenerating.</div>';return;}
+  el.innerHTML=pal.map(p=>`
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;min-width:80px">
+      <div style="width:100%;height:64px;border:1px solid var(--border);background:${p.hex}"></div>
+      <div style="font-size:.58rem;color:var(--white);font-weight:700;text-transform:uppercase;letter-spacing:.06em">${p.role}</div>
+      <div style="font-size:.56rem;color:var(--muted);text-align:center">${p.name}</div>
+      <div style="font-size:.54rem;color:rgba(255,255,255,.3);font-family:monospace">${p.hex.toUpperCase()}</div>
+    </div>`).join('');
+}
+function populateTypography(typo){
+  const el=document.getElementById('typo-block');if(!el)return;
+  if(!typo.display&&!typo.body){el.innerHTML='<div style="font-size:.62rem;color:var(--muted)">Typography unavailable — try regenerating.</div>';return;}
+  let html='';
+  if(typo.display){
+    loadGoogleFont(typo.display.font);
+    html+=`<div style="margin-bottom:22px">
+      <div style="font-size:.56rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--scarlet);margin-bottom:8px">Display — ${typo.display.font}</div>
+      <div style="font-family:'${typo.display.font.replace(/["']/g,'')}',serif;font-size:2.1rem;color:var(--white);line-height:1.2">Aa Bb Cc</div>
+      <div style="font-size:.6rem;color:var(--muted);margin-top:8px">${typo.display.desc}</div>
+    </div>`;
+  }
+  if(typo.body){
+    loadGoogleFont(typo.body.font);
+    html+=`<div>
+      <div style="font-size:.56rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--scarlet);margin-bottom:8px">Body — ${typo.body.font}</div>
+      <div style="font-family:'${typo.body.font.replace(/["']/g,'')}',sans-serif;font-size:1.02rem;color:var(--white)">The quick brown fox jumps over the lazy dog.</div>
+      <div style="font-size:.6rem;color:var(--muted);margin-top:8px">${typo.body.desc}</div>
+    </div>`;
+  }
+  el.innerHTML=html;
 }
 
 // ══════════════════════════════════════════
@@ -2141,12 +2225,16 @@ async function runProposal(){
     setLoader(true,`Streaming from ${S.selectedModel}...`);
     document.getElementById('proposal-out').classList.add('on');
     const fullText=await streamFromBackend(enrichedVision);
-    // Parse scope from full text
+    // Parse scope, palette and typography from full text
     const scope=parseScope(fullText);
     populateScope(scope);
+    populatePalette(parsePalette(fullText));
+    populateTypography(parseTypography(fullText));
     // Show full text in claude-out (already streamed there)
     toast('Propuesta generada ✓','ok');
-    fetchImages(vision).then(imgs=>{if(imgs)renderImages(imgs);});
+    fetchImages(vision,'moodboard').then(imgs=>{if(imgs)renderImages(imgs,'leo-gallery');});
+    fetchImages(vision,'logo').then(imgs=>{if(imgs)renderImages(imgs,'logo-gallery');});
+    fetchImages(vision,'packaging').then(imgs=>{if(imgs)renderImages(imgs,'packaging-gallery');});
   }catch(e){
     toast(`Error: ${e.message.slice(0,55)}. Usando demo.`,'err');
     demoProposal();return;
