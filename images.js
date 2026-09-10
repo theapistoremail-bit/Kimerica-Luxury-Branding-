@@ -4,12 +4,31 @@
  * La LEONARDO_API_KEY vive solo en Vercel env vars.
  */
 
+// Prompt builder + generation params per section of the branding presentation.
+const CATEGORY_PRESETS = {
+  moodboard: {
+    build: (p) => `Luxury brand moodboard: ${p}. Dark editorial aesthetic, high contrast, minimal, premium, accent on black background`,
+    photoReal: false,
+    negative: 'low quality, blurry, amateur, watermark, text',
+  },
+  logo: {
+    build: (p) => `Minimalist luxury logo mark concept for a brand described as: ${p}. Vector-style emblem or monogram, centered composition, plain neutral background, elegant negative space, professional brand identity design sheet`,
+    photoReal: false,
+    negative: 'low quality, blurry, amateur, watermark, photo, realistic photograph, clutter',
+  },
+  packaging: {
+    build: (p) => `Premium product packaging mockup for a luxury brand described as: ${p}. Elegant box, bottle or bag design, studio lighting, minimalist backdrop, high-end commercial product photography`,
+    photoReal: true,
+    negative: 'low quality, blurry, amateur, watermark, text errors, distorted shape',
+  },
+};
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { prompt, count = 4, width = 512, height = 512 } = req.body;
+  const { prompt, count = 4, width = 512, height = 512, category = 'moodboard' } = req.body;
 
   const key = process.env.LEONARDO;
   if (!key) {
@@ -20,6 +39,9 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Prompt is required' });
   }
 
+  const preset = CATEGORY_PRESETS[category] || CATEGORY_PRESETS.moodboard;
+  const finalPrompt = preset.build(prompt);
+
   try {
     // 1. Create generation
     const genRes = await fetch('https://cloud.leonardo.ai/api/rest/v1/generations', {
@@ -29,14 +51,14 @@ export default async function handler(req, res) {
         'Authorization': `Bearer ${key}`,
       },
       body: JSON.stringify({
-        prompt,
+        prompt: finalPrompt,
         modelId: 'b24e16ff-06e3-43eb-8d33-4416c2d75876', // Leonardo Phoenix
         width,
         height,
         num_images: Math.min(count, 4),
         guidance_scale: 7,
-        negative_prompt: 'low quality, blurry, amateur, watermark, text',
-        photoReal: false,
+        negative_prompt: preset.negative,
+        photoReal: preset.photoReal,
         alchemy: true,
       }),
     });
