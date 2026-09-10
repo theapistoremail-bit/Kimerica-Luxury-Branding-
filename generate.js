@@ -1,222 +1,206 @@
 /**
- * POST /api/download-package
- * Genera y devuelve el ZIP del proyecto completo.
- * Body: { proposal, selections, model }
+ * POST /api/generate
+ * Genera el AI creative proposal usando Claude con streaming SSE.
+ * Las API keys NUNCA llegan al cliente — solo viven en Vercel env vars.
  */
 
-export default async function handler(req, res) {
+export const config = {
+  runtime: 'edge', // Edge runtime para streaming real
+};
+
+const MODEL_MAP = {
+  'claude-opus-4-6':          'claude-opus-4-6',
+  'claude-sonnet-4-6':        'claude-sonnet-4-6',
+  'claude-haiku-4-5-20251001':'claude-haiku-4-5-20251001',
+  'gpt-4o':                   'gpt-4o',
+  'gpt-4o-mini':              'gpt-4o-mini',
+  'deepseek-chat':            'deepseek-chat',
+};
+
+const PROVIDER = (model) => {
+  if (model.startsWith('claude'))    return 'anthropic';
+  if (model.startsWith('gpt'))       return 'openai';
+  if (model.startsWith('deepseek'))  return 'deepseek';
+  return 'anthropic';
+};
+
+export default async function handler(req) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 });
   }
 
-  const { proposal = {}, selections = {}, model = 'claude-sonnet-4-6' } = req.body;
-  const today = new Date().toLocaleDateString('en-US', {
-    year: 'numeric', month: 'long', day: 'numeric',
-  });
+  const { vision, selections = {}, model = 'claude-sonnet-4-6' } = await req.json();
 
-  const files = {
-    'KIMERICA_Creative_Brief.md': buildBrief(proposal, today, model),
-    'Brand_Guidelines.md':        buildGuidelines(selections, today),
-    'Scope_Timeline.md':          buildScope(proposal, today),
-    'Moodboard_Notes.md':         buildMoodboard(today),
-    'Project_Config.json':        JSON.stringify({ project: { generated: today, model, studio: 'KIMERICA' }, selections, scope: proposal, status: 'proposal_delivered' }, null, 2),
-    'README.md':                  buildReadme(today),
+  if (!vision?.trim()) {
+    return new Response(JSON.stringify({ error: 'Vision is required' }), { status: 400 });
+  }
+
+  const provider = PROVIDER(model);
+
+  const systemPrompt = `You are KIMERICA's lead creative director — a world-class luxury branding strategist with 20 years shaping the visual identity of iconic global brands. Write a complete AI creative proposal covering strategy, color, typography and cost. Be poetic, authoritative, and precise. Use high-concept language appropriate for luxury branding.
+
+Structure your response EXACTLY like this, keeping every header on its own line and every field on its own line so it can be parsed programmatically:
+
+[CREATIVE DIRECTION]
+Write 3 powerful paragraphs of creative direction. Each paragraph should be distinct and commanding.
+
+[COLOR PALETTE]
+Primary: #HEXCODE — one or two word color name
+Secondary: #HEXCODE — one or two word color name
+Accent: #HEXCODE — one or two word color name
+Neutral Dark: #HEXCODE — one or two word color name
+Neutral Light: #HEXCODE — one or two word color name
+
+[TYPOGRAPHY]
+Display: Font Name (a real Google Fonts family) — one short sentence on why it fits
+Body: Font Name (a real Google Fonts family) — one short sentence on why it fits
+
+[SCOPE]
+Creative Direction & Strategy: $X,XXX
+Visual Identity System: $X,XXX
+Digital Experience Design: $X,XXX
+3D / AI-Driven Elements: $X,XXX
+Timeline: X–X weeks
+Total: $XX,XXX`;
+
+  const objMap = {
+    authority: 'Brand Authority System',
+    identity:  'Visual Identity System',
+    immersive: 'Immersive 3D Experience',
+    product:   'Product Launch System',
+  };
+  const visMap = {
+    minimal:    'Minimal & Refined',
+    bold:       'Bold & High Contrast',
+    editorial:  'Editorial & Elegant',
+    futuristic: 'Futuristic',
+    abstract:   'Conceptual / Abstract',
+    luxury:     'Luxury Black',
   };
 
+  const userMsg = `Project vision: ${vision}
+Objective: ${objMap[selections.obj] || 'Brand Authority'}
+Visual direction: ${visMap[selections.vis] || 'Luxury Black'}
+Budget range: ${selections.bud || 'Open'}
+
+Generate a powerful creative direction proposal and realistic project scope.`;
+
   try {
-    const zipBuffer = buildZip(files);
-    res.setHeader('Content-Type', 'application/zip');
-    res.setHeader('Content-Disposition', 'attachment; filename="KIMERICA_Project_Package.zip"');
-    res.setHeader('Content-Length', zipBuffer.length);
-    return res.status(200).send(Buffer.from(zipBuffer));
-  } catch (err) {
-    console.error('[/api/download-package]', err.message);
-    return res.status(500).json({ error: err.message });
-  }
-}
+    // ─── ANTHROPIC (Claude) ─────────────────────────────────────
+    if (provider === 'anthropic') {
+      const key = process.env.CLAUDEAPIKEY;
+      if (!key) throw new Error('ANTHROPIC_API_KEY not configured');
 
-// ── File builders ────────────────────────────────────────────────
+      const upstream = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: MODEL_MAP[model] || 'claude-sonnet-4-6',
+          max_tokens: 1800,
+          stream: true,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userMsg }],
+        }),
+      });
 
-function buildBrief(sc, today, model) {
-  return `# KIMERICA — AI Creative Brief
-**Generated:** ${today}
-**Model:** ${model}
+      if (!upstream.ok) {
+        const err = await upstream.json().catch(() => ({}));
+        throw new Error(err.error?.message || `Anthropic ${upstream.status}`);
+      }
 
----
-
-## Creative Direction
-
-${sc.proposalText || 'Creative direction will be populated from AI generation.'}
-
----
-
-## Project Scope
-
-| Deliverable | Investment |
-|---|---|
-| Creative Direction & Strategy | ${sc.sc1 || '$2,800'} |
-| Visual Identity System | ${sc.sc2 || '$4,200'} |
-| Digital Experience Design | ${sc.sc3 || '$5,500'} |
-| 3D / AI-Driven Elements | ${sc.sc4 || '$3,800'} |
-
-**Total Investment:** ${sc.total || '$16,300'}
-**Timeline:** ${sc.time || '8–10 weeks'}
-`;
-}
-
-function buildGuidelines(sel, today) {
-  return `# Brand Guidelines — Draft
-**Studio:** KIMERICA · **Generated:** ${today}
-
-## Visual Direction
-${sel.vis || 'Luxury Black'}
-
-## Primary Objective
-${sel.obj || 'Brand Authority'}
-
-## Typography
-Primary: Cormorant Garamond (Display)
-Secondary: Syne (Body + UI)
-
-## Color Palette
-- Primary Black: #060608
-- Surface: #0d0d10
-- Accent Red: #FF1A1A
-- White: #f8f6f2
-
-## Motion Principles
-- Reveal, don't decorate
-- Scroll-driven storytelling
-- Minimum 800ms transitions
-- Easing: cubic-bezier(.4,0,.2,1)
-`;
-}
-
-function buildScope(sc, today) {
-  return `# Project Scope & Timeline
-**Generated:** ${today}
-
-## Deliverables & Investment
-
-| Phase | Deliverable | Investment |
-|---|---|---|
-| 01 | Creative Direction & Strategy | ${sc.sc1 || '$2,800'} |
-| 02 | Visual Identity System | ${sc.sc2 || '$4,200'} |
-| 03 | Digital Experience Design | ${sc.sc3 || '$5,500'} |
-| 04 | 3D / AI-Driven Elements | ${sc.sc4 || '$3,800'} |
-
-## Total
-**${sc.total || '$16,300'}**
-
-## Timeline
-**${sc.time || '8–10 weeks'}**
-
-## Payment Schedule
-- 50% upon project confirmation
-- 25% upon design approval (Phase 2)
-- 25% upon delivery
-`;
-}
-
-function buildMoodboard(today) {
-  return `# Moodboard — Visual References
-**Generated:** ${today}
-
-## Concept Directions
-
-1. **3D Brand Object** — Dark editorial, high contrast metallic form
-2. **Code Architecture** — Digital infrastructure, terminal aesthetic
-3. **Identity System** — Typography-led luxury composition
-4. **Digital Presence** — Immersive particle environment
-5. **System Architecture** — Data grid visualization
-6. **Motion Language** — Waveform animation guide
-
-High-resolution AI-generated assets (Leonardo AI) delivered in Phase 2.
-`;
-}
-
-function buildReadme(today) {
-  return `# KIMERICA Project Package
-
-## Contents
-- \`KIMERICA_Creative_Brief.md\` — Full AI-generated creative direction
-- \`Brand_Guidelines.md\` — Typography, color, and motion principles
-- \`Scope_Timeline.md\` — Full project breakdown & payment schedule
-- \`Moodboard_Notes.md\` — Visual reference guide
-- \`Project_Config.json\` — Full project configuration and metadata
-- \`README.md\` — This file
-
-## Next Steps
-1. Review the creative brief
-2. Approve or request revision via your client dashboard
-3. Creative team begins Phase 2 within 48 hours
-4. Direct contact from studio: 48–72 hours
-
----
-Generated by KIMERICA AI Pipeline · ${today}
-studio@kimerica.com
-`;
-}
-
-// ── Minimal ZIP builder (no external deps) ──────────────────────
-
-function buildZip(files) {
-  const enc = new TextEncoder();
-  const entries = [];
-  let offset = 0;
-
-  function crc32(buf) {
-    const table = [];
-    for (let i = 0; i < 256; i++) {
-      let c = i;
-      for (let j = 0; j < 8; j++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1;
-      table[i] = c;
+      // Proxy the SSE stream directly to the client
+      return new Response(upstream.body, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'X-Provider': 'anthropic',
+        },
+      });
     }
-    let crc = 0xFFFFFFFF;
-    for (let i = 0; i < buf.length; i++) crc = table[(crc ^ buf[i]) & 0xFF] ^ (crc >>> 8);
-    return (crc ^ 0xFFFFFFFF) >>> 0;
-  }
-  function u16(v) { const b = new Uint8Array(2); new DataView(b.buffer).setUint16(0, v, true); return b; }
-  function u32(v) { const b = new Uint8Array(4); new DataView(b.buffer).setUint32(0, v, true); return b; }
-  function concat(...arrays) {
-    const tot = arrays.reduce((s, a) => s + a.length, 0);
-    const out = new Uint8Array(tot);
-    let p = 0;
-    arrays.forEach(a => { out.set(a, p); p += a.length; });
-    return out;
-  }
 
-  for (const [name, content] of Object.entries(files)) {
-    const fileData = enc.encode(content);
-    const nameBytes = enc.encode(name);
-    const crc = crc32(fileData);
-    const localHeader = concat(
-      new Uint8Array([0x50, 0x4B, 0x03, 0x04]),
-      u16(20), u16(0), u16(0), u16(0), u16(0),
-      u32(crc), u32(fileData.length), u32(fileData.length),
-      u16(nameBytes.length), u16(0), nameBytes
+    // ─── OPENAI (GPT-4o) ─────────────────────────────────────────
+    if (provider === 'openai') {
+      const key = process.env.OPENAPIKEY;
+      if (!key) throw new Error('OPENAI_API_KEY not configured');
+
+      const upstream = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${key}`,
+        },
+        body: JSON.stringify({
+          model: MODEL_MAP[model] || 'gpt-4o',
+          max_tokens: 1800,
+          stream: true,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user',   content: userMsg },
+          ],
+        }),
+      });
+
+      if (!upstream.ok) {
+        const err = await upstream.json().catch(() => ({}));
+        throw new Error(err.error?.message || `OpenAI ${upstream.status}`);
+      }
+
+      return new Response(upstream.body, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'X-Provider': 'openai',
+        },
+      });
+    }
+
+    // ─── DEEPSEEK ─────────────────────────────────────────────────
+    if (provider === 'deepseek') {
+      const key = process.env.DEEPSEAK;
+      if (!key) throw new Error('DEEPSEEK_API_KEY not configured');
+
+      const upstream = await fetch('https://api.deepseek.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${key}`,
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          max_tokens: 1800,
+          stream: true,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user',   content: userMsg },
+          ],
+        }),
+      });
+
+      if (!upstream.ok) {
+        const err = await upstream.json().catch(() => ({}));
+        throw new Error(err.error?.message || `DeepSeek ${upstream.status}`);
+      }
+
+      return new Response(upstream.body, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'X-Provider': 'deepseek',
+        },
+      });
+    }
+
+    throw new Error('Unknown provider');
+
+  } catch (err) {
+    console.error('[/api/generate]', err.message);
+    return new Response(
+      JSON.stringify({ error: err.message }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
-    entries.push({ nameBytes, fileData, crc, localOffset: offset, localHeader });
-    offset += localHeader.length + fileData.length;
   }
-
-  const cdEntries = entries.map(e => concat(
-    new Uint8Array([0x50, 0x4B, 0x01, 0x02]),
-    u16(20), u16(20), u16(0), u16(0), u16(0), u16(0),
-    u32(e.crc), u32(e.fileData.length), u32(e.fileData.length),
-    u16(e.nameBytes.length), u16(0), u16(0), u16(0), u16(0), u32(0),
-    u32(e.localOffset), e.nameBytes
-  ));
-
-  const cdData = concat(...cdEntries);
-  const eocd = concat(
-    new Uint8Array([0x50, 0x4B, 0x05, 0x06]),
-    u16(0), u16(0),
-    u16(entries.length), u16(entries.length),
-    u32(cdData.length), u32(offset), u16(0)
-  );
-
-  const parts = [];
-  for (const e of entries) { parts.push(e.localHeader); parts.push(e.fileData); }
-  return concat(...parts, cdData, eocd);
 }
